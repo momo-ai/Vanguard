@@ -3,13 +3,21 @@
 //
 
 #include "IntraproceduralExample.h"
+#include "ModPrint.h"
 
-IntraproceduralExample::IntraproceduralExample() : IntraproceduralVanguard(ID) {
+namespace IntraExample {
+    IntraproceduralExample::IntraproceduralExample() : IntraproceduralVanguard(ID) {
+        printer = new ModPrint();
+        Vanguard::registerAnalysis(printer);
+    }
+
+    IntraproceduralExample::~IntraproceduralExample() {
+        delete printer;
+    }
+
+    char IntraproceduralExample::ID = 0;
+    static RegisterPass<IntraproceduralExample> X("intra-example", "Intraprocedural Example",
+                                                  true /* Only looks at CFG */,
+                                                  true /* Analysis Pass */);
 
 }
-
-
-char IntraproceduralExample::ID = 0;
-static RegisterPass<IntraproceduralExample> X("intra-example", "Intraprocedural Example",
-                             true /* Only looks at CFG */,
-                             true /* Analysis Pass */);

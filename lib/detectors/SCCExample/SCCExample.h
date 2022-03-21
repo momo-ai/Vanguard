@@ -11,11 +11,16 @@
 
 using namespace vanguard;
 
-namespace {
+#include "ModPrint.h"
+
+namespace sccexample {
     class SCCExample : public SCCVanguard{
     public:
         static char ID;
         SCCExample();
+        ~SCCExample();
+    private:
+        ModPrint *printer;
     };
 }
 

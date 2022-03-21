@@ -5,5 +5,4 @@
 #include "TaintAnalysis.h"
 
 namespace vanguard {
-    void TaintAnalysis::init() {}
 }

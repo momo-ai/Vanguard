@@ -12,8 +12,8 @@
 namespace vanguard {
     class SCCVanguard : public CallGraphSCCPass, public Vanguard {
     public:
-        SCCVanguard(char &ID) : CallGraphSCCPass(ID) {}
-        virtual bool runOnSCC(CallGraphSCC &SCC) override;
+        explicit SCCVanguard(char &ID) : CallGraphSCCPass(ID) {}
+        bool runOnSCC(CallGraphSCC &SCC) override;
     };
 }
 

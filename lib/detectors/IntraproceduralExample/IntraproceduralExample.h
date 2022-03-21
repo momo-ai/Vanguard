@@ -6,14 +6,18 @@
 #define VANGUARD_INTRAPROCEDURALEXAMPLE_H
 
 #include "../../IntraproceduralVanguard.h"
+#include "ModPrint.h"
 
 using namespace vanguard;
 
-namespace {
+namespace IntraExample {
     class IntraproceduralExample : public IntraproceduralVanguard {
     public:
         static char ID;
         IntraproceduralExample();
+        ~IntraproceduralExample();
+    private:
+        ModPrint *printer;
     };
 }
 

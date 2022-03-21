@@ -14,11 +14,13 @@ using namespace llvm;
 namespace vanguard {
     class Analysis {
     public:
-        virtual void init() = 0;
-        virtual bool shouldAnalyze(Function &fn) = 0;
-        virtual bool transfer(Instruction &ins) = 0;
-        virtual bool isVulnerable() = 0;
-        virtual string getVulnerability() = 0;
+        //virtual void init() = 0;
+        virtual bool shouldAnalyze(const Function &fn) = 0;
+        virtual bool beginFn(const Function &fn) = 0;
+        virtual bool transfer(const Instruction &ins) = 0;
+        virtual bool endFn(const Function &fn) = 0;
+        //virtual bool isVulnerable() = 0;
+        virtual string vulnerabilityReport() = 0;
     };
 }
 

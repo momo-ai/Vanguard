@@ -12,8 +12,8 @@
 namespace vanguard {
     class LocalVanguard : public FunctionPass, public Vanguard {
     public:
-        LocalVanguard(char &ID) : FunctionPass(ID) {}
-        virtual bool runOnFunction(Function &F) override;
+        explicit LocalVanguard(char &ID) : FunctionPass(ID) {}
+        bool runOnFunction(Function &F) override;
     };
 }
 

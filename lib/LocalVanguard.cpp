@@ -6,7 +6,9 @@
 
 
 namespace vanguard {
-    bool LocalVanguard::runOnFunction(Function &F) {
+    bool LocalVanguard::runOnFunction(Function &fn) {
+        runToFixedpoint(fn);
         return false;
     }
+
 }

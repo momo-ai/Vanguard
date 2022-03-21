@@ -13,7 +13,6 @@
 namespace vanguard {
     class TaintAnalysis : public Analysis {
     public:
-        virtual void init() override;
         /*virtual bool shouldAnalyze(Function &fn) override;
         virtual bool transfer(Instruction &ins) override;
         virtual bool isVulnerable() override;*/

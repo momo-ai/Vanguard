@@ -4,9 +4,18 @@
 
 #include "SCCExample.h"
 
-SCCExample::SCCExample() : SCCVanguard(ID) {}
+namespace sccexample {
+    SCCExample::SCCExample() : SCCVanguard(ID) {
+        printer = new ModPrint();
+        Vanguard::registerAnalysis(printer);
+    }
 
-char SCCExample::ID = 0;
-static RegisterPass<SCCExample> X("scc-example", "SCC Example",
+    SCCExample::~SCCExample() {
+        delete printer;
+    }
+}
+
+char sccexample::SCCExample::ID = 0;
+static RegisterPass<sccexample::SCCExample> X("scc-example", "SCC Example",
                                               true /* Only looks at CFG */,
                                               true /* Analysis Pass */);

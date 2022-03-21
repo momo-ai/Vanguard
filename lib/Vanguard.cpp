@@ -3,9 +3,73 @@
 //
 
 #include "Vanguard.h"
+#include "llvm/Analysis/CFG.h"
+#include "llvm/IR/CFG.h"
+
+#include <list>
 
 namespace vanguard {
     void Vanguard::registerAnalysis(Analysis *a) {
         analysis = a;
+    }
+
+    vector<const BasicBlock *> *Vanguard::reachableBlks(const BasicBlock &blk, unordered_set<const BasicBlock *> *exclude) {
+        auto reachable = new vector<const BasicBlock *>();
+        list<const BasicBlock *> wl;
+        unordered_set<const BasicBlock *> seen;
+
+        wl.push_back(&blk);
+        while(!wl.empty()) {
+            const BasicBlock *curBlk = wl.front();
+            wl.pop_front();
+
+            for(const BasicBlock *succBlk : successors(curBlk)) {
+                if(seen.find(succBlk) == seen.end()) {
+                    seen.insert(succBlk);
+                    wl.push_back(succBlk);
+                    if(exclude == nullptr || exclude->find(succBlk) == exclude->end()) {
+                        reachable->push_back(succBlk);
+                    }
+                }
+            }
+        }
+
+        return reachable;
+    }
+
+    bool Vanguard::runToFixedpoint(const Function &fn) {
+        if(!analysis->shouldAnalyze(fn)) {
+            return false;
+        }
+
+        bool modified = false;
+        modified = analysis->beginFn(fn) || modified;
+
+        unordered_set<const BasicBlock *> wlContents;
+        list<const BasicBlock *> bbWorklist;
+        for(const BasicBlock &bb : fn) {
+            wlContents.insert(&bb);
+            bbWorklist.insert(bbWorklist.end(), &bb);
+        }
+
+        while(!bbWorklist.empty()) {
+            const BasicBlock *blk = bbWorklist.front();
+            bbWorklist.pop_front();
+            wlContents.erase(blk);
+
+            for(const Instruction &ins : *blk) {
+                if(analysis->transfer(ins)) {
+                    modified = true;
+                    vector<const BasicBlock *> *reachable = reachableBlks(*blk, &wlContents);
+                    bbWorklist.insert(bbWorklist.begin(), reachable->begin(), reachable->end());
+                    wlContents.insert(reachable->begin(), reachable->end());
+                    delete reachable;
+                }
+            }
+        }
+
+        modified = analysis->endFn(fn) || modified;
+
+        return modified;
     }
 }
