@@ -14,7 +14,6 @@ namespace Reentrancy {
     }
 
     bool ReentrancyAnalysis::beginFn(const Function &fn) {
-        cout << fn.getName().str() << endl;
         lastExternalCall = NULL;
         currFn = &fn;
         return false;
@@ -26,7 +25,7 @@ namespace Reentrancy {
             if (isExternal(*called_func)) {
                 lastExternalCall = called_func;
             }
-        } else if (auto StorInstr = dyn_cast<StoreInst>(&ins)) {
+        } else if (auto StoreInstr = dyn_cast<StoreInst>(&ins)) {
             if (lastExternalCall) {
                 potentialReentrancies.push_back(make_tuple(currFn->getName().str(),lastExternalCall->getName().str()));
             }
@@ -44,7 +43,7 @@ namespace Reentrancy {
         for(tuple<string,string> tup : potentialReentrancies) {
             report += "Function '" + get<0>(tup) + "' has potential reentrancy after call to '" + get<1>(tup) + "'\n";
         }
-        report += "--------\n";
+        report += "--------\nDone!";
         return report;
     }
 }

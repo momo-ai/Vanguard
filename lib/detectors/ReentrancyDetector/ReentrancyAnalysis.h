@@ -20,7 +20,6 @@ namespace Reentrancy {
     private:
         const Function *currFn; // Tracks current function being analyzed
         const Function *lastExternalCall = NULL; // Tracks last external call
-//        vector<tuple<int*,int*>> potentialReentrancies; // Tracks potential reentrant funcs and external call
         vector<tuple<string,string>> potentialReentrancies; // Tracks potential reentrant funcs and external call
         bool isExternal(const Function &fn) {
             return true;
