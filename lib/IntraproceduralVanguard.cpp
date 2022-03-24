@@ -32,7 +32,9 @@ namespace vanguard {
             bool modified = runToFixedpoint(*curFn);
 
             if(modified) {
-                fnWorklist.insert(fns.begin(), fns.end());
+                for(const Function &f : m) {
+                    fnWorklist.insert(&f);
+                }
             }
         }
 
