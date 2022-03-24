@@ -18,9 +18,11 @@ namespace Reentrancy {
         bool endFn(const Function &fn) override;
         string vulnerabilityReport() override;
     private:
-        const Function *currFn; // Tracks current function being analyzed
         const Function *lastExternalCall = NULL; // Tracks last external call
-        vector<tuple<string,string>> potentialReentrancies; // Tracks potential reentrant funcs and external call
+        string fname; // Current function name
+        map<string,string> potentialReentrancies; // Tracks potential reentrant funcs and external call
+        map<string,tuple<bool,bool>> fnInfo; // Tracks for each func if it (1) has extern call or (2) has store
+        bool modified; // Tracks if current function being analyzed has been updated in fnInfo on this pass
         bool isExternal(const Function &fn) {
             return true;
         }
