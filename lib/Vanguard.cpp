@@ -5,12 +5,27 @@
 #include "Vanguard.h"
 #include "llvm/Analysis/CFG.h"
 #include "llvm/IR/CFG.h"
-
+#include "llvm/Support/CommandLine.h"
 #include <list>
+#include <stdexcept>
+#include <SummaryReader.h>
 
 namespace vanguard {
+    cl::opt<string> inputSummary("summary", cl::desc("Input Smart Contract Summary"), cl::value_desc("filename"));
     void Vanguard::registerAnalysis(Analysis *a) {
         analysis = a;
+    }
+
+    const blockchain::Blockchain *Vanguard::blockchain() {
+        if(chain == nullptr) {
+            if(inputSummary.empty()) {
+                throw runtime_error("A summary must be provided using --summary=filename");
+            }
+            blockchain::SummaryReader reader(inputSummary);
+            chain = reader.blockchain();
+        }
+
+        return chain;
     }
 
     vector<const BasicBlock *> *Vanguard::reachableBlks(const BasicBlock &blk, unordered_set<const BasicBlock *> *exclude) {
