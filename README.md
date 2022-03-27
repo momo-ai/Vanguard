@@ -22,10 +22,12 @@ make
 
 ## Usage
 ```bash
-opt --load=build/lib/libVanguard.dylib -enable-new-pm=0 <passes> --summary=<summary> <llvm bytecode> -o /dev/null
+opt --load=build/lib/libVanguard.dylib -enable-new-pm=0 <detectors> --summary=<summary> <llvm bytecode> -o /dev/null
 ```
 
-### Passes
+### Detectors
+Below is a list of detectors that are available on Vanguard. Note, to run them merely prepend '--' to their name.
+
 | Name          | Description                                     |
 | ------------- | ----------------------------------------------- |
 | intra-example | Prints out all of the functions in the bc file  |
