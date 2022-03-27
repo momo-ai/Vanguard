@@ -5,7 +5,7 @@ detecting common vulnerabilities in any smart contract language that can be comp
 ## Dependencies
  * LLVM 13
  * Z3
- * libBlockchain
+ * [libBlockchain](https://github.com/Veridise/libBlockchain)
  * CMake
 
 ## Build
