@@ -26,3 +26,7 @@ opt --load=build/lib/libVanguard.dylib -enable-new-pm=0 <passes> --summary=<summ
 ```
 
 ### Passes
+| Name          | Description                                     |
+| ------------- | ----------------------------------------------- |
+| intra-example | Prints out all of the functions in the bc file  |
+
