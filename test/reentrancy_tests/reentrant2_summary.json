@@ -1,0 +1,63 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "name": "deposit"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "name": "withdraw"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "name": "clearBalance"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint"
+              }
+            }
+          ],
+          "modifiers": [],
+          "name": "getBalance"
+        }
+      ],
+      "variables": [
+        {
+          "name": "balances",
+          "type": {
+            "subType": "MapType",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint"
+            }
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 76,
+      "name": "reentrant2"
+    }
+  ],
+  "version": "^0.8.10",
+  "compiler": "Solang"
+}

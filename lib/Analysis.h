@@ -7,6 +7,7 @@
 
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instruction.h"
+#include <SummaryReader.h>
 
 using namespace std;
 using namespace llvm;

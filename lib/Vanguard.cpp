@@ -19,6 +19,7 @@ namespace vanguard {
     const blockchain::Blockchain *Vanguard::blockchain() {
         if(chain == nullptr) {
             if(inputSummary.empty()) {
+                // TODO: This check doesn't seem to work2
                 throw runtime_error("A summary must be provided using --summary=filename");
             }
             blockchain::SummaryReader reader(inputSummary);
