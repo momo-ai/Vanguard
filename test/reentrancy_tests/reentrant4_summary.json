@@ -8,18 +8,21 @@
           "params": [],
           "returns": [],
           "modifiers": [],
+          "isConstructor": false,
           "name": "deposit"
         },
         {
           "params": [],
           "returns": [],
           "modifiers": [],
+          "isConstructor": false,
           "name": "withdraw"
         },
         {
           "params": [],
           "returns": [],
           "modifiers": [],
+          "isConstructor": false,
           "name": "clearBalance"
         },
         {
@@ -34,6 +37,7 @@
           ],
           "returns": [],
           "modifiers": [],
+          "isConstructor": false,
           "name": "sendThaMoney"
         },
         {
@@ -47,6 +51,7 @@
             }
           ],
           "modifiers": [],
+          "isConstructor": false,
           "name": "getBalance"
         }
       ],
@@ -55,6 +60,7 @@
           "name": "balances",
           "type": {
             "subType": "MapType",
+            "name": "mapping(address => uint256)",
             "key": {
               "subType": "ElementaryType",
               "name": "address"
