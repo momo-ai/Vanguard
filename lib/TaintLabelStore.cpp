@@ -6,6 +6,15 @@
 #include "TaintLabel.h"
 
 namespace vanguard {
+    TaintLabelStore::~TaintLabelStore() {
+        for(auto entry : idToLabel) {
+            delete entry.second;
+        }
+
+        idToLabel.clear();
+        maskToLabel.clear();
+    }
+
     TaintLabel *TaintLabelStore::newLabel() {
         auto l = new TaintLabel(nextLabel++);
         maskToLabel[l->taintMask()] = l;

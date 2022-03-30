@@ -15,6 +15,7 @@ namespace vanguard {
     class TaintLabelStore {
     public:
         TaintLabelStore() = default;
+        ~TaintLabelStore();
         TaintLabel *newLabel();
         TaintLabel *getLabelFromMask(uint64_t mask) const;
         TaintLabel *getLabelFromId(uint id) const;

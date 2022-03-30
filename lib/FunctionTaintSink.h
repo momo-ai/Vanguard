@@ -11,10 +11,13 @@
 #include "Val.h"
 
 namespace vanguard {
-    class FunctionTaintSink : TaintSink {
+    /*
+     * Check associated function summary to see if appropriate location is tainted
+     */
+    class FunctionTaintSink : public TaintSink {
     public:
         virtual bool isSink(const llvm::Function &fn) = 0;
-        virtual std::vector<Val> sinkValues() = 0;
+        virtual std::vector<Val *> sinkValues(const llvm::Function &fn) = 0;
     private:
     };
 }

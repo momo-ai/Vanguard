@@ -16,6 +16,7 @@ namespace vanguard {
 
     class Val {
     public:
+        virtual ~Val() = default;
         virtual ValType type() const = 0;
         static std::unordered_set<Val *> functionOutputs(llvm::Function &fn);
     };

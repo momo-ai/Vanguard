@@ -34,14 +34,14 @@ namespace vanguard {
         bool untaint(const Val &v);
         std::vector<TaintLabel *> taintedWith(const Val &v) const;
 
-        static bool propagate(const Taint &from, const std::vector<Val> &uses, Taint &to, const std::vector<Val> &tgts);
+        static bool propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts);
         static bool merge(const std::vector<Taint *> &from, Taint &to);
     private:
         std::unordered_map<RegisterVal, uint64_t> &regTaint;
         TaintLabelStore &labelStore;
 
         uint64_t getTaint(const Val &v) const;
-        uint64_t accumulate(const std::vector<Val> &vals) const;
+        uint64_t accumulate(const std::vector<Val *> &vals) const;
         bool setTaint(const Val &v, uint64_t mask);
         bool addTaint(const Val &v, uint64_t mask);
         bool untaint(const Val &v, uint64_t mask);

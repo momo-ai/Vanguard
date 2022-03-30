@@ -10,11 +10,15 @@
 #include "Val.h"
 
 namespace vanguard {
-    class FunctionTaintSource : TaintSource {
+    /*
+     * Create initial taint summary based off this information
+     */
+    class FunctionTaintSource : public TaintSource {
     public:
         virtual bool isSource(const llvm::Function &fn) = 0;
-        virtual std::vector<Val> sourceValues() = 0;
+        virtual std::vector<Val *> sourceValues(const llvm::Function &fn) = 0;
     private:
+
     };
 }
 

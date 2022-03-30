@@ -10,10 +10,10 @@ namespace vanguard {
     /*
      * Private helpers
      */
-    uint64_t Taint::accumulate(const std::vector<Val> &from) const {
+    uint64_t Taint::accumulate(const std::vector<Val *> &from) const {
         uint64_t accTaint = 0;
         for(auto &v : from) {
-            accTaint = accTaint | getTaint(v);
+            accTaint = accTaint | getTaint(*v);
         }
 
         return accTaint;
@@ -115,12 +115,12 @@ namespace vanguard {
         return taintLabels;
     }
 
-    bool Taint::propagate(const Taint &from, const std::vector<Val> &uses, Taint &to, const std::vector<Val> &tgts) {
+    bool Taint::propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts) {
         uint64_t taint = from.accumulate(uses);
         bool modified = false;
 
-        for(auto &v : tgts) {
-            modified = to.setTaint(v, taint) || modified;
+        for(auto v : tgts) {
+            modified = to.setTaint(*v, taint) || modified;
         }
 
         return modified;

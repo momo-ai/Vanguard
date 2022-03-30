@@ -6,24 +6,21 @@
 
 namespace vanguard {
 
-    Instruction *prevIns(Instruction &ins) {
-        return ins.getPrevNode();
+    TaintAnalysis::TaintAnalysis(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources) : store(sinks, sources) {
+
+    }
+
+    bool TaintAnalysis::beginFn(const Function &fn) {
+        curSummary = store.getSummary(fn);
+        return false;
     }
 
     bool TaintAnalysis::transfer(const Instruction &ins) {
-       /* vector<Val> reads = rwInfo.reads(ins);
-        vector<Val> writes = rwInfo.writes(ins);
-        Instruction *prev = prevIns(ins);
-
-        return test;*/
-       return false;
+       return curSummary->propagate(ins);
     }
 
-    void TaintAnalysis::registerSource(FunctionTaintSource &src) {
-        fnSources.push_back(&src);
-    }
-
-    void TaintAnalysis::registerSink(FunctionTaintSink &sink) {
-        fnSinks.push_back(&sink);
+    bool TaintAnalysis::endFn(const Function &fn) {
+        curSummary = nullptr;
+        return false;
     }
 }
