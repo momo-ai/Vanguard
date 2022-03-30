@@ -7,7 +7,8 @@
 
 namespace Reentrancy {
     ReentrancyDetector::ReentrancyDetector() : IntraproceduralVanguard(ID) {
-        analyzer = new ReentrancyAnalysis();
+        const blockchain::Blockchain *chain = blockchain();
+        analyzer = new ReentrancyAnalysis(chain);
         Vanguard::registerAnalysis(analyzer);
     }
 

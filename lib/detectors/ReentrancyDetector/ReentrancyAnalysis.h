@@ -12,6 +12,7 @@ using namespace vanguard;
 namespace Reentrancy {
     class ReentrancyAnalysis : public Analysis {
     public:
+        ReentrancyAnalysis(const blockchain::Blockchain *in_chain);
         bool shouldAnalyze(const Function &fn) override;
         bool beginFn(const Function &fn) override;
         bool transfer(const Instruction &ins) override;
@@ -26,6 +27,7 @@ namespace Reentrancy {
         bool isExternal(const Function &fn) {
             return true;
         }
+        const blockchain::Blockchain *chain;
     };
 }
 

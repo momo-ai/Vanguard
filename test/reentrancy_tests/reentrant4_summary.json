@@ -1,0 +1,83 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "deposit"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "withdraw"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "clearBalance"
+        },
+        {
+          "params": [
+            {
+              "name": "bal",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "sendThaMoney"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "getBalance"
+        }
+      ],
+      "variables": [
+        {
+          "name": "balances",
+          "type": {
+            "subType": "MapType",
+            "name": "mapping(address => uint256)",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint"
+            }
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 86,
+      "name": "reentrant4"
+    }
+  ],
+  "version": "^0.8.10",
+  "compiler": "Solang"
+}

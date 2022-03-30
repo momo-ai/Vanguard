@@ -9,8 +9,13 @@
 using namespace std;
 
 namespace Reentrancy {
+    ReentrancyAnalysis::ReentrancyAnalysis(const blockchain::Blockchain *in_chain) : Analysis() {
+        chain = in_chain;
+    }
+
     bool ReentrancyAnalysis::shouldAnalyze(const Function &fn) {
-        return true;
+        return chain->isContractFunction(fn);
+//        return true;
     }
 
     bool ReentrancyAnalysis::beginFn(const Function &fn) {

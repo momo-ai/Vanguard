@@ -19,7 +19,7 @@ namespace vanguard {
         vector<const BasicBlock *> *reachableBlks(const BasicBlock &blk, unordered_set<const BasicBlock *> *exclude);
         virtual void registerAnalysis(Analysis *a);
     private:
-        const blockchain::Blockchain *chain;
+        const blockchain::Blockchain *chain = nullptr;
     };
 }
 #endif //VANGUARD_VANGUARD_H
