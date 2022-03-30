@@ -7,17 +7,24 @@
 #include "Analysis.h"
 #include "llvm/IR/Function.h"
 #include "Taint.h"
+#include "ReadWriteInfo.h"
+#include "FunctionTaintSource.h"
+#include "FunctionTaintSink.h"
 
 //Taint analysis should be agnostic what we're running on (i.e. intraprocedural / functional)
 
 namespace vanguard {
     class TaintAnalysis : public Analysis {
     public:
-        /*virtual bool shouldAnalyze(Function &fn) override;
-        virtual bool transfer(Instruction &ins) override;
-        virtual bool isVulnerable() override;*/
+        bool transfer(const Instruction &ins) override;
+        void registerSource(FunctionTaintSource &src);
+        void registerSink(FunctionTaintSink &sink);
 
-        //how should we add taint source / sink?
+    private:
+        vector<FunctionTaintSink *> fnSinks;
+        vector<FunctionTaintSource *> fnSources;
+        map<Instruction *, Taint *> insToTaint;
+        ReadWriteInfo rwInfo;
     };
 }
 

@@ -9,13 +9,14 @@ add_library(Vanguard SHARED
         IntraproceduralVanguard.cpp
         IntraproceduralVanguard.h
         LocalVanguard.cpp
-        LocalVanguard.h SCCVanguard.cpp SCCVanguard.h Vanguard.h Vanguard.cpp)
+        LocalVanguard.h SCCVanguard.cpp SCCVanguard.h Vanguard.h Vanguard.cpp ReadWriteInfo.cpp ReadWriteInfo.h Val.h RegisterVal.cpp RegisterVal.h TaintLabel.cpp TaintLabel.h TaintSink.h TaintSource.h TaintNode.h TaintSink.cpp TaintNode.cpp TaintSummary.cpp TaintSummary.h TaintLabelStore.cpp TaintLabelStore.h FunctionTaintSource.cpp FunctionTaintSource.h FunctionTaintSink.cpp FunctionTaintSink.h Val.cpp)
 
 if(DEFINED ENV{Z3_HOME})
   set(ENV{Z3_DIR} $ENV{Z3_HOME})
 endif()
 
 if(DEFINED ENV{LIBBLOCKCHAIN_HOME})
+  message(STATUS "LIBBLOCKCHAIN_HOME: ${LIBBLOCKCHAIN_HOME}")
   set(ENV{LIBBLOCKCHAIN_DIR} $ENV{LIBBLOCKCHAIN_HOME})
 endif()
 
@@ -41,7 +42,7 @@ message(STATUS "Found Z3 ${Z3_VERSION_STRING}")
 message(STATUS "Z3_DIR: ${Z3_DIR}")
 
 message(STATUS "Found libBlockchain ${LIBBLOCKCHAIN_VERSION_STRING}")
-message(STATUS "LIBBLOCKCHAIN_DIR: ${LIBBLOCKCHAIN_DIR}")
+message(STATUS "LIBBLOCKCHAIN_DIR: $ENV{LIBBLOCKCHAIN_DIR}")
 
 target_include_directories(Vanguard PRIVATE ${Z3_CXX_INCLUDE_DIRS})
 target_include_directories(Vanguard PRIVATE ${LIBBLOCKCHAIN_INCLUDE_DIRS})
