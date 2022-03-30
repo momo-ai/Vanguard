@@ -38,7 +38,7 @@ namespace vanguard {
         if(v.type() == ValType::REG_VAL) {
             const auto &regVal = static_cast<const RegisterVal &>(v);
 
-            if((regTaint[regVal] & mask) != 0) {
+            if((regTaint[regVal] & mask) == mask) {
                 return false;
             }
 

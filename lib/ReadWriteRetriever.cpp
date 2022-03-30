@@ -21,7 +21,7 @@ namespace vanguard {
         ReadWriteInfo info;
         info.requiresUpdate = false;
 
-        for(auto &use : ins.uses()) {
+        for(auto &use : ins.operands()) {
             info.reads.push_back(new RegisterVal(*use.get()));
         }
 

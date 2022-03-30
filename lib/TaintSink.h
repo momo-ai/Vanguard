@@ -9,12 +9,16 @@
 #include "TaintNode.h"
 
 namespace vanguard {
+    class TaintSinkProvider;
+
     class TaintSink {
     public:
-        void addTaint(TaintNode * node);
+        TaintSink() = default;
+        virtual std::vector<TaintNode *> gatherTaint() = 0;
+        void registerProvider(TaintSinkProvider *l);
         std::unordered_set<TaintSource *> sources();
     protected:
-        std::vector<TaintNode *> taintedBy;
+        std::vector<TaintSinkProvider *> providers;
     };
 }
 

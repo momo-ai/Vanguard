@@ -2,6 +2,7 @@
 // Created by Jon Stephens on 3/29/22.
 //
 
+#include <iostream>
 #include "TaintSummary.h"
 #include "ReadWriteRetriever.h"
 #include "llvm/IR/CFG.h"
@@ -9,9 +10,10 @@
 namespace vanguard {
     TaintSummary::TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources) : fn(summaryFn), rwRetriever(rw) {
         initState = new Taint(labelStore, regTaint);
+        summary = initState;
         for(auto sink : sinks) {
             if(sink->isSink(summaryFn)) {
-                fnSinks.push_back(sink);
+                sink->registerProvider(this);
             }
         }
 
@@ -71,6 +73,7 @@ namespace vanguard {
     }
 
     bool TaintSummary::propagate(const llvm::Instruction &ins) {
+        //ins.print(errs());
         Taint *prev = getPrevTaint(ins);
         ReadWriteInfo info = rwRetriever.retrieve(ins);
         Taint *cur = insToTaint[&ins];
@@ -99,6 +102,7 @@ namespace vanguard {
             if(valIt == valToLabel.end()) {
                 auto l = labelStore.newLabel();
                 valToLabel[*rv] = l;
+                state->addTaint(*v, *l);
                 labels.push_back(l);
             }
             else {
@@ -109,7 +113,55 @@ namespace vanguard {
         return labels;
     }
 
-    void TaintSummary::checkSinks() {
+    std::vector<TaintNode *> TaintSummary::getTaint(FunctionTaintSink &sink) {
+        std::vector<TaintNode *> labels;
+        if(!sink.isSink(fn)) {
+            return labels;
+        }
+
+        std::vector<Val *> sinkVals = sink.sinkValues(fn);
+        for(auto &val : sinkVals) {
+            for(TaintLabel *l : summary->taintedWith(*val)) {
+                labels.push_back(l);
+            }
+        }
+
+        return labels;
+    }
+
+    bool TaintSummary::didSummaryChange() {
+        return computeSummary();
+    }
+
+    bool TaintSummary::computeSummary() {
+        std::vector<Taint *> finalStates;
+
+        for(auto &blk : fn) {
+            if(successors(&blk).empty()) {
+                auto termIns = blk.getTerminator();
+                if(insToTaint.find(termIns) != insToTaint.end()) {
+                    finalStates.push_back(insToTaint.at(termIns));
+                }
+            }
+        }
+
+        if(finalStates.empty()) {
+            summary = initState;
+            return false;
+        }
+
+        bool updated = false;
+        if(summary == initState) {
+            summary = new Taint(labelStore, regTaint);
+            updated = true;
+        }
+
+        updated = Taint::merge(finalStates, *summary) || updated;
+
+        return updated;
+    }
+
+    /*void TaintSummary::checkSinks() {
         for(auto sink : fnSinks) {
             if(!sink->isSink(fn)) {
                 continue;
@@ -123,5 +175,9 @@ namespace vanguard {
                 }
             }
         }
-    }
+    }*/
+
+    /*bool computeFinalState() {
+
+    }*/
 }

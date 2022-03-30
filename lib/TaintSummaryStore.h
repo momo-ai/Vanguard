@@ -20,8 +20,8 @@ namespace vanguard {
         TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources);
         TaintSummary *getSummary(const Function &fn);
     private:
-        std::vector<FunctionTaintSink *> &fnSinks;
-        std::vector<FunctionTaintSource *> &fnSources;
+        std::vector<FunctionTaintSink *> fnSinks;
+        std::vector<FunctionTaintSource *> fnSources;
         ReadWriteRetriever rwRetriever;
         std::unordered_map<const Function *, TaintSummary *> fnSummaries;
     };

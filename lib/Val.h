@@ -7,6 +7,7 @@
 
 #include <llvm/IR/Function.h>
 #include <unordered_set>
+#include <vector>
 
 namespace vanguard {
     enum ValType {
@@ -18,7 +19,8 @@ namespace vanguard {
     public:
         virtual ~Val() = default;
         virtual ValType type() const = 0;
-        static std::unordered_set<Val *> functionOutputs(llvm::Function &fn);
+        static std::vector<Val *> functionOutputs(const llvm::Function &fn);
+        static std::vector<Val *> functionArgs(const llvm::Function &fn);
     };
 }
 

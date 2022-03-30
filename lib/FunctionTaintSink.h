@@ -16,6 +16,8 @@ namespace vanguard {
      */
     class FunctionTaintSink : public TaintSink {
     public:
+        FunctionTaintSink() = default;
+        std::vector<TaintNode *> gatherTaint() override;
         virtual bool isSink(const llvm::Function &fn) = 0;
         virtual std::vector<Val *> sinkValues(const llvm::Function &fn) = 0;
     private:

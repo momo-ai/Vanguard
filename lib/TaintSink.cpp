@@ -5,19 +5,24 @@
 #include "TaintSink.h"
 
 namespace vanguard {
-    void TaintSink::addTaint(TaintNode *node) {
+    void TaintSink::registerProvider(TaintSinkProvider *p) {
+        providers.push_back(p);
+    }
+
+
+    /*void TaintSink::addTaint(TaintNode *node) {
         if(node == nullptr) {
             return;
         }
 
         taintedBy.push_back(node);
-    }
+    }*/
 
     std::unordered_set<TaintSource *> TaintSink::sources() {
         std::unordered_set<TaintNode *> seen;
         std::unordered_set<TaintSource *> srcs;
 
-        for(auto child : taintedBy) {
+        for(auto child : gatherTaint()) {
             child->sources(seen, srcs);
         }
 
