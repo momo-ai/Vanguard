@@ -48,7 +48,7 @@ namespace Reentrancy {
                         potentialReentrancies[fname] = lastExternalCall->getName().str();
                     }
                 }
-                if (get<0>(fnInfo[fname])) {
+                if (get<0>(fnInfo[cfname])) {
                     // If call has external, record that current function has external call
                     lastExternalCall = called_func;
                     if (!get<0>(fnInfo[fname])) {
@@ -57,24 +57,29 @@ namespace Reentrancy {
                     }
                 }
             }
-            if (chain->isAnyExternalCall(*called_func)) {
-                // If call is external, record that current func has ext and set last ext call
-                lastExternalCall = called_func;
-                if (!get<0>(fnInfo[fname])) {
-                    // Indicate function has ext call if not already indicated
-                    fnInfo[fname] = make_tuple(true, get<1>(fnInfo[fname]));
-                    modified = true;
+            if (chain->isAnyExternalCall(*called_func)) { // && !chain->callHasKeccik(*called_func)) {
+                auto arg = CallInstr->getArgOperand(1);
+                if (auto i1 = dyn_cast<Instruction>(arg)) {
+                    // If call is external, record that current func has ext and set last ext call
+                    lastExternalCall = called_func;
+                    if (!get<0>(fnInfo[fname])) {
+                        // Indicate function has ext call if not already indicated
+                        fnInfo[fname] = make_tuple(true, get<1>(fnInfo[fname]));
+                        modified = true;
+                    }
                 }
             }
-        } else if (auto StoreInstr = dyn_cast<StoreInst>(&ins)) {
-            if (!get<1>(fnInfo[fname])) {
-                // Indicate function has store if not already indicated
-                fnInfo[fname] = make_tuple(get<0>(fnInfo[fname]), true);
-                modified = true;
-            }
-            if (lastExternalCall && potentialReentrancies.find(fname) == potentialReentrancies.end()) {
-                // Record reentrancy if there is prev ext call in this func (and not already recorded)
-                potentialReentrancies[fname] = lastExternalCall->getName().str();
+            if (cfname.compare("storageStore") == 0) {
+                // Detect store to contract state
+                if (!get<1>(fnInfo[fname])) {
+                    // Indicate function has store if not already indicated
+                    fnInfo[fname] = make_tuple(get<0>(fnInfo[fname]), true);
+                    modified = true;
+                }
+                if (lastExternalCall && potentialReentrancies.find(fname) == potentialReentrancies.end()) {
+                    // Record reentrancy if there is prev ext call in this func (and not already recorded)
+                    potentialReentrancies[fname] = lastExternalCall->getName().str();
+                }
             }
         }
         return false;
