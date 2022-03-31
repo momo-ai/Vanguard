@@ -10,12 +10,13 @@ def run():
     tnames = set([t.split("_")[0] for t in tests]) # Get unique test names
 
     for test in tnames:
+        print(test)
         bc_path = os.path.join(TESTS_PATH, "{}_deploy.bc".format(test))
         summary_path = os.path.join(TESTS_PATH, "{}_summary.json".format(test))
         opt_cmd = OPT_CMD.format(summary_path, bc_path)
-        print(opt_cmd)
+        # print(opt_cmd)
         tout = subprocess.check_output(opt_cmd.split())
-        print(tout)
+        print(bytes.decode(tout))
 
 if __name__=="__main__":
     run()

@@ -15,7 +15,6 @@ namespace Reentrancy {
 
     bool ReentrancyAnalysis::shouldAnalyze(const Function &fn) {
         return chain->isContractFunction(fn);
-//        return true;
     }
 
     bool ReentrancyAnalysis::beginFn(const Function &fn) {
@@ -58,7 +57,7 @@ namespace Reentrancy {
                     }
                 }
             }
-            if (isExternal(*called_func)) {
+            if (chain->isAnyExternalCall(*called_func)) {
                 // If call is external, record that current func has ext and set last ext call
                 lastExternalCall = called_func;
                 if (!get<0>(fnInfo[fname])) {
@@ -68,6 +67,11 @@ namespace Reentrancy {
                 }
             }
         } else if (auto StoreInstr = dyn_cast<StoreInst>(&ins)) {
+            if (!get<1>(fnInfo[fname])) {
+                // Indicate function has store if not already indicated
+                fnInfo[fname] = make_tuple(get<0>(fnInfo[fname]), true);
+                modified = true;
+            }
             if (lastExternalCall && potentialReentrancies.find(fname) == potentialReentrancies.end()) {
                 // Record reentrancy if there is prev ext call in this func (and not already recorded)
                 potentialReentrancies[fname] = lastExternalCall->getName().str();
