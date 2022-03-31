@@ -68,7 +68,7 @@ namespace vanguard {
             bbInit[blk] = blkTaint;
         }
 
-        Taint::merge(toMerge, *blkTaint);
+        blkTaint->merge(toMerge);
         return blkTaint;
     }
 
@@ -82,7 +82,7 @@ namespace vanguard {
             insToTaint[&ins] = cur;
         }
 
-        bool modified = Taint::propagate(*prev, info.reads, *cur, info.writes);
+        bool modified = cur->propagate(*prev, info.reads, info.writes);
         return modified;
     }
 
@@ -93,20 +93,21 @@ namespace vanguard {
         }
 
         for(Val *v : vals) {
-            if(v->type() != ValType::REG_VAL) {
+            /*if(v->type() != ValType::REG_VAL) {
                 throw std::runtime_error("Only reg values supported right now");
             }
 
             RegisterVal *rv = static_cast<RegisterVal *>(v);
-            auto valIt = valToLabel.find(*rv);
+            RegisterVal *rv = cast<RegisterVal>(v);*/
+            auto valIt = valToLabel.find(v);
             if(valIt == valToLabel.end()) {
                 auto l = labelStore.newLabel();
-                valToLabel[*rv] = l;
-                state->addTaint(*v, *l);
+                valToLabel[v] = l;
+                v->addTaint(*state, *l);
                 labels.push_back(l);
             }
             else {
-                labels.push_back(valToLabel.at(*rv));
+                labels.push_back(valToLabel.at(v));
             }
         }
 
@@ -121,7 +122,7 @@ namespace vanguard {
 
         std::vector<Val *> sinkVals = sink.sinkValues(fn);
         for(auto &val : sinkVals) {
-            for(TaintLabel *l : summary->taintedWith(*val)) {
+            for(TaintLabel *l : val->taintedWith(*summary)) {
                 labels.push_back(l);
             }
         }
@@ -156,7 +157,7 @@ namespace vanguard {
             updated = true;
         }
 
-        updated = Taint::merge(finalStates, *summary) || updated;
+        updated = summary->merge(finalStates) || updated;
 
         return updated;
     }

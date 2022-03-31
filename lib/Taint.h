@@ -9,6 +9,7 @@
 #include "Val.h"
 #include "RegisterVal.h"
 #include "TaintLabel.h"
+#include "RegisterTaint.h"
 #include <unordered_map>
 #include <vector>
 using namespace llvm;
@@ -23,6 +24,20 @@ using namespace llvm;
  */
 
 namespace vanguard {
+    class Taint : public RegisterTaint {
+    public:
+        Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint);
+
+        bool propagate(const Taint &from, const std::vector<Val *> &uses, const std::vector<Val *> &tgts);
+        bool merge(const std::vector<Taint *> &from);
+    private:
+        uint64_t accumulate(const std::vector<Val *> &vals) const;
+        std::vector<std::pair<const Val *, uint64_t>> getAllTaint();
+    };
+}
+
+
+/*namespace vanguard {
     class Taint {
     public:
         Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint);
@@ -46,7 +61,7 @@ namespace vanguard {
         bool addTaint(const Val &v, uint64_t mask);
         bool untaint(const Val &v, uint64_t mask);
     };
-}
+}*/
 
 
 

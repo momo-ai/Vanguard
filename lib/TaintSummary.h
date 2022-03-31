@@ -35,7 +35,8 @@ namespace vanguard {
         std::unordered_map<const BasicBlock *, Taint *> bbInit;
         std::unordered_map<const Instruction *, Taint *> insToTaint;
         std::vector<FunctionTaintSource *> fnSources;
-        std::unordered_map<RegisterVal, TaintLabel *> valToLabel;
+        //std::unordered_map<RegisterVal, TaintLabel *> valToLabel;
+        std::unordered_map<Val *, TaintLabel *, ValPtrHash, ValPtrEq> valToLabel;
         Taint *initState;
         Taint *summary;
     };

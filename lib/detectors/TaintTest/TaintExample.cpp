@@ -11,8 +11,9 @@
 namespace vanguard {
     TaintExample::TaintExample() : IntraproceduralVanguard(ID) {
         ExampleSource *src = new ExampleSource();
+        ExampleSource *src2 = new ExampleSource();
         ExampleSink *sink = new ExampleSink();
-        std::vector<FunctionTaintSource *> sources = {src};
+        std::vector<FunctionTaintSource *> sources = {src, src2};
         std::vector<FunctionTaintSink *> sinks = {sink};
         analysis = new AnalysisExample(sinks, sources);
         Vanguard::registerAnalysis(analysis);
