@@ -6,20 +6,20 @@
 #include "Taint.h"
 
 namespace vanguard {
-    Taint::Taint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint) : labelStore(store), regTaint(sharedRegTaint) {}
+    Taint::Taint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint) : RegisterTaint(store, sharedRegTaint) {}
     /*
      * Private helpers
      */
     uint64_t Taint::accumulate(const std::vector<Val *> &from) const {
         uint64_t accTaint = 0;
-        for(auto &v : from) {
-            accTaint = accTaint | getTaint(*v);
+        for(auto v : from) {
+            accTaint = accTaint | v->getTaint(*this);
         }
 
         return accTaint;
     }
 
-    bool Taint::setTaint(const Val &v, uint64_t mask) {
+    /*bool Taint::setTaint(const Val &v, uint64_t mask) {
         if(v.type() == ValType::REG_VAL) {
             const auto &regVal = static_cast<const RegisterVal &>(v);
 
@@ -75,13 +75,13 @@ namespace vanguard {
         }
 
         return 0;
-    }
+    }*/
 
     /*
      * Public Functions
      */
 
-    bool Taint::isTainted(const Val &v) const {
+    /*bool Taint::isTainted(const Val &v) const {
         return getTaint(v) != 0;
     }
 
@@ -113,31 +113,42 @@ namespace vanguard {
         }
 
         return taintLabels;
-    }
+    }*/
 
-    bool Taint::propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts) {
+    bool Taint::propagate(const Taint &from, const std::vector<Val *> &uses, const std::vector<Val *> &tgts) {
         uint64_t taint = from.accumulate(uses);
         bool modified = false;
 
         for(auto v : tgts) {
-            modified = to.setTaint(*v, taint) || modified;
+            //modified = to.setTaint(*v, taint) || modified;
+            modified = v->setTaint(*this, taint);
         }
 
         return modified;
     }
 
-    bool Taint::merge(const std::vector<Taint *> &from, Taint &to) {
+    bool Taint::merge(const std::vector<Taint *> &from) {
         if(from.empty()) {
             return false;
         }
 
         bool modified = false;
         for(auto cur : from) {
-            for(auto &entry : (*cur).regTaint) {
-                modified = to.addTaint(entry.first, entry.second) || modified;
+            for(auto &entry : getAllTaint()) {
+                modified = entry.first->addTaint(*this, entry.second) || modified;
             }
+            /*for(auto &entry : (*cur).regTaint) {
+                modified = this->addTaint(entry.first, entry.second) || modified;
+            }*/
         }
 
         return modified;
+    }
+
+    std::vector<std::pair<const Val *, uint64_t>> Taint::getAllTaint() {
+        std::vector<std::pair<const Val *, uint64_t>> allTaint;
+        std::vector<std::pair<const RegisterVal *, uint64_t>> regTaint = getRegTaint();
+        allTaint.insert(allTaint.end(), regTaint.begin(), regTaint.end());
+        return allTaint;
     }
 }

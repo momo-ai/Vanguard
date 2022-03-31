@@ -8,6 +8,10 @@
 #include "llvm/IR/Type.h"
 
 namespace vanguard {
+    ValType Val::getType() const {
+        return type;
+    }
+
     std::vector<Val *> Val::functionOutputs(const llvm::Function &fn) {
         std::vector<Val *> outputs;
 
