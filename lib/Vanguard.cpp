@@ -28,17 +28,17 @@ namespace vanguard {
         return chain;
     }
 
-    vector<const BasicBlock *> *Vanguard::reachableBlks(const BasicBlock &blk, unordered_set<const BasicBlock *> *exclude) {
-        auto reachable = new vector<const BasicBlock *>();
-        list<const BasicBlock *> wl;
-        unordered_set<const BasicBlock *> seen;
+    vector<BasicBlock *> *Vanguard::reachableBlks(BasicBlock &blk, unordered_set<BasicBlock *> *exclude) {
+        auto reachable = new vector<BasicBlock *>();
+        list<BasicBlock *> wl;
+        unordered_set<BasicBlock *> seen;
 
         wl.push_back(&blk);
         while(!wl.empty()) {
-            const BasicBlock *curBlk = wl.front();
+            BasicBlock *curBlk = wl.front();
             wl.pop_front();
 
-            for(const BasicBlock *succBlk : successors(curBlk)) {
+            for(BasicBlock *succBlk : successors(curBlk)) {
                 if(seen.find(succBlk) == seen.end()) {
                     seen.insert(succBlk);
                     wl.push_back(succBlk);
@@ -52,7 +52,7 @@ namespace vanguard {
         return reachable;
     }
 
-    bool Vanguard::runToFixedpoint(const Function &fn) {
+    bool Vanguard::runToFixedpoint(Function &fn) {
         if(!analysis->shouldAnalyze(fn)) {
             return false;
         }
@@ -60,22 +60,22 @@ namespace vanguard {
         bool modified = false;
         modified = analysis->beginFn(fn) || modified;
 
-        unordered_set<const BasicBlock *> wlContents;
-        list<const BasicBlock *> bbWorklist;
-        for(const BasicBlock &bb : fn) {
+        unordered_set<BasicBlock *> wlContents;
+        list<BasicBlock *> bbWorklist;
+        for(BasicBlock &bb : fn) {
             wlContents.insert(&bb);
             bbWorklist.insert(bbWorklist.end(), &bb);
         }
 
         while(!bbWorklist.empty()) {
-            const BasicBlock *blk = bbWorklist.front();
+            BasicBlock *blk = bbWorklist.front();
             bbWorklist.pop_front();
             wlContents.erase(blk);
 
-            for(const Instruction &ins : *blk) {
+            for(Instruction &ins : *blk) {
                 if(analysis->transfer(ins)) {
                     modified = true;
-                    vector<const BasicBlock *> *reachable = reachableBlks(*blk, &wlContents);
+                    vector<BasicBlock *> *reachable = reachableBlks(*blk, &wlContents);
                     bbWorklist.insert(bbWorklist.begin(), reachable->begin(), reachable->end());
                     wlContents.insert(reachable->begin(), reachable->end());
                     delete reachable;

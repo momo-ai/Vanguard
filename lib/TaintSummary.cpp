@@ -8,8 +8,8 @@
 #include "llvm/IR/CFG.h"
 
 namespace vanguard {
-    TaintSummary::TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources) : fn(summaryFn), rwRetriever(rw) {
-        initState = new Taint(labelStore, regTaint);
+    TaintSummary::TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources, llvm::AAResults &aa) : fn(summaryFn), rwRetriever(rw), alias(aa) {
+        initState = new Taint(labelStore, regTaint, alias);
         summary = initState;
         for(auto sink : sinks) {
             if(sink->isSink(summaryFn)) {
@@ -64,7 +64,7 @@ namespace vanguard {
 
         Taint *blkTaint = bbInit[blk];
         if(blkTaint == nullptr) {
-            blkTaint = new Taint(labelStore, regTaint);
+            blkTaint = new Taint(labelStore, regTaint, alias);
             bbInit[blk] = blkTaint;
         }
 
@@ -103,7 +103,7 @@ namespace vanguard {
             if(valIt == valToLabel.end()) {
                 auto l = labelStore.newLabel();
                 valToLabel[v] = l;
-                v->addTaint(*state, *l);
+                state->addTaint(*v, *l);
                 labels.push_back(l);
             }
             else {
@@ -122,7 +122,7 @@ namespace vanguard {
 
         std::vector<Val *> sinkVals = sink.sinkValues(fn);
         for(auto &val : sinkVals) {
-            for(TaintLabel *l : val->taintedWith(*summary)) {
+            for(TaintLabel *l : summary->taintedWith(*val)) {
                 labels.push_back(l);
             }
         }
@@ -153,7 +153,7 @@ namespace vanguard {
 
         bool updated = false;
         if(summary == initState) {
-            summary = new Taint(labelStore, regTaint);
+            summary = new Taint(labelStore, regTaint, alias);
             updated = true;
         }
 

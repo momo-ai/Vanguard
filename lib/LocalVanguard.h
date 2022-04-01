@@ -12,8 +12,11 @@
 namespace vanguard {
     class LocalVanguard : public FunctionPass, public Vanguard {
     public:
-        explicit LocalVanguard(char &ID) : FunctionPass(ID) {}
+        explicit LocalVanguard(char &ID) : FunctionPass(ID), started(false) {}
+        void getAnalysisUsage(llvm::AnalysisUsage &Info) const override;
         bool runOnFunction(Function &F) override;
+    private:
+        bool started;
     };
 }
 

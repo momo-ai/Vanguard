@@ -8,6 +8,7 @@
 #include "llvm/IR/Function.h"
 #include "llvm/IR/Instruction.h"
 #include <SummaryReader.h>
+#include "llvm/Pass.h"
 
 using namespace std;
 using namespace llvm;
@@ -16,10 +17,12 @@ namespace vanguard {
     class Analysis {
     public:
         //virtual void init() = 0;
-        virtual bool shouldAnalyze(const Function &fn) = 0;
-        virtual bool beginFn(const Function &fn) = 0;
-        virtual bool transfer(const Instruction &ins) = 0;
-        virtual bool endFn(const Function &fn) = 0;
+        virtual void registerRequirements(llvm::AnalysisUsage &Info) const {}
+        virtual void startAnalysis(llvm::Pass &pass) {}
+        virtual bool shouldAnalyze(Function &fn) = 0;
+        virtual bool beginFn(Function &fn) = 0;
+        virtual bool transfer(Instruction &ins) = 0;
+        virtual bool endFn(Function &fn) = 0;
         //virtual bool isVulnerable() = 0;
         virtual string vulnerabilityReport() = 0;
     };

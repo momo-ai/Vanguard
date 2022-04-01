@@ -17,9 +17,10 @@ namespace vanguard {
 
     class TaintSummaryStore {
     public:
-        TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources);
-        TaintSummary *getSummary(const Function &fn);
+        TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass);
+        TaintSummary *getSummary(Function &fn);
     private:
+        llvm::Pass &pass;
         std::vector<FunctionTaintSink *> fnSinks;
         std::vector<FunctionTaintSource *> fnSources;
         ReadWriteRetriever rwRetriever;

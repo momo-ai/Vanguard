@@ -33,7 +33,7 @@ namespace vanguard {
         return (size_t) val;
     }
 
-    bool RegisterVal::isTainted(Taint &taint) const {
+    /*bool RegisterVal::isTainted(Taint &taint) const {
         return taint.isTainted(*this);
     }
 
@@ -55,15 +55,19 @@ namespace vanguard {
 
     std::vector<TaintLabel *> RegisterVal::taintedWith(Taint &taint) const {
         return taint.taintedWith(*this);
-    }
+    }*/
 
     uint64_t RegisterVal::getTaint(const Taint &taint) const {
-        return taint.getTaint(*this);
+        return taint.getRegTaint(*this);
     }
     bool RegisterVal::setTaint(Taint &taint, uint64_t mask) const {
-        return taint.setTaint(*this, mask);
+        return taint.setRegTaint(*this, mask);
     }
     bool RegisterVal::addTaint(Taint &taint, uint64_t mask) const {
-        return taint.addTaint(*this, mask);
+        return taint.addRegTaint(*this, mask);
+    }
+
+    bool RegisterVal::untaint(Taint &taint, uint64_t mask) const {
+        return taint.untaintReg(*this, mask);
     }
 }

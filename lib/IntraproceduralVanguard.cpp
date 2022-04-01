@@ -17,22 +17,28 @@
 using namespace llvm;
 
 namespace vanguard {
+    void IntraproceduralVanguard::getAnalysisUsage(llvm::AnalysisUsage &info) const {
+        analysis->registerRequirements(info);
+    }
+
     bool IntraproceduralVanguard::runOnModule(Module &m) {
-        unordered_set<const Function *> fnWorklist;
-        vector<const Function *> fns(m.getFunctionList().size());
-        for(const Function &f : m) {
+        analysis->startAnalysis(*this);
+
+        unordered_set<Function *> fnWorklist;
+        vector<Function *> fns(m.getFunctionList().size());
+        for(Function &f : m) {
             fns.push_back(&f);
             fnWorklist.insert(&f);
         }
 
         while(!fnWorklist.empty()) {
-            const Function *curFn = *fnWorklist.begin();
+            Function *curFn = *fnWorklist.begin();
             fnWorklist.erase(fnWorklist.begin());
 
             bool modified = runToFixedpoint(*curFn);
 
             if(modified) {
-                for(const Function &f : m) {
+                for(Function &f : m) {
                     fnWorklist.insert(&f);
                 }
             }

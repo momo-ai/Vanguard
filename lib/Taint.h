@@ -10,11 +10,12 @@
 #include "RegisterVal.h"
 #include "TaintLabel.h"
 #include "RegisterTaint.h"
+#include "MemoryTaint.h"
 #include <unordered_map>
 #include <vector>
 using namespace llvm;
 
-
+#include "llvm/Analysis/AliasAnalysis.h"
 /*
  * Plan: Each function can define up to 64 taint labels.
  * Each sink will take in those taint labels that reach the sink.
@@ -24,13 +25,22 @@ using namespace llvm;
  */
 
 namespace vanguard {
-    class Taint : public RegisterTaint {
+    class Taint : public RegisterTaint, public MemoryTaint {
     public:
-        Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint);
+        Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAResults &alias);
+
+        bool isTainted(const Val &v) const;
+        bool isTainted(const Val &v, const TaintLabel &label) const;
+
+        bool addTaint(const Val &v, const TaintLabel &label);
+        bool untaint(const Val &v, const TaintLabel &label);
+        bool untaint(const Val &v);
+        std::vector<TaintLabel *> taintedWith(const Val &v) const;
 
         bool propagate(const Taint &from, const std::vector<Val *> &uses, const std::vector<Val *> &tgts);
         bool merge(const std::vector<Taint *> &from);
     private:
+        TaintLabelStore &store;
         uint64_t accumulate(const std::vector<Val *> &vals) const;
         std::vector<std::pair<const Val *, uint64_t>> getAllTaint();
     };

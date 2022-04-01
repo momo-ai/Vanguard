@@ -14,7 +14,8 @@ namespace vanguard {
     class Taint;
 
     enum ValType {
-        REGISTER_VAL
+        REGISTER_VAL,
+        MEMORY_VAL
     };
 
     class Val {
@@ -26,12 +27,12 @@ namespace vanguard {
         static inline bool classof(const Val *) {return true;}
 
         ValType getType() const;
-        virtual bool isTainted(Taint &taint) const = 0;
+        /*virtual bool isTainted(Taint &taint) const = 0;
         virtual bool isTainted(Taint &taint, const TaintLabel &label) const = 0;
         virtual bool addTaint(Taint &taint, const TaintLabel &label) const = 0;
         virtual bool untaint(Taint &taint) const = 0;
         virtual bool untaint(Taint &taint, const TaintLabel &label) const = 0;
-        virtual std::vector<TaintLabel *> taintedWith(Taint &taint) const = 0;
+        virtual std::vector<TaintLabel *> taintedWith(Taint &taint) const = 0;*/
         virtual std::size_t hash() const = 0;
         virtual bool operator==(const Val &rhs) const = 0;
         /*
@@ -55,6 +56,7 @@ namespace vanguard {
         virtual uint64_t getTaint(const Taint &taint) const = 0;
         virtual bool setTaint(Taint &taint, uint64_t mask) const = 0;
         virtual bool addTaint(Taint &taint, uint64_t mask) const = 0;
+        virtual bool untaint(Taint &taint, uint64_t mask) const = 0;
     private:
         ValType type;
     };

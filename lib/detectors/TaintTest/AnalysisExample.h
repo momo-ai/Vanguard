@@ -12,7 +12,7 @@ namespace vanguard {
         AnalysisExample(vector<FunctionTaintSink *> &sinks,
                         vector<FunctionTaintSource *> &sources);
 
-        bool shouldAnalyze(const Function &fn) override;
+        bool shouldAnalyze(Function &fn) override;
         string vulnerabilityReport() override;
     private:
         vector<FunctionTaintSink *> sinks;

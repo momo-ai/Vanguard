@@ -16,6 +16,7 @@ namespace vanguard {
     class IntraproceduralVanguard : public ModulePass, public Vanguard {
     public:
         explicit IntraproceduralVanguard(char &ID) : ModulePass(ID) {}
+        void getAnalysisUsage(llvm::AnalysisUsage &Info) const override;
         bool runOnModule(Module &m) override;
     };
 }

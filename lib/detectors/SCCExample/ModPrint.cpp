@@ -8,11 +8,11 @@
 using namespace std;
 
 namespace sccexample {
-    bool ModPrint::shouldAnalyze(const Function &fn) {
+    bool ModPrint::shouldAnalyze(Function &fn) {
         return true;
     }
 
-    bool ModPrint::beginFn(const Function &fn) {
+    bool ModPrint::beginFn(Function &fn) {
         if(fn.hasName()) {
             cout << fn.getName().str() << endl;
         }
@@ -20,11 +20,11 @@ namespace sccexample {
         return false;
     }
 
-    bool ModPrint::transfer(const Instruction &ins) {
+    bool ModPrint::transfer(Instruction &ins) {
         return false;
     }
 
-    bool ModPrint::endFn(const Function &fn) {
+    bool ModPrint::endFn(Function &fn) {
         return false;
     }
 

@@ -7,16 +7,18 @@
 #include "Analysis.h"
 #include <Blockchain.h>
 #include <unordered_set>
+#include "llvm/Pass.h"
 
 namespace vanguard {
     class Vanguard {
     public:
+        explicit Vanguard() : analysis(nullptr) {}
         const blockchain::Blockchain *blockchain();
     protected:
         Analysis *analysis;
 
-        bool runToFixedpoint(const Function &fn);
-        vector<const BasicBlock *> *reachableBlks(const BasicBlock &blk, unordered_set<const BasicBlock *> *exclude);
+        bool runToFixedpoint(Function &fn);
+        vector<BasicBlock *> *reachableBlks(BasicBlock &blk, unordered_set<BasicBlock *> *exclude);
         virtual void registerAnalysis(Analysis *a);
     private:
         const blockchain::Blockchain *chain = nullptr;

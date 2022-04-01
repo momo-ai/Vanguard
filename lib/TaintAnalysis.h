@@ -19,12 +19,17 @@ namespace vanguard {
     class TaintAnalysis : public Analysis {
     public:
         TaintAnalysis(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources);
-        bool transfer(const Instruction &ins) override;
-        bool beginFn(const Function &fn) override;
-        bool endFn(const Function &fn) override;
+        ~TaintAnalysis();
+        void startAnalysis(llvm::Pass &pass) override;
+        void registerRequirements(llvm::AnalysisUsage &Info) const override;
+        bool transfer(Instruction &ins) override;
+        bool beginFn(Function &fn) override;
+        bool endFn(Function &fn) override;
 
     private:
-        TaintSummaryStore store;
+        std::vector<FunctionTaintSink *> sinks;
+        std::vector<FunctionTaintSource *> sources;
+        TaintSummaryStore *store;
         TaintSummary *curSummary;
     };
 }

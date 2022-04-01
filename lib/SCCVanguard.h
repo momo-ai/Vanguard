@@ -12,8 +12,11 @@
 namespace vanguard {
     class SCCVanguard : public CallGraphSCCPass, public Vanguard {
     public:
-        explicit SCCVanguard(char &ID) : CallGraphSCCPass(ID) {}
+        explicit SCCVanguard(char &ID) : CallGraphSCCPass(ID), started(false) {}
+        void getAnalysisUsage(llvm::AnalysisUsage &Info) const override;
         bool runOnSCC(CallGraphSCC &SCC) override;
+    private:
+        bool started;
     };
 }
 

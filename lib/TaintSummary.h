@@ -18,7 +18,7 @@
 namespace vanguard {
     class TaintSummary : public TaintSinkProvider {
     public:
-        TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources);
+        TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources, llvm::AAResults &aa);
         ~TaintSummary();
         bool propagate(const llvm::Instruction &ins);
         std::vector<TaintNode *> getTaint(FunctionTaintSink &sink) override;
@@ -28,6 +28,7 @@ namespace vanguard {
         Taint *getPrevTaint(const llvm::Instruction &ins);
         bool computeSummary();
 
+        llvm::AAResults &alias;
         ReadWriteRetriever &rwRetriever;
         const Function &fn;
         TaintLabelStore labelStore;
