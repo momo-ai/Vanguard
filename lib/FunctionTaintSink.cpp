@@ -9,7 +9,8 @@ namespace vanguard {
     std::vector<TaintNode *> FunctionTaintSink::gatherTaint() {
         std::vector<TaintNode *> taint;
         for(auto provider : providers) {
-            provider->getTaint(*this);
+            auto providedTaint = provider->getTaint(*this);
+            taint.insert(taint.end(), providedTaint.begin(), providedTaint.end());
         }
 
         return taint;
