@@ -1,0 +1,62 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [
+            {
+              "name": "_destination",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "__set_destination"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "name": "dst",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "__get_destination"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "transfer"
+        }
+      ],
+      "variables": [
+        {
+          "name": "destination",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "address"
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 41,
+      "name": "no_uninitialized_state2"
+    }
+  ],
+  "version": "^0.8.10",
+  "compiler": "Solang"
+}
