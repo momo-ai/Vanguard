@@ -12,9 +12,10 @@
 namespace vanguard {
     class MemoryVal : public Val {
     public:
-        MemoryVal(const llvm::Value &ptr, uint64_t size);
+        MemoryVal(llvm::Value &val, uint64_t size);
+        explicit MemoryVal(llvm::MemoryLocation memLoc);
         const llvm::Value &ptr() const;
-        uint64_t size() const;
+        //uint64_t size() const;
 
         static inline bool classof(const MemoryVal *) { return true; }
         static inline bool classof(const Val *b) {
@@ -29,8 +30,7 @@ namespace vanguard {
         bool operator==(const Val &rhs) const override;
         std::size_t hash() const override;
     private:
-        const llvm::Value *memPtr;
-        uint64_t memSize;
+        llvm::MemoryLocation loc;
 
         uint64_t getTaint(const Taint &taint) const override;
         bool setTaint(Taint &taint, uint64_t mask) const override;

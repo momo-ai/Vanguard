@@ -3,6 +3,7 @@
 //
 
 #include "TaintSummaryStore.h"
+#include "AAWrapper.h"
 
 
 namespace vanguard {
@@ -14,11 +15,12 @@ namespace vanguard {
         auto summaryIt = fnSummaries.find(&fn);
         TaintSummary *summary = nullptr;
         if(summaryIt == fnSummaries.end()) {
-            AAResults *alias = nullptr;
+            /*AAResults *alias = nullptr;
+
             if(!fn.isDeclaration()) {
                 alias = &pass.getAnalysis<AAResultsWrapperPass>(fn).getAAResults();
-            }
-            summary = new TaintSummary(fn, rwRetriever, fnSinks, fnSources, alias);
+            }*/
+            summary = new TaintSummary(fn, rwRetriever, fnSinks, fnSources, pass);
             fnSummaries[&fn] = summary;
         }
         else {

@@ -8,7 +8,7 @@
 #include "llvm/IR/CFG.h"
 
 namespace vanguard {
-    TaintSummary::TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources, llvm::AAResults *aa) : fn(summaryFn), rwRetriever(rw), alias(aa) {
+    TaintSummary::TaintSummary(Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass) : fn(summaryFn), rwRetriever(rw), alias(pass, summaryFn) {
         initState = new Taint(labelStore, regTaint, alias);
         summary = initState;
         for(auto sink : sinks) {
@@ -33,6 +33,10 @@ namespace vanguard {
         }
 
         bbInit[&fn.getEntryBlock()] = initState;
+    }
+
+    AAWrapper &TaintSummary::getAliasWrapper() {
+        return alias;
     }
 
     TaintSummary::~TaintSummary() {
@@ -73,7 +77,8 @@ namespace vanguard {
     }
 
     bool TaintSummary::propagate(const llvm::Instruction &ins) {
-        //ins.print(errs());
+        //ins.print(outs());
+        //std::cout << std::endl;
         Taint *prev = getPrevTaint(ins);
         ReadWriteInfo info = rwRetriever.retrieve(ins);
         Taint *cur = insToTaint[&ins];

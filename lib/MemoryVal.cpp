@@ -6,10 +6,22 @@
 #include "Taint.h"
 
 namespace vanguard {
-    MemoryVal::MemoryVal(const llvm::Value &ptr, uint64_t size) : memPtr(&ptr), memSize(size), Val(MEMORY_VAL) {}
+    MemoryVal::MemoryVal(llvm::Value &val, uint64_t size) : Val(MEMORY_VAL) {
+        loc = MemoryLocation(&val, llvm::LocationSize::precise(size));
+    }
+
+    MemoryVal::MemoryVal(llvm::MemoryLocation memLoc) : loc(memLoc), Val(MEMORY_VAL) {}
 
     bool operator==(const MemoryVal& lhs, const MemoryVal& rhs) {
-        return lhs.memPtr == rhs.memPtr && lhs.memSize == rhs.memSize;
+        if(lhs.loc.Size.hasValue() == rhs.loc.Size.hasValue()) {
+            if(lhs.loc.Size.hasValue()) {
+                return lhs.loc.Ptr == rhs.loc.Ptr && lhs.loc.Size.getValue() == rhs.loc.Size.getValue();
+            }
+            else {
+                return lhs.loc.Ptr == rhs.loc.Ptr;
+            }
+        }
+        return false;
     }
 
     bool operator!=(const MemoryVal& lhs, const MemoryVal& rhs) {
@@ -26,26 +38,34 @@ namespace vanguard {
     }
 
     bool MemoryVal::includes(const MemoryVal &other) const {
-        return memPtr == other.memPtr && memSize >= other.memSize;
+        //return loc.Ptr == other.loc.&& memSize >= other.memSize;
+        if(loc.Ptr == other.loc.Ptr) {
+            return loc.Size.unionWith(other.loc.Size) == loc.Size;
+        }
+
+        return false;
     }
 
     const llvm::Value &MemoryVal::ptr() const {
-        return *memPtr;
+        return *loc.Ptr;
     }
 
-    uint64_t MemoryVal::size() const {
+    /*uint64_t MemoryVal::size() const {
         return memSize;
-    }
+    }*/
 
     llvm::MemoryLocation MemoryVal::toMemoryLocation() const {
-        return llvm::MemoryLocation(memPtr, llvm::LocationSize::precise(memSize));
+        return loc;
     }
 
     /*
      * Overloaded Functions
      */
     std::size_t MemoryVal::hash() const {
-        return ((std::size_t) memPtr) * memSize;
+        if(loc.Size.hasValue()) {
+            return ((std::size_t) loc.Ptr) * loc.Size.getValue();
+        }
+        return ((std::size_t) loc.Ptr);
     }
 
 

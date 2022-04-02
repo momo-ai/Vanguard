@@ -9,11 +9,12 @@
 #include "llvm/Analysis/AliasAnalysis.h"
 #include "MemoryVal.h"
 #include <unordered_map>
+#include "AAWrapper.h"
 
 namespace vanguard {
     class MemoryTaint {
     public:
-        explicit MemoryTaint(llvm::AAResults *aa);
+        explicit MemoryTaint(AAWrapper &aa);
 
         //static bool propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts);
         //static bool merge(const std::vector<Taint *> &from, Taint &to);
@@ -21,7 +22,7 @@ namespace vanguard {
         std::vector<std::pair<const MemoryVal *, uint64_t>> getMemTaint();
 
     private:
-        llvm::AAResults *alias;
+        AAWrapper &aaWrapper;
 
         /*
          * For now we're just going to do something quick and dirty. Get by checking for alias against all memory taint

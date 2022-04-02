@@ -6,7 +6,7 @@
 #include "Taint.h"
 
 namespace vanguard {
-    Taint::Taint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAResults *alias) : store(store), RegisterTaint(sharedRegTaint), MemoryTaint(alias) {}
+    Taint::Taint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAWrapper &alias) : store(store), RegisterTaint(sharedRegTaint), MemoryTaint(alias) {}
 
     bool Taint::isTainted(const Val &v) const {
         return v.getTaint(*this) != 0;

@@ -39,6 +39,7 @@ namespace vanguard {
 
     bool TaintAnalysis::endFn(Function &fn) {
         bool changed = curSummary->didSummaryChange();
+        curSummary->getAliasWrapper().invalidate();
         curSummary = nullptr;
         return changed;
     }

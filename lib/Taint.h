@@ -27,7 +27,7 @@ using namespace llvm;
 namespace vanguard {
     class Taint : public RegisterTaint, public MemoryTaint {
     public:
-        Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAResults *alias);
+        Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAWrapper &alias);
 
         bool isTainted(const Val &v) const;
         bool isTainted(const Val &v, const TaintLabel &label) const;
