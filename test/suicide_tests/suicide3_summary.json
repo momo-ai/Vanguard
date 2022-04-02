@@ -1,0 +1,82 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "close"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "close_help"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "close_help_help"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "deposit"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "withdraw"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "getBalance"
+        }
+      ],
+      "variables": [
+        {
+          "name": "balances",
+          "type": {
+            "subType": "MapType",
+            "name": "mapping(address => uint256)",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint"
+            }
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 95,
+      "name": "suicide3"
+    }
+  ],
+  "version": "^0.8.10",
+  "compiler": "Solang"
+}
