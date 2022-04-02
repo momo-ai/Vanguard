@@ -4,28 +4,42 @@
 
 #include <iostream>
 #include "TaintAnalysis.h"
+#include "llvm/Analysis/AliasAnalysis.h"
 
 namespace vanguard {
 
-    TaintAnalysis::TaintAnalysis(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources) : store(sinks, sources) {
+    TaintAnalysis::TaintAnalysis(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources) : sinks(sinks), sources(sources), store(nullptr) {
 
     }
 
-    bool TaintAnalysis::beginFn(const Function &fn) {
+    TaintAnalysis::~TaintAnalysis() {
+        delete store;
+    }
+
+    void TaintAnalysis::registerRequirements(llvm::AnalysisUsage &info) const {
+        info.addRequired<AAResultsWrapperPass>();
+    }
+
+    void TaintAnalysis::startAnalysis(llvm::Pass &pass) {
+        store = new TaintSummaryStore(sinks, sources, pass);
+    }
+
+    bool TaintAnalysis::beginFn(Function &fn) {
         if(fn.hasName()) {
            std::cout << fn.getName().str() << std::endl;
         }
-        curSummary = store.getSummary(fn);
+        curSummary = store->getSummary(fn);
         return false;
     }
 
-    bool TaintAnalysis::transfer(const Instruction &ins) {
+    bool TaintAnalysis::transfer(Instruction &ins) {
         //ins.print(outs(), true);
         return curSummary->propagate(ins);
     }
 
-    bool TaintAnalysis::endFn(const Function &fn) {
+    bool TaintAnalysis::endFn(Function &fn) {
         bool changed = curSummary->didSummaryChange();
+        curSummary->getAliasWrapper().invalidate();
         curSummary = nullptr;
         return changed;
     }

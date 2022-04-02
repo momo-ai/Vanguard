@@ -12,10 +12,10 @@ using namespace vanguard;
 namespace IntraExample {
     class ModPrint : public Analysis {
     public:
-        bool shouldAnalyze(const Function &fn) override;
-        bool beginFn(const Function &fn) override;
-        bool transfer(const Instruction &ins) override;
-        bool endFn(const Function &fn) override;
+        bool shouldAnalyze(Function &fn) override;
+        bool beginFn(Function &fn) override;
+        bool transfer(Instruction &ins) override;
+        bool endFn(Function &fn) override;
         string vulnerabilityReport() override;
     };
 }

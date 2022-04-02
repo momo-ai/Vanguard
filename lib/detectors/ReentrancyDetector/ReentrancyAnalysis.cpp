@@ -13,11 +13,11 @@ namespace Reentrancy {
         chain = in_chain;
     }
 
-    bool ReentrancyAnalysis::shouldAnalyze(const Function &fn) {
+    bool ReentrancyAnalysis::shouldAnalyze(Function &fn) {
         return chain->isContractFunction(fn);
     }
 
-    bool ReentrancyAnalysis::beginFn(const Function &fn) {
+    bool ReentrancyAnalysis::beginFn(Function &fn) {
         fname = fn.getName().str();
         modified = false;
         lastExternalCall = NULL;
@@ -28,7 +28,7 @@ namespace Reentrancy {
         return false;
     }
 
-    bool ReentrancyAnalysis::transfer(const Instruction &ins) {
+    bool ReentrancyAnalysis::transfer(Instruction &ins) {
         if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
             // Detect function call
             Function *called_func = CallInstr->getCalledFunction();
@@ -85,7 +85,7 @@ namespace Reentrancy {
         return false;
     }
 
-    bool ReentrancyAnalysis::endFn(const Function &fn) {
+    bool ReentrancyAnalysis::endFn(Function &fn) {
         return modified;
     }
 

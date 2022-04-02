@@ -11,7 +11,7 @@
 #include <unordered_set>
 
 namespace vanguard {
-    RegisterTaint::RegisterTaint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint) : labelStore(store), regTaint(sharedRegTaint) {}
+    RegisterTaint::RegisterTaint(std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint) : regTaint(sharedRegTaint) {}
     /*
      * Private helpers
      */
@@ -24,7 +24,7 @@ namespace vanguard {
         return accTaint;
     }*/
 
-    bool RegisterTaint::setTaint(const RegisterVal &v, uint64_t mask) {
+    bool RegisterTaint::setRegTaint(const RegisterVal &v, uint64_t mask) {
         const auto &regVal = static_cast<const RegisterVal &>(v);
 
         if(regTaint[regVal] == mask) {
@@ -35,7 +35,7 @@ namespace vanguard {
         return true;
     }
 
-    bool RegisterTaint::addTaint(const RegisterVal &v, uint64_t mask) {
+    bool RegisterTaint::addRegTaint(const RegisterVal &v, uint64_t mask) {
         const auto &regVal = static_cast<const RegisterVal &>(v);
 
         if((regTaint[regVal] & mask) == mask) {
@@ -46,7 +46,7 @@ namespace vanguard {
         return true;
     }
 
-    bool RegisterTaint::untaint(const RegisterVal &v, uint64_t mask) {
+    bool RegisterTaint::untaintReg(const RegisterVal &v, uint64_t mask) {
         const auto &regVal = static_cast<const RegisterVal &>(v);
 
         if((regTaint[regVal] & mask) == 0) {
@@ -57,7 +57,7 @@ namespace vanguard {
         return true;
     }
 
-    uint64_t RegisterTaint::getTaint(const RegisterVal &v) const {
+    uint64_t RegisterTaint::getRegTaint(const RegisterVal &v) const {
         const auto &regVal = static_cast<const RegisterVal &>(v);
         if(regTaint.find(regVal) == regTaint.end()) {
             return 0;
@@ -69,7 +69,7 @@ namespace vanguard {
      * Public Functions
      */
 
-    bool RegisterTaint::isTainted(const RegisterVal &v) const {
+    /*bool RegisterTaint::isTainted(const RegisterVal &v) const {
         return getTaint(v) != 0;
     }
 
@@ -101,7 +101,7 @@ namespace vanguard {
         }
 
         return taintLabels;
-    }
+    }*/
 
     std::vector<std::pair<const RegisterVal *, uint64_t>> RegisterTaint::getRegTaint() {
         std::vector<std::pair<const RegisterVal *, uint64_t>> tainted;

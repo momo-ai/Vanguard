@@ -25,6 +25,10 @@ namespace vanguard {
     class ReadWriteRetriever : public InstVisitor<ReadWriteRetriever> {
     public:
         ReadWriteInfo retrieve(const Instruction &ins);
+    private:
+        ReadWriteInfo get(const LoadInst &ins);
+        ReadWriteInfo get(const StoreInst &ins);
+        ReadWriteInfo get(const Instruction &ins);
     };
 }
 

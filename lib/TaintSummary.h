@@ -13,21 +13,25 @@
 #include "FunctionTaintSink.h"
 #include "FunctionTaintSource.h"
 #include "TaintSinkProvider.h"
+#include "AAWrapper.h"
 #include <unordered_map>
 
 namespace vanguard {
     class TaintSummary : public TaintSinkProvider {
     public:
-        TaintSummary(const Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources);
+        TaintSummary(Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources, llvm::Pass &pass);
         ~TaintSummary();
         bool propagate(const llvm::Instruction &ins);
         std::vector<TaintNode *> getTaint(FunctionTaintSink &sink) override;
         bool didSummaryChange();
+        AAWrapper &getAliasWrapper();
     private:
         std::vector<TaintLabel *> getOrCreateTaintLabels(Taint *state, std::vector<Val *> &vals);
         Taint *getPrevTaint(const llvm::Instruction &ins);
         bool computeSummary();
 
+
+        AAWrapper alias;
         ReadWriteRetriever &rwRetriever;
         const Function &fn;
         TaintLabelStore labelStore;

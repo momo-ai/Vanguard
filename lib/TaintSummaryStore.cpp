@@ -3,18 +3,24 @@
 //
 
 #include "TaintSummaryStore.h"
+#include "AAWrapper.h"
 
 
 namespace vanguard {
-    TaintSummaryStore::TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources) : fnSinks(sinks), fnSources(sources) {
+    TaintSummaryStore::TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass) : fnSinks(sinks), fnSources(sources), pass(pass) {
 
     }
 
-    TaintSummary *TaintSummaryStore::getSummary(const Function &fn) {
+    TaintSummary *TaintSummaryStore::getSummary(Function &fn) {
         auto summaryIt = fnSummaries.find(&fn);
         TaintSummary *summary = nullptr;
         if(summaryIt == fnSummaries.end()) {
-            summary = new TaintSummary(fn, rwRetriever, fnSinks, fnSources);
+            /*AAResults *alias = nullptr;
+
+            if(!fn.isDeclaration()) {
+                alias = &pass.getAnalysis<AAResultsWrapperPass>(fn).getAAResults();
+            }*/
+            summary = new TaintSummary(fn, rwRetriever, fnSinks, fnSources, pass);
             fnSummaries[&fn] = summary;
         }
         else {

@@ -13,10 +13,10 @@ namespace Reentrancy {
     class ReentrancyAnalysis : public Analysis {
     public:
         ReentrancyAnalysis(const blockchain::Blockchain *in_chain);
-        bool shouldAnalyze(const Function &fn) override;
-        bool beginFn(const Function &fn) override;
-        bool transfer(const Instruction &ins) override;
-        bool endFn(const Function &fn) override;
+        bool shouldAnalyze(Function &fn) override;
+        bool beginFn(Function &fn) override;
+        bool transfer(Instruction &ins) override;
+        bool endFn(Function &fn) override;
         string vulnerabilityReport() override;
     private:
         const Function *lastExternalCall = NULL; // Tracks last external call

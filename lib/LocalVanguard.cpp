@@ -6,7 +6,15 @@
 
 
 namespace vanguard {
+    void LocalVanguard::getAnalysisUsage(llvm::AnalysisUsage &info) const {
+        analysis->registerRequirements(info);
+    }
+
     bool LocalVanguard::runOnFunction(Function &fn) {
+        if(!started) {
+            analysis->startAnalysis(*this);
+            started = true;
+        }
         runToFixedpoint(fn);
         return false;
     }

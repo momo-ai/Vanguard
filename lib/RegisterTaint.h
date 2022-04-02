@@ -11,14 +11,14 @@
 namespace vanguard {
     class RegisterTaint {
     public:
-        RegisterTaint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint);
-        bool isTainted(const RegisterVal &v) const;
+        explicit RegisterTaint(std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint);
+        /*bool isTainted(const RegisterVal &v) const;
         bool isTainted(const RegisterVal &v, const TaintLabel &label) const;
 
         bool addTaint(const RegisterVal &v, const TaintLabel &label);
         bool untaint(const RegisterVal &v, const TaintLabel &label);
         bool untaint(const RegisterVal &v);
-        std::vector<TaintLabel *> taintedWith(const RegisterVal &v) const;
+        std::vector<TaintLabel *> taintedWith(const RegisterVal &v) const;*/
 
 
         //static bool propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts);
@@ -30,13 +30,12 @@ namespace vanguard {
         friend RegisterVal;
 
         std::unordered_map<RegisterVal, uint64_t> &regTaint;
-        TaintLabelStore &labelStore;
 
         //hide implementation details as much as possible
-        bool addTaint(const RegisterVal &v, uint64_t mask);
-        bool untaint(const RegisterVal &v, uint64_t mask);
-        uint64_t getTaint(const RegisterVal &v) const;
-        bool setTaint(const RegisterVal &v, uint64_t mask);
+        bool addRegTaint(const RegisterVal &v, uint64_t mask);
+        bool untaintReg(const RegisterVal &v, uint64_t mask);
+        uint64_t getRegTaint(const RegisterVal &v) const;
+        bool setRegTaint(const RegisterVal &v, uint64_t mask);
     };
 }
 #endif //VANGUARD_REGISTERTAINT_H

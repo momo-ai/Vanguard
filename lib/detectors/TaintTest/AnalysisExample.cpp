@@ -12,7 +12,7 @@ namespace vanguard {
 
     }
 
-    bool AnalysisExample::shouldAnalyze(const Function &fn) {
+    bool AnalysisExample::shouldAnalyze(Function &fn) {
         return true;
     }
 
