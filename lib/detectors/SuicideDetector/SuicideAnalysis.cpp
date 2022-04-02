@@ -13,11 +13,11 @@ namespace Suicide {
         chain = in_chain;
     }
 
-    bool SuicideAnalysis::shouldAnalyze(const Function &fn) {
+    bool SuicideAnalysis::shouldAnalyze(Function &fn) {
         return chain->isContractFunction(fn);
     }
 
-    bool SuicideAnalysis::beginFn(const Function &fn) {
+    bool SuicideAnalysis::beginFn(Function &fn) {
         fname = fn.getName().str();
         // TODO: Move to blockchain
 //        if (chain->findFunction(fn).isPublic()) {
@@ -28,7 +28,7 @@ namespace Suicide {
         return false;
     }
 
-    bool SuicideAnalysis::transfer(const Instruction &ins) {
+    bool SuicideAnalysis::transfer(Instruction &ins) {
         bool modified = false;
         if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
             // Check for call to selfDestruct
@@ -49,7 +49,7 @@ namespace Suicide {
         return modified;
     }
 
-    bool SuicideAnalysis::endFn(const Function &fn) {
+    bool SuicideAnalysis::endFn(Function &fn) {
         return false;
     }
 

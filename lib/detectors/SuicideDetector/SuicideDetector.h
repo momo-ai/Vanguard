@@ -18,7 +18,6 @@ namespace Suicide {
         ~SuicideDetector();
     private:
         SuicideAnalysis *analyzer;
-
     };
 }
 
