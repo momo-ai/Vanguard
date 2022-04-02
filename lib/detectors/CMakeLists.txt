@@ -3,3 +3,4 @@
 add_subdirectory(SCCExample)
 add_subdirectory(IntraproceduralExample)
 add_subdirectory(ReentrancyDetector)
+add_subdirectory(SuicideDetector)
