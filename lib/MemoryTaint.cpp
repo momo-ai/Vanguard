@@ -5,7 +5,10 @@
 #include "MemoryTaint.h"
 
 namespace vanguard {
-    MemoryTaint::MemoryTaint(llvm::AAResults &aa) : alias(aa) {}
+    /*
+     * alias analysis is only null on declaration, in that case pretend like no memory is aliased
+     */
+    MemoryTaint::MemoryTaint(llvm::AAResults *aa) : alias(aa) {}
 
     std::vector<std::pair<const MemoryVal *, uint64_t>> MemoryTaint::getMemTaint() {
         std::vector<std::pair<const MemoryVal *, uint64_t>> tainted;
@@ -22,8 +25,21 @@ namespace vanguard {
      */
     bool MemoryTaint::addMemTaint(const MemoryVal &v, uint64_t mask) {
         bool modified = false;
+        if(alias == nullptr) {
+            for(auto &entry : memTaint) {
+                if(v.includes(entry.first)) {
+                    if((entry.second & mask) != mask) {
+                        entry.second |= mask;
+                        modified = true;
+                    }
+                }
+            }
+
+            return modified;
+        }
+
         for(auto &entry : memTaint) {
-            if(alias.alias(entry.first.toMemoryLocation(), v.toMemoryLocation())) {
+            if(alias->alias(entry.first.toMemoryLocation(), v.toMemoryLocation())) {
                 if((memTaint[v] & mask) != mask) {
                     modified = true;
                     entry.second |= mask;
@@ -60,9 +76,20 @@ namespace vanguard {
             return memTaint.at(v);
         }
 
+        if(alias == nullptr) {
+            uint64_t taint = 0;
+            for(auto &entry : memTaint) {
+                if(v.includes(entry.first)) {
+                    taint |= entry.second;
+                }
+            }
+
+            return taint;
+        }
+
         uint64_t taint = 0;
         for(auto &entry : memTaint) {
-            if(alias.alias(entry.first.toMemoryLocation(), v.toMemoryLocation())) {
+            if(alias->alias(entry.first.toMemoryLocation(), v.toMemoryLocation())) {
                 taint |= entry.second;
             }
         }
@@ -84,6 +111,10 @@ namespace vanguard {
                     modified = true;
                 }
             }
+        }
+
+        if(alias == nullptr) {
+            return modified;
         }
 
         return addMemTaint(v, mask) || modified;

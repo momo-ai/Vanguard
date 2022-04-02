@@ -14,10 +14,10 @@ namespace vanguard {
         auto summaryIt = fnSummaries.find(&fn);
         TaintSummary *summary = nullptr;
         if(summaryIt == fnSummaries.end()) {
-            if(fn.isDeclaration()) {
-                return nullptr;
+            AAResults *alias = nullptr;
+            if(!fn.isDeclaration()) {
+                alias = &pass.getAnalysis<AAResultsWrapperPass>(fn).getAAResults();
             }
-            auto &alias = pass.getAnalysis<AAResultsWrapperPass>(fn).getAAResults();
             summary = new TaintSummary(fn, rwRetriever, fnSinks, fnSources, alias);
             fnSummaries[&fn] = summary;
         }

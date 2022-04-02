@@ -13,9 +13,7 @@ namespace vanguard {
     }
 
     TaintAnalysis::~TaintAnalysis() {
-        if(store != nullptr) {
-            delete store;
-        }
+        delete store;
     }
 
     void TaintAnalysis::registerRequirements(llvm::AnalysisUsage &info) const {
@@ -40,10 +38,6 @@ namespace vanguard {
     }
 
     bool TaintAnalysis::endFn(Function &fn) {
-        if(curSummary == nullptr) {
-            return false;
-        }
-
         bool changed = curSummary->didSummaryChange();
         curSummary = nullptr;
         return changed;
