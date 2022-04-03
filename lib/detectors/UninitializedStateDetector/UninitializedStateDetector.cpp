@@ -18,7 +18,7 @@ namespace UninitializedState {
 
     char UninitializedStateDetector::ID = 0;
     static RegisterPass<UninitializedStateDetector> X("uninitialized_state", "Basic uninitialized state detector",
-                                              true /* Only looks at CFG */,
-                                              true /* Analysis Pass */);
+                                                      true /* Only looks at CFG */,
+                                                      true /* Analysis Pass */);
 
 }

@@ -6,7 +6,7 @@ import subprocess
 from tabulate import tabulate
 from typing import *
 
-TYPES = ["reentrancy", "suicide", "uninitialized_state"]
+TYPES = ["reentrancy", "suicide", "uninitialized_state", "msg_value_loop"]
 TESTS_PATH = os.path.join("test")
 OPT_PATH = os.path.join("/", "opt", "homebrew", "Cellar", "llvm", "13.0.1_1", "bin", "opt")
 OPT_CMD = "{} --load=cmake-build-debug/lib/libVanguard.dylib -enable-new-pm=0 --summary={{}} --{{}} {{}} -o /dev/null".format(OPT_PATH)
@@ -24,7 +24,8 @@ def run():
     for test, typ_res in results.items():
         row = ["{}.sol".format(test)] + [""]*len(TYPES)
         for typ, res in typ_res.items():
-            row[TYPES.index(typ)+1] = "\n".join([r[1].split("::")[-1] for r in res])
+            fnames = [r[1].split("::")[-1].split("__")[0] for r in res]
+            row[TYPES.index(typ)+1] = "\n".join(fnames)
         out_res.append(row)
 
     print(tabulate(out_res, tablefmt="grid"))

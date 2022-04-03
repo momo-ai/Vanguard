@@ -1,0 +1,78 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [
+            {
+              "name": "receivers",
+              "type": {
+                "subType": "ArrayType",
+                "name": "address[]",
+                "base": {
+                  "subType": "ElementaryType",
+                  "name": "address"
+                }
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "bad"
+        },
+        {
+          "params": [
+            {
+              "name": "receivers",
+              "type": {
+                "subType": "ArrayType",
+                "name": "address[]",
+                "base": {
+                  "subType": "ElementaryType",
+                  "name": "address"
+                }
+              }
+            },
+            {
+              "name": "i",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "name": "__for_loop_body_1"
+        }
+      ],
+      "variables": [
+        {
+          "name": "balances",
+          "type": {
+            "subType": "MapType",
+            "name": "mapping(address => uint256)",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint256"
+            }
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 49,
+      "name": "msg_value_loop1"
+    }
+  ],
+  "version": "^0.8.10",
+  "compiler": "Solang"
+}
