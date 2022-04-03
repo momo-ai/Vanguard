@@ -8,6 +8,31 @@
 namespace vanguard {
     Taint::Taint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAWrapper &alias) : store(store), RegisterTaint(sharedRegTaint), MemoryTaint(alias) {}
 
+    bool Taint::hasValLabel(Val &val) {
+        auto valIt = valToLabel.find(&val);
+        return valIt != valToLabel.end();
+    }
+
+    std::vector<TaintLabel *>Taint::getOrCreateTaintLabels(std::vector<Val *> &vals) {
+        std::vector<TaintLabel *> labels;
+
+        for(Val *v : vals) {
+            labels.push_back(getOrCreateTaintLabel(*v));
+        }
+
+        return labels;
+    }
+
+    TaintLabel *Taint::getOrCreateTaintLabel(Val &val) {
+        if(!hasValLabel(val)) {
+            auto l = store.newLabel(&val);
+            valToLabel[&val] = l;
+            addTaint(val, *l);
+        }
+
+        return valToLabel.at(&val);
+    }
+
     bool Taint::isTainted(const Val &v) const {
         return v.getTaint(*this) != 0;
     }

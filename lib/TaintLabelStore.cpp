@@ -6,6 +6,8 @@
 #include "TaintLabel.h"
 
 namespace vanguard {
+    TaintLabelStore::TaintLabelStore(const TaintSummary &parent) : summary(parent), nextLabel(0) {}
+
     TaintLabelStore::~TaintLabelStore() {
         for(auto entry : idToLabel) {
             delete entry.second;
@@ -15,8 +17,12 @@ namespace vanguard {
         maskToLabel.clear();
     }
 
-    TaintLabel *TaintLabelStore::newLabel() {
-        auto l = new TaintLabel(nextLabel++);
+    const TaintSummary &TaintLabelStore::parent() const {
+        return summary;
+    }
+
+    TaintLabel *TaintLabelStore::newLabel(Val *origin) {
+        auto l = new TaintLabel(*this, origin, nextLabel++);
         maskToLabel[l->taintMask()] = l;
         idToLabel[l->id()] = l;
         return l;

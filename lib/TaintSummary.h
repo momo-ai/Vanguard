@@ -17,20 +17,23 @@
 #include <unordered_map>
 
 namespace vanguard {
+    class TaintSummaryStore;
     class TaintSummary : public TaintSinkProvider {
     public:
-        TaintSummary(Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources, llvm::Pass &pass);
+        TaintSummary(TaintSummaryStore &parent, Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources, llvm::Pass &pass);
         ~TaintSummary();
         bool propagate(const llvm::Instruction &ins);
+        bool propagate(const llvm::CallInst &call);
         std::vector<TaintNode *> getTaint(FunctionTaintSink &sink) override;
         bool didSummaryChange();
         AAWrapper &getAliasWrapper();
+        const Function &function() const;
+        const TaintSummaryStore &parent();
     private:
-        std::vector<TaintLabel *> getOrCreateTaintLabels(Taint *state, std::vector<Val *> &vals);
         Taint *getPrevTaint(const llvm::Instruction &ins);
         bool computeSummary();
 
-
+        TaintSummaryStore &store;
         AAWrapper alias;
         ReadWriteRetriever &rwRetriever;
         const Function &fn;
@@ -40,7 +43,6 @@ namespace vanguard {
         std::unordered_map<const Instruction *, Taint *> insToTaint;
         std::vector<FunctionTaintSource *> fnSources;
         //std::unordered_map<RegisterVal, TaintLabel *> valToLabel;
-        std::unordered_map<Val *, TaintLabel *, ValPtrHash, ValPtrEq> valToLabel;
         Taint *initState;
         Taint *summary;
     };

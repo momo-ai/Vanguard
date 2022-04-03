@@ -20,7 +20,7 @@ namespace vanguard {
             if(!fn.isDeclaration()) {
                 alias = &pass.getAnalysis<AAResultsWrapperPass>(fn).getAAResults();
             }*/
-            summary = new TaintSummary(fn, rwRetriever, fnSinks, fnSources, pass);
+            summary = new TaintSummary(*this, fn, rwRetriever, fnSinks, fnSources, pass);
             fnSummaries[&fn] = summary;
         }
         else {
