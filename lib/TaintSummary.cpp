@@ -6,11 +6,13 @@
 #include "TaintSummary.h"
 #include "ReadWriteRetriever.h"
 #include "llvm/IR/CFG.h"
+#include "TaintSummaryStore.h"
+#include "Val.h"
 
 namespace vanguard {
-    TaintSummary::TaintSummary(Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass) : fn(summaryFn), rwRetriever(rw), alias(pass, summaryFn) {
+    TaintSummary::TaintSummary(TaintSummaryStore &parent, Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &sinks, const std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass) : store(parent), labelStore(*this), fn(summaryFn), rwRetriever(rw), alias(pass, summaryFn) {
         initState = new Taint(labelStore, regTaint, alias);
-        summary = initState;
+        summary = new Taint(labelStore, regTaint, alias);
         for(auto sink : sinks) {
             if(sink->isSink(summaryFn)) {
                 sink->registerProvider(this);
@@ -23,7 +25,7 @@ namespace vanguard {
                 if(!taintedVals.empty()) {
                     /*TODO: can probably consolidate some of these labels*/
                     fnSources.push_back(src);
-                    std::vector<TaintLabel *> labels = getOrCreateTaintLabels(initState, taintedVals);
+                    std::vector<TaintLabel *> labels = initState->getOrCreateTaintLabels(taintedVals);
                     for(auto l : labels) {
                         l->addSource(src);
                     }
@@ -33,6 +35,14 @@ namespace vanguard {
         }
 
         bbInit[&fn.getEntryBlock()] = initState;
+    }
+
+    const TaintSummaryStore &TaintSummary::parent() {
+        return store;
+    }
+
+    const Function &TaintSummary::function() const {
+        return fn;
     }
 
     AAWrapper &TaintSummary::getAliasWrapper() {
@@ -77,6 +87,9 @@ namespace vanguard {
     }
 
     bool TaintSummary::propagate(const llvm::Instruction &ins) {
+        if(auto call = dyn_cast<const llvm::CallInst>(&ins)) {
+            return propagate(*call);
+        }
         //ins.print(outs());
         //std::cout << std::endl;
         Taint *prev = getPrevTaint(ins);
@@ -88,35 +101,71 @@ namespace vanguard {
         }
 
         bool modified = cur->propagate(*prev, info.reads, info.writes);
-        return modified;
+        return modified || info.requiresUpdate;
     }
 
-    std::vector<TaintLabel *>TaintSummary::getOrCreateTaintLabels(Taint *state, std::vector<Val *> &vals) {
-        std::vector<TaintLabel *> labels;
-        if(vals.empty()) {
-            return labels;
+    bool TaintSummary::propagate(const llvm::CallInst &call) {
+        std::cout << "  called: " << call.getCalledFunction()->getName().str() << std::endl;
+        bool requiresUpdate = false;
+        std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> inVals = Val::inVals(call);
+        std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> outVals = Val::outVals(call);
+
+        TaintSummary *callee = store.getSummary(*call.getCalledFunction());
+        Taint *prev = getPrevTaint(call);
+        Taint *cur = insToTaint[&call];
+        if(cur == nullptr) {
+            cur = new Taint(*prev);
+            insToTaint[&call] = cur;
         }
 
-        for(Val *v : vals) {
-            /*if(v->type() != ValType::REG_VAL) {
-                throw std::runtime_error("Only reg values supported right now");
+        //std::vector<TaintLabel *> calleeTaint;
+        //std::unordered_map<TaintLabel *, std::vector<TaintLabel *>> calleeToCaller;
+        for(auto &entry : inVals) {
+            Val *callerVal = entry.first;
+            Val *calleeVal = entry.second;
+
+            if(!cur->isTainted(*callerVal)) {
+                continue;
             }
 
-            RegisterVal *rv = static_cast<RegisterVal *>(v);
-            RegisterVal *rv = cast<RegisterVal>(v);*/
-            auto valIt = valToLabel.find(v);
-            if(valIt == valToLabel.end()) {
-                auto l = labelStore.newLabel();
-                valToLabel[v] = l;
-                state->addTaint(*v, *l);
-                labels.push_back(l);
+            if(!callee->initState->hasValLabel(*calleeVal)) {
+                requiresUpdate = true;
             }
-            else {
-                labels.push_back(valToLabel.at(v));
+
+            // Get the taint label
+            TaintLabel *calleeLabel = callee->initState->getOrCreateTaintLabel(*calleeVal);
+
+            //connect taint labels
+            for(TaintLabel *callerLabel : cur->taintedWith(*callerVal)) {
+                calleeLabel->addNode(callerLabel);
+                //calleeToCaller[calleeLabel].push_back(callerLabel);
             }
+
+            //delete callerVal;
+            //delete calleeVal;
         }
 
-        return labels;
+        for(auto &entry : outVals) {
+            Val *calleeVal = entry.first;
+            Val *callerVal = entry.second;
+
+            if(!callee->summary->isTainted(*calleeVal)) {
+                continue;
+            }
+
+            TaintLabel *callerLabel = cur->getOrCreateTaintLabel(*callerVal);
+
+            for(TaintLabel *calleeLabel : callee->summary->taintedWith(*calleeVal)) {
+                callerLabel->addNode(calleeLabel);
+            }
+
+            //delete calleeVal;
+            //delete callerVal;
+        }
+
+        //see if any of our taint labels
+
+        return requiresUpdate;
     }
 
     std::vector<TaintNode *> TaintSummary::getTaint(FunctionTaintSink &sink) {

@@ -6,12 +6,15 @@
 #define VANGUARD_VAL_H
 
 #include <llvm/IR/Function.h>
+#include <llvm/IR/Instruction.h>
 #include <unordered_set>
+#include <unordered_map>
 #include <vector>
-#include "TaintLabel.h"
 
 namespace vanguard {
     class Taint;
+    struct ValPtrHash;
+    struct ValPtrEq;
 
     enum ValType {
         REGISTER_VAL,
@@ -50,6 +53,8 @@ namespace vanguard {
         // Static Types
         static std::vector<Val *> functionOutputs(const llvm::Function &fn);
         static std::vector<Val *> functionArgs(const llvm::Function &fn);
+        static std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> inVals(const llvm::CallInst &call);
+        static std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> outVals(const llvm::CallInst &call);
     protected:
         friend Taint;
 

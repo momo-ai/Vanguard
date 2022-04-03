@@ -13,12 +13,17 @@
 namespace vanguard {
     class TaintLabel : public TaintNode {
     public:
-        ~TaintLabel() = default;
+        ~TaintLabel();
         uint id() const;
         uint64_t taintMask() const;
+        const TaintLabelStore &parent() const;
+        const Val *origin() override;
+        std::size_t hash() const override;
     private:
         uint tid;
-        explicit TaintLabel(uint id);
+        Val *originVal;
+        const TaintLabelStore &store;
+        explicit TaintLabel(const TaintLabelStore &parent, Val *origin, uint id);
 
         friend class TaintLabelStore;
     };

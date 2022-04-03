@@ -9,7 +9,7 @@
 namespace vanguard {
     void TaintNode::addNode(TaintNode *n) {
         if(n != nullptr) {
-            children.push_back(n);
+            children.insert(n);
         }
     }
 

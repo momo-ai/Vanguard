@@ -6,10 +6,26 @@
 #include <exception>
 
 namespace vanguard {
-    TaintLabel::TaintLabel(uint id) : tid(id) {
+    TaintLabel::TaintLabel(const TaintLabelStore &parent, Val *origin, uint id) : originVal(origin), store(parent), tid(id) {
         if(id >= 64) {
             throw std::out_of_range("Can only have up to 64 taint labels per labelStore");
         }
+    }
+
+    std::size_t TaintLabel::hash() const {
+        return (size_t) this;
+    }
+
+    const Val *TaintLabel::origin() {
+        return originVal;
+    }
+
+    TaintLabel::~TaintLabel() {
+        delete originVal;
+    }
+
+    const TaintLabelStore &TaintLabel::parent() const {
+        return store;
     }
 
     uint TaintLabel::id() const {
