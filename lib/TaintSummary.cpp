@@ -193,7 +193,7 @@ namespace vanguard {
                         if(passThroughGenLabels.find(calleeLabel) != passThroughGenLabels.end()) {
                             generatedLabels.insert(callerLabel);
                         }
-                        
+
                         callerLabel->addNode(calleeLabel);
                     }
                 }

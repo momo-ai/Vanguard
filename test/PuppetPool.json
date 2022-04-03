@@ -1,0 +1,918 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [
+            {
+              "name": "recipient",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "amount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "sendValue"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionCall"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            },
+            {
+              "name": "errorMessage",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionCall"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionCallWithValue"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            },
+            {
+              "name": "errorMessage",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionCallWithValue"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionStaticCall"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            },
+            {
+              "name": "errorMessage",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionStaticCall"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionDelegateCall"
+        },
+        {
+          "params": [
+            {
+              "name": "target",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "data",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            },
+            {
+              "name": "errorMessage",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "functionDelegateCall"
+        },
+        {
+          "params": [
+            {
+              "name": "success",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bool"
+              }
+            },
+            {
+              "name": "returndata",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            },
+            {
+              "name": "errorMessage",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bytes"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "pure",
+          "name": "verifyCallResult"
+        }
+      ],
+      "variables": [],
+      "structs": [],
+      "enums": [],
+      "id": 250,
+      "name": "Address"
+    },
+    {
+      "inherits": [],
+      "events": [
+        {
+          "params": [
+            {
+              "name": "from",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "to",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "name": "Transfer"
+        },
+        {
+          "params": [
+            {
+              "name": "owner",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "spender",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "value",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "name": "Approval"
+        }
+      ],
+      "functions": [
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "view",
+          "name": "totalSupply"
+        },
+        {
+          "params": [
+            {
+              "name": "account",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "view",
+          "name": "balanceOf"
+        },
+        {
+          "params": [
+            {
+              "name": "to",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "amount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bool"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "nonpayable",
+          "name": "transfer"
+        },
+        {
+          "params": [
+            {
+              "name": "owner",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "spender",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "view",
+          "name": "allowance"
+        },
+        {
+          "params": [
+            {
+              "name": "spender",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "amount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bool"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "nonpayable",
+          "name": "approve"
+        },
+        {
+          "params": [
+            {
+              "name": "from",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "to",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "amount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bool"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "nonpayable",
+          "name": "transferFrom"
+        }
+      ],
+      "variables": [],
+      "structs": [],
+      "enums": [],
+      "id": 328,
+      "name": "IERC20"
+    },
+    {
+      "inherits": [],
+      "events": [
+        {
+          "params": [
+            {
+              "name": "account",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "depositRequired",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            },
+            {
+              "name": "borrowAmount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "name": "Borrowed"
+        }
+      ],
+      "functions": [
+        {
+          "params": [
+            {
+              "name": "tokenAddress",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            },
+            {
+              "name": "uniswapPairAddress",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": true,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "constructor"
+        },
+        {
+          "params": [
+            {
+              "name": "borrowAmount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [
+            "nonReentrant"
+          ],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "payable",
+          "name": "borrow"
+        },
+        {
+          "params": [
+            {
+              "name": "amount",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "view",
+          "name": "calculateDepositRequired"
+        },
+        {
+          "params": [
+            {
+              "name": "tok",
+              "type": {
+                "subType": "UserType",
+                "refId": 328,
+                "name": "contract IERC20"
+              }
+            },
+            {
+              "name": "addr",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "address"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "view",
+          "name": "v_call_IERC20_balanceOf"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "private",
+          "mutability": "view",
+          "name": "_computeOraclePrice"
+        }
+      ],
+      "variables": [
+        {
+          "name": "deposits",
+          "type": {
+            "subType": "MapType",
+            "name": "mapping(address => uint256)",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint256"
+            }
+          }
+        },
+        {
+          "name": "uniswapPair",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "address"
+          }
+        },
+        {
+          "name": "token",
+          "type": {
+            "subType": "UserType",
+            "refId": 328,
+            "name": "contract IERC20"
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 505,
+      "name": "PuppetPool"
+    },
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "view",
+          "name": "v_get__status"
+        },
+        {
+          "params": [
+            {
+              "name": "__status",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "v_set__status"
+        },
+        {
+          "params": [
+            {
+              "name": "a",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            },
+            {
+              "name": "b",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint256"
+              }
+            }
+          ],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bool"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "pure",
+          "name": "v_neq"
+        },
+        {
+          "params": [
+            {
+              "name": "cond",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "bool"
+              }
+            },
+            {
+              "name": "message",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "string"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "pure",
+          "name": "v_require"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": true,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "constructor"
+        }
+      ],
+      "variables": [
+        {
+          "name": "_NOT_ENTERED",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "uint256"
+          }
+        },
+        {
+          "name": "_ENTERED",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "uint256"
+          }
+        },
+        {
+          "name": "_status",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "uint256"
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 592,
+      "name": "ReentrancyGuard"
+    }
+  ],
+  "version": "^0.8.0",
+  "compiler": "Solang"
+}
