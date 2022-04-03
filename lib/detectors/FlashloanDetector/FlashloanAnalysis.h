@@ -6,11 +6,11 @@
 #define VANGUARD_ANALYSISEXAMPLE_H
 
 #include "../../TaintAnalysis.h"
-namespace vanguard {
-    class AnalysisExample : public TaintAnalysis {
+namespace flashloan {
+    class FlashloanAnalysis : public vanguard::TaintAnalysis {
     public:
-        AnalysisExample(vector<FunctionTaintSink *> &sinks,
-                        vector<FunctionTaintSource *> &sources);
+        FlashloanAnalysis(vector<vanguard::FunctionTaintSink *> &sinks,
+                        vector<vanguard::FunctionTaintSource *> &sources);
 
         bool shouldAnalyze(Function &fn) override;
         string vulnerabilityReport() override;

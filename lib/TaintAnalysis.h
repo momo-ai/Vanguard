@@ -26,9 +26,10 @@ namespace vanguard {
         bool beginFn(Function &fn) override;
         bool endFn(Function &fn) override;
 
-    private:
+    protected:
         std::vector<FunctionTaintSink *> sinks;
         std::vector<FunctionTaintSource *> sources;
+    private:
         TaintSummaryStore *store;
         TaintSummary *curSummary;
     };

@@ -10,18 +10,20 @@
 #include "llvm/Analysis/MemoryLocation.h"
 #include "MemoryVal.h"
 
+using namespace std;
+
 namespace vanguard {
     ValType Val::getType() const {
         return type;
     }
 
-    std::vector<Val *> Val::functionOutputs(const llvm::Function &fn) {
-        std::vector<Val *> outputs;
+    vector<pair<FunctionLocation, Val *>> Val::functionOutputs(const llvm::Function &fn) {
+        vector<pair<FunctionLocation, Val *>> outputs;
 
         for(auto &arg : fn.args()) {
             if(arg.getType()->isPointerTy()) {
                 //finding type size is annoying without call...
-                outputs.push_back(new MemoryVal((Value &) arg, 1));
+                outputs.emplace_back(OUTPUT, new MemoryVal((Value &) arg, 1));
             }
         }
 
@@ -31,7 +33,7 @@ namespace vanguard {
                 if (auto ret = llvm::dyn_cast<llvm::ReturnInst>(blkTerm)) {
                     for(auto &op : ret->operands()) {
                         Value *opVal = op.get();
-                        outputs.push_back(new RegisterVal(*opVal));
+                        outputs.emplace_back(OUTPUT, new RegisterVal(*opVal));
                     }
                 }
             }
@@ -40,14 +42,14 @@ namespace vanguard {
         return outputs;
     }
 
-    std::vector<Val *> Val::functionArgs(const llvm::Function &fn) {
-        std::vector<Val *> args;
+    vector<pair<FunctionLocation, Val *>> Val::functionArgs(const llvm::Function &fn) {
+        vector<pair<FunctionLocation, Val *>> args;
 
         for(auto &arg : fn.args()) {
-            args.push_back(new RegisterVal(arg));
+            args.emplace_back(INPUT, new RegisterVal(arg));
             if(arg.getType()->isPointerTy()) {
                 //finding type size is annoying without call...
-                args.push_back(new MemoryVal((Value &) arg, 1));
+                args.emplace_back(INPUT, new MemoryVal((Value &) arg, 1));
             }
         }
 

@@ -3,6 +3,7 @@
 //
 
 #include "MemoryTaint.h"
+#include <iostream>
 
 namespace vanguard {
     /*
@@ -10,7 +11,7 @@ namespace vanguard {
      */
     MemoryTaint::MemoryTaint(AAWrapper &aa) : aaWrapper(aa) {}
 
-    std::vector<std::pair<const MemoryVal *, uint64_t>> MemoryTaint::getMemTaint() {
+    std::vector<std::pair<const MemoryVal *, uint64_t>> MemoryTaint::getMemTaint() const {
         std::vector<std::pair<const MemoryVal *, uint64_t>> tainted;
 
         for(auto &entry : memTaint) {
@@ -24,7 +25,9 @@ namespace vanguard {
      * add taint to all aliased memory locations
      */
     bool MemoryTaint::addMemTaint(const MemoryVal &v, uint64_t mask) {
-        bool modified = false;
+        bool modified = (memTaint[v] & mask) != mask;
+        memTaint[v] |= mask;
+
         if(aaWrapper.noAlias()) {
             for(auto &entry : memTaint) {
                 if(v.includes(entry.first) || entry.first.includes(v)) {

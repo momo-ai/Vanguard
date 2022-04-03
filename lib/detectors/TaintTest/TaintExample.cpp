@@ -10,17 +10,17 @@
 
 namespace vanguard {
     TaintExample::TaintExample() : IntraproceduralVanguard(ID) {
-        ExampleSource *src = new ExampleSource();
-        ExampleSource *src2 = new ExampleSource();
-        ExampleSink *sink = new ExampleSink();
+        auto src = new ExampleSource();
+        auto src2 = new ExampleSource();
+        auto sink = new ExampleSink();
         std::vector<FunctionTaintSource *> sources = {src, src2};
         std::vector<FunctionTaintSink *> sinks = {sink};
-        analysis = new AnalysisExample(sinks, sources);
+        auto analysis = new AnalysisExample(sinks, sources);
         Vanguard::registerAnalysis(analysis);
     }
 
     char TaintExample::ID = 0;
     static RegisterPass<TaintExample> X("taint-example", "Taint Analysis Example",
-                                                  true /* Only looks at CFG */,
-                                                  true /* Analysis Pass */);
+                                        true /* Only looks at CFG */,
+                                        true /* Analysis Pass */);
 }

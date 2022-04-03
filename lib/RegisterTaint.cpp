@@ -103,7 +103,7 @@ namespace vanguard {
         return taintLabels;
     }*/
 
-    std::vector<std::pair<const RegisterVal *, uint64_t>> RegisterTaint::getRegTaint() {
+    std::vector<std::pair<const RegisterVal *, uint64_t>> RegisterTaint::getRegTaint() const {
         std::vector<std::pair<const RegisterVal *, uint64_t>> tainted;
 
         for(auto &entry : regTaint) {

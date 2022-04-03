@@ -24,7 +24,7 @@ namespace vanguard {
         //static bool propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts);
         //static bool merge(const std::vector<Taint *> &from, Taint &to);
     protected:
-        std::vector<std::pair<const RegisterVal *, uint64_t>> getRegTaint();
+        std::vector<std::pair<const RegisterVal *, uint64_t>> getRegTaint() const;
 
     private:
         friend RegisterVal;

@@ -11,6 +11,7 @@
 #include "Val.h"
 
 namespace vanguard {
+
     /*
      * Check associated function summary to see if appropriate location is tainted
      */
@@ -19,7 +20,7 @@ namespace vanguard {
         FunctionTaintSink() = default;
         std::vector<TaintNode *> gatherTaint() override;
         virtual bool isSink(const llvm::Function &fn) = 0;
-        virtual std::vector<Val *> sinkValues(const llvm::Function &fn) = 0;
+        virtual std::vector<std::pair<FunctionLocation, Val *>> sinkValues(const llvm::Function &fn) = 0;
     private:
     };
 }

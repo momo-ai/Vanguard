@@ -7,10 +7,10 @@
 
 #include "../../FunctionTaintSource.h"
 
-namespace vanguard {
-    class ExampleSource : public FunctionTaintSource {
+namespace flashloan {
+    class BalanceOfSource : public vanguard::FunctionTaintSource {
         bool isSource(const llvm::Function &fn) override;
-        std::vector<std::pair<FunctionLocation, Val *>> sourceValues(const llvm::Function &fn) override;
+        std::vector<std::pair<vanguard::FunctionLocation, vanguard::Val *>> sourceValues(const llvm::Function &fn) override;
     };
 }
 

@@ -33,6 +33,9 @@ namespace vanguard {
         Taint *getPrevTaint(const llvm::Instruction &ins);
         bool computeSummary();
 
+        //labels created within the function
+        std::unordered_set<TaintLabel *> generatedLabels;
+        std::vector<TaintLabel *> getOrCreateTaintLabels(std::vector<std::pair<FunctionLocation, Val *>> &vals);
         TaintSummaryStore &store;
         AAWrapper alias;
         ReadWriteRetriever &rwRetriever;

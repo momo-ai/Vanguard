@@ -3,25 +3,27 @@
 //
 
 #include <iostream>
-#include "AnalysisExample.h"
+#include "FlashloanAnalysis.h"
 #include "../../TaintLabel.h"
 #include "../../TaintLabelStore.h"
 #include "../../TaintSummary.h"
 #include "llvm/IR/Function.h"
 
+using namespace vanguard;
+using namespace llvm;
+using namespace std;
 
-
-namespace vanguard {
-    AnalysisExample::AnalysisExample(vector<FunctionTaintSink *> &sinks,
-                                     vector<FunctionTaintSource *> &sources) : TaintAnalysis(sinks, sources) {
+namespace flashloan {
+    FlashloanAnalysis::FlashloanAnalysis(vector<FunctionTaintSink *> &sinks,
+                                               vector<FunctionTaintSource *> &sources) : TaintAnalysis(sinks, sources) {
 
     }
 
-    bool AnalysisExample::shouldAnalyze(Function &fn) {
+    bool FlashloanAnalysis::shouldAnalyze(Function &fn) {
         return true;
     }
 
-    string AnalysisExample::vulnerabilityReport() {
+    string FlashloanAnalysis::vulnerabilityReport() {
         cout << "Vulnerability Report:" << endl;
         for(auto sink : sinks) {
             for(TaintNode *node : sink->gatherTaint()) {

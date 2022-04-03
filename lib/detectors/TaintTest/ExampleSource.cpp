@@ -10,7 +10,7 @@ namespace vanguard {
         return true;
     }
 
-    std::vector<Val *> ExampleSource::sourceValues(const llvm::Function &fn) {
+    std::vector<std::pair<FunctionLocation, Val *>> ExampleSource::sourceValues(const llvm::Function &fn) {
         // TODO: taint analysis does not take ownership of these values, they should be deleted here.
         return Val::functionArgs(fn);
     }

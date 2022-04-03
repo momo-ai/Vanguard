@@ -2,6 +2,7 @@
 // Created by Jon Stephens on 3/19/22.
 //
 
+#include <algorithm>
 #include <unordered_set>
 #include "Taint.h"
 
@@ -53,6 +54,15 @@ namespace vanguard {
         return v.untaint(*this, v.getTaint(*this));
     }
 
+    bool Taint::isTaintedWith(const Val &v, std::unordered_set<TaintLabel *> labels) const {
+        uint64_t tgtTaint = 0;
+        for(TaintLabel *label : labels) {
+            tgtTaint |= label->taintMask();
+        }
+
+        return (v.getTaint(*this) & tgtTaint) != 0;
+    }
+
     std::vector<TaintLabel *> Taint::taintedWith(const Val &v) const {
         uint64_t valTaint = v.getTaint(*this);
         std::vector<TaintLabel *> taintLabels;
@@ -67,12 +77,18 @@ namespace vanguard {
         return taintLabels;
     }
 
+    //TODO: make this more efficient later
     bool Taint::propagate(const Taint &from, const std::vector<Val *> &uses, const std::vector<Val *> &tgts) {
         uint64_t taint = from.accumulate(uses);
         bool modified = false;
 
+        for(auto entry : from.getAllTaint()) {
+            if(find(tgts, entry.first) == tgts.end()) {
+                entry.first->setTaint(*this, entry.second);
+            }
+        }
+
         for(auto v : tgts) {
-            //modified = to.setTaint(*v, taint) || modified;
             modified = v->setTaint(*this, taint);
         }
 
@@ -86,7 +102,7 @@ namespace vanguard {
 
         bool modified = false;
         for(auto cur : from) {
-            for(auto &entry : getAllTaint()) {
+            for(auto &entry : cur->getAllTaint()) {
                 modified = entry.first->addTaint(*this, entry.second) || modified;
             }
             /*for(auto &entry : (*cur).regTaint) {
@@ -97,10 +113,12 @@ namespace vanguard {
         return modified;
     }
 
-    std::vector<std::pair<const Val *, uint64_t>> Taint::getAllTaint() {
+    std::vector<std::pair<const Val *, uint64_t>> Taint::getAllTaint() const {
         std::vector<std::pair<const Val *, uint64_t>> allTaint;
         std::vector<std::pair<const RegisterVal *, uint64_t>> regTaint = getRegTaint();
+        std::vector<std::pair<const MemoryVal *, uint64_t>> memTaint = getMemTaint();
         allTaint.insert(allTaint.end(), regTaint.begin(), regTaint.end());
+        allTaint.insert(allTaint.end(), memTaint.begin(), memTaint.end());
         return allTaint;
     }
 

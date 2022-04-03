@@ -6,13 +6,13 @@
 #define VANGUARD_TAINTEXAMPLE_H
 
 #include "../../IntraproceduralVanguard.h"
-#include "AnalysisExample.h"
+#include "FlashloanAnalysis.h"
 
-namespace vanguard {
-    class TaintExample : public IntraproceduralVanguard {
+namespace flashloan {
+    class FlashloanDetector : public vanguard::IntraproceduralVanguard {
     public:
         static char ID;
-        TaintExample();
+        FlashloanDetector();
     private:
     };
 }

@@ -19,7 +19,7 @@ namespace vanguard {
         //static bool propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts);
         //static bool merge(const std::vector<Taint *> &from, Taint &to);
     protected:
-        std::vector<std::pair<const MemoryVal *, uint64_t>> getMemTaint();
+        std::vector<std::pair<const MemoryVal *, uint64_t>> getMemTaint() const;
 
     private:
         AAWrapper &aaWrapper;
