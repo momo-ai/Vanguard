@@ -6,6 +6,7 @@
 #define VANGUARD_SUICIDE_H
 
 #include "../../Analysis.h"
+#include <unordered_set>
 
 using namespace vanguard;
 
@@ -22,7 +23,7 @@ namespace Suicide {
         bool hasModifier; // Stores whether or not current function has protecting modifier
         string fname; // Current function name
         vector<string> potentialSuicides; // Tracks function names with potential suicides
-        vector<string> pubFuncs; // Tracks publicly executable functions
+        unordered_set<string> pubFuncs; // Tracks publicly executable functions
         const blockchain::Blockchain *chain;
     };
 }

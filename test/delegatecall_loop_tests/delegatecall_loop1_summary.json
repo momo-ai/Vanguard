@@ -5,39 +5,44 @@
       "events": [],
       "functions": [
         {
-          "params": [],
+          "params": [
+            {
+              "name": "receivers",
+              "type": {
+                "subType": "ArrayType",
+                "name": "address[]",
+                "base": {
+                  "subType": "ElementaryType",
+                  "name": "address"
+                }
+              }
+            }
+          ],
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
           "visibility": "public",
           "mutability": "payable",
-          "name": "deposit"
-        },
-        {
-          "params": [],
-          "returns": [],
-          "modifiers": [],
-          "isConstructor": false,
-          "visibility": "public",
-          "mutability": "nonpayable",
-          "name": "withdraw"
-        },
-        {
-          "params": [],
-          "returns": [],
-          "modifiers": [],
-          "isConstructor": false,
-          "visibility": "internal",
-          "mutability": "nonpayable",
-          "name": "clearBalance"
+          "name": "bad"
         },
         {
           "params": [
             {
-              "name": "bal",
+              "name": "receivers",
+              "type": {
+                "subType": "ArrayType",
+                "name": "address[]",
+                "base": {
+                  "subType": "ElementaryType",
+                  "name": "address"
+                }
+              }
+            },
+            {
+              "name": "i",
               "type": {
                 "subType": "ElementaryType",
-                "name": "uint"
+                "name": "uint256"
               }
             }
           ],
@@ -46,23 +51,24 @@
           "isConstructor": false,
           "visibility": "internal",
           "mutability": "nonpayable",
-          "name": "sendThaMoney"
+          "name": "__for_loop_body_1"
         },
         {
-          "params": [],
-          "returns": [
+          "params": [
             {
+              "name": "a",
               "type": {
                 "subType": "ElementaryType",
-                "name": "uint"
+                "name": "address"
               }
             }
           ],
+          "returns": [],
           "modifiers": [],
           "isConstructor": false,
           "visibility": "public",
-          "mutability": "view",
-          "name": "getBalance"
+          "mutability": "payable",
+          "name": "addBalance"
         }
       ],
       "variables": [
@@ -77,15 +83,15 @@
             },
             "value": {
               "subType": "ElementaryType",
-              "name": "uint"
+              "name": "uint256"
             }
           }
         }
       ],
       "structs": [],
       "enums": [],
-      "id": 86,
-      "name": "reentrant4"
+      "id": 69,
+      "name": "delegatecall_loop1"
     }
   ],
   "version": "^0.8.10",

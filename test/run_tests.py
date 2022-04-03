@@ -6,7 +6,7 @@ import subprocess
 from tabulate import tabulate
 from typing import *
 
-TYPES = ["reentrancy", "suicide", "uninitialized_state", "msg_value_loop"]
+TYPES = ["reentrancy", "suicide", "uninitialized_state", "msg_value_loop", "delegatecall_loop"]
 TESTS_PATH = os.path.join("test")
 OPT_PATH = os.path.join("/", "opt", "homebrew", "Cellar", "llvm", "13.0.1_1", "bin", "opt")
 OPT_CMD = "{} --load=cmake-build-debug/lib/libVanguard.dylib -enable-new-pm=0 --summary={{}} --{{}} {{}} -o /dev/null".format(OPT_PATH)

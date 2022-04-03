@@ -17,6 +17,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": true,
+          "visibility": "public",
+          "mutability": "nonpayable",
           "name": "constructor"
         },
         {
@@ -32,6 +34,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
           "name": "__set_destination"
         },
         {
@@ -47,6 +51,8 @@
           ],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "view",
           "name": "__get_destination"
         },
         {
@@ -54,6 +60,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "public",
+          "mutability": "payable",
           "name": "transfer"
         }
       ],

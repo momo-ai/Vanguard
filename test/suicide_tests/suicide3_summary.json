@@ -9,6 +9,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
           "name": "close"
         },
         {
@@ -16,6 +18,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
           "name": "close_help"
         },
         {
@@ -23,6 +27,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
           "name": "close_help_help"
         },
         {
@@ -30,6 +36,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "public",
+          "mutability": "payable",
           "name": "deposit"
         },
         {
@@ -37,6 +45,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
           "name": "withdraw"
         },
         {
@@ -51,6 +61,8 @@
           ],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "public",
+          "mutability": "view",
           "name": "getBalance"
         }
       ],

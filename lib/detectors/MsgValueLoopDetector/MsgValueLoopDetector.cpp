@@ -16,7 +16,7 @@ namespace MsgValueLoop {
     }
 
     char MsgValueLoopDetector::ID = 0;
-    static RegisterPass<MsgValueLoopDetector> X("msg_value_loop", "Basic uninitialized state detector",
+    static RegisterPass<MsgValueLoopDetector> X("msg_value_loop", "Detects use of msg.value in loop",
                                                       true /* Only looks at CFG */,
                                                       true /* Analysis Pass */);
 

@@ -21,6 +21,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "public",
+          "mutability": "payable",
           "name": "bad"
         },
         {
@@ -47,6 +49,8 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
           "name": "__for_loop_body_1"
         }
       ],

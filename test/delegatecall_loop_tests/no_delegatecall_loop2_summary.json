@@ -16,20 +16,13 @@
                   "name": "address"
                 }
               }
-            },
-            {
-              "name": "msg_value",
-              "type": {
-                "subType": "ElementaryType",
-                "name": "uint256"
-              }
             }
           ],
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
           "visibility": "public",
-          "mutability": "nonpayable",
+          "mutability": "payable",
           "name": "not_bad"
         },
         {
@@ -43,13 +36,6 @@
                   "subType": "ElementaryType",
                   "name": "address"
                 }
-              }
-            },
-            {
-              "name": "msg_value",
-              "type": {
-                "subType": "ElementaryType",
-                "name": "uint256"
               }
             },
             {
@@ -83,12 +69,27 @@
               "name": "uint256"
             }
           }
+        },
+        {
+          "name": "votes",
+          "type": {
+            "subType": "MapType",
+            "name": "mapping(address => uint256)",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint256"
+            }
+          }
         }
       ],
       "structs": [],
       "enums": [],
-      "id": 53,
-      "name": "no_msg_value_loop1"
+      "id": 52,
+      "name": "no_delegatecall_loop2"
     }
   ],
   "version": "^0.8.10",
