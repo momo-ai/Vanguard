@@ -13,13 +13,14 @@ namespace vanguard {
     class Vanguard {
     public:
         explicit Vanguard() : analysis(nullptr) {}
+        ~Vanguard();
         const blockchain::Blockchain *blockchain();
     protected:
         Analysis *analysis;
 
         bool runToFixedpoint(Function &fn);
         vector<BasicBlock *> *reachableBlks(BasicBlock &blk, unordered_set<BasicBlock *> *exclude);
-        virtual void registerAnalysis(Analysis *a);
+        void registerAnalysis(Analysis *a);
     private:
         const blockchain::Blockchain *chain = nullptr;
     };

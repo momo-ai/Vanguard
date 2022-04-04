@@ -12,6 +12,11 @@
 
 namespace vanguard {
     cl::opt<string> inputSummary("summary", cl::desc("Input Smart Contract Summary"), cl::value_desc("filename"));
+
+    Vanguard::~Vanguard() {
+        delete analysis;
+    }
+
     void Vanguard::registerAnalysis(Analysis *a) {
         analysis = a;
     }

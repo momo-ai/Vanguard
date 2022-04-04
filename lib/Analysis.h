@@ -16,6 +16,7 @@ using namespace llvm;
 namespace vanguard {
     class Analysis {
     public:
+        virtual ~Analysis() = default;
         //virtual void init() = 0;
         virtual void registerRequirements(llvm::AnalysisUsage &Info) const {}
         virtual void startAnalysis(llvm::Pass &pass) {}
