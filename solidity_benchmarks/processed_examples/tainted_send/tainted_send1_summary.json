@@ -1,0 +1,43 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "setDestination"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "withdraw"
+        }
+      ],
+      "variables": [
+        {
+          "name": "destination",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "address"
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 30,
+      "name": "tainted_send1"
+    }
+  ],
+  "version": "^0.8.10",
+  "compiler": "Solang"
+}
