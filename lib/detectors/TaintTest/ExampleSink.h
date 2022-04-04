@@ -10,8 +10,8 @@
 namespace vanguard {
     class ExampleSink : public FunctionTaintSink {
     public:
-        bool isSink(const llvm::Function &fn) override;
-        std::vector<std::pair<FunctionLocation, Val *>> sinkValues(const llvm::Function &fn) override;
+        bool isSink(const llvm::Function &fn) const override;
+        std::vector<std::pair<FunctionLocation, Val *>> sinkValues(const llvm::Function &fn) const override;
     private:
     };
 }

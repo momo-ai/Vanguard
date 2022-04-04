@@ -20,9 +20,9 @@ namespace vanguard {
     public:
         FunctionTaintSink() = default;
         std::vector<TaintNode *> gatherTaint() override;
-        //std::unordered_set<const llvm::Function *> generators();
-        virtual bool isSink(const llvm::Function &fn) = 0;
-        virtual std::vector<std::pair<FunctionLocation, Val *>> sinkValues(const llvm::Function &fn) = 0;
+        std::unordered_set<const llvm::Function *> generatingFns() const;
+        virtual bool isSink(const llvm::Function &fn) const = 0;
+        virtual std::vector<std::pair<FunctionLocation, Val *>> sinkValues(const llvm::Function &fn) const = 0;
     private:
     };
 }

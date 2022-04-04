@@ -65,6 +65,10 @@ namespace vanguard {
         return alias;
     }
 
+    bool TaintSummary::isGenerated(const TaintLabel *label) const {
+        return generatedLabels.find(label) != generatedLabels.end();
+    }
+
     TaintSummary::~TaintSummary() {
         delete initState;
 
@@ -139,8 +143,8 @@ namespace vanguard {
         //std::vector<TaintLabel *> calleeTaint;
         //std::unordered_map<TaintLabel *, std::vector<TaintLabel *>> calleeToCaller;
         //interesting labels are those that pass through + any that are generated in callee
-        std::unordered_set<TaintLabel *> passThroughLabels;
-        std::unordered_set<TaintLabel *> passThroughGenLabels;
+        std::unordered_set<const TaintLabel *> passThroughLabels;
+        std::unordered_set<const TaintLabel *> passThroughGenLabels;
         for(auto &entry : inVals) {
             Val *callerVal = entry.first;
             Val *calleeVal = entry.second;
@@ -208,7 +212,7 @@ namespace vanguard {
         return requiresUpdate;
     }
 
-    std::vector<TaintNode *> TaintSummary::getTaint(FunctionTaintSink &sink) {
+    std::vector<TaintNode *> TaintSummary::getTaint(const FunctionTaintSink &sink) const {
         std::vector<TaintNode *> labels;
         if(!sink.isSink(fn)) {
             return labels;

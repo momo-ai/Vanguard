@@ -11,7 +11,7 @@ using namespace llvm;
 using namespace std;
 
 namespace flashloan {
-    bool TransferSink::isSink(const llvm::Function &fn) {
+    bool TransferSink::isSink(const llvm::Function &fn) const {
         if(!fn.hasName()) {
             return false;
         }
@@ -20,7 +20,7 @@ namespace flashloan {
         return fnName == "call";
     }
 
-    vector<pair<FunctionLocation, Val *>> TransferSink::sinkValues(const llvm::Function &fn)  {
+    vector<pair<FunctionLocation, Val *>> TransferSink::sinkValues(const llvm::Function &fn) const {
         // TODO: taint analysis does not take ownership of these values, they should be deleted here.
 
         vector<pair<FunctionLocation, Val *>> vals;

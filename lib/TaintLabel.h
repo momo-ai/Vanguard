@@ -19,6 +19,8 @@ namespace vanguard {
         const TaintLabelStore &parent() const;
         const Val *origin() override;
         std::size_t hash() const override;
+        bool isGenerated() const override;
+        const llvm::Function *generatedBy() const override;
     private:
         uint tid;
         Val *originVal;

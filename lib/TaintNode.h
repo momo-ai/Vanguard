@@ -16,6 +16,9 @@ namespace vanguard {
         void addNode(TaintNode *n);
         void addSource(TaintSource *s);
         std::unordered_set<TaintSource *> sources();
+        void generatingFns(std::unordered_set<const TaintNode *> &seen, std::unordered_set<const llvm::Function *> &generators) const;
+        virtual bool isGenerated() const = 0;
+        virtual const llvm::Function *generatedBy() const = 0;
         void sources(std::unordered_set<TaintNode *> &seen, std::unordered_set<TaintSource *> &srcs);
         virtual const Val *origin() = 0;
         virtual std::size_t hash() const = 0;

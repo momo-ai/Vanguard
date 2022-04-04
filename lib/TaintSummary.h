@@ -24,17 +24,18 @@ namespace vanguard {
         ~TaintSummary();
         bool propagate(const llvm::Instruction &ins);
         bool propagate(const llvm::CallInst &call);
-        std::vector<TaintNode *> getTaint(FunctionTaintSink &sink) override;
+        std::vector<TaintNode *> getTaint(const FunctionTaintSink &sink) const override;
         bool didSummaryChange();
         AAWrapper &getAliasWrapper();
         const Function &function() const;
         const TaintSummaryStore &parent();
+        bool isGenerated(const TaintLabel *) const;
     private:
         Taint *getPrevTaint(const llvm::Instruction &ins);
         bool computeSummary();
 
         //labels created within the function
-        std::unordered_set<TaintLabel *> generatedLabels;
+        std::unordered_set<const TaintLabel *> generatedLabels;
         std::vector<TaintLabel *> getOrCreateTaintLabels(std::vector<std::pair<FunctionLocation, Val *>> &vals);
         TaintSummaryStore &store;
         AAWrapper alias;

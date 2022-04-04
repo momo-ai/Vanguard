@@ -12,7 +12,7 @@
 namespace vanguard {
     class TaintSinkProvider {
     public:
-        virtual std::vector<TaintNode *> getTaint(FunctionTaintSink &sink) = 0;
+        virtual std::vector<TaintNode *> getTaint(const FunctionTaintSink &sink) const = 0;
     };
 }
 

@@ -4,6 +4,7 @@
 
 #include "TaintLabel.h"
 #include <exception>
+#include "TaintSummary.h"
 
 namespace vanguard {
     TaintLabel::TaintLabel(const TaintLabelStore &parent, Val *origin, uint id) : originVal(origin), store(parent), tid(id) {
@@ -34,5 +35,16 @@ namespace vanguard {
 
     uint64_t TaintLabel::taintMask() const {
         return 0x1 << tid;
+    }
+    bool TaintLabel::isGenerated() const {
+        return parent().parent().isGenerated(this);
+    }
+
+    const llvm::Function *TaintLabel::generatedBy() const {
+        if(parent().parent().isGenerated(this)) {
+            return &parent().parent().function();
+        }
+
+        return nullptr;
     }
 }

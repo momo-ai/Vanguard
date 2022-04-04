@@ -6,11 +6,11 @@
 
 
 namespace vanguard {
-    bool ExampleSink::isSink(const llvm::Function &fn) {
+    bool ExampleSink::isSink(const llvm::Function &fn) const {
         return true;
     }
 
-    std::vector<std::pair<FunctionLocation, Val *>> ExampleSink::sinkValues(const llvm::Function &fn)  {
+    std::vector<std::pair<FunctionLocation, Val *>> ExampleSink::sinkValues(const llvm::Function &fn) const {
         // TODO: taint analysis does not take ownership of these values, they should be deleted here.
         return Val::functionOutputs(fn);
     }

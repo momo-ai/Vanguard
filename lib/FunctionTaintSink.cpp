@@ -15,4 +15,18 @@ namespace vanguard {
 
         return taint;
     }
+
+    std::unordered_set<const llvm::Function *> FunctionTaintSink::generatingFns() const {
+        std::unordered_set<const llvm::Function *> generators;
+        std::unordered_set<const TaintNode *> seen;
+
+        for(auto provider : providers) {
+            auto nodes = provider->getTaint(*this);
+            for(TaintNode *node : nodes) {
+                node->generatingFns(seen, generators);
+            }
+        }
+
+        return generators;
+    }
 }

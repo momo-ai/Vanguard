@@ -43,7 +43,7 @@ namespace vanguard {
         bool hasValLabel(Val &val);
         std::vector<TaintLabel *> getOrCreateTaintLabels(std::vector<Val *> &vals);
         TaintLabel *getOrCreateTaintLabel(Val &val);
-        bool isTaintedWith(const Val &v, std::unordered_set<TaintLabel *> labels) const;
+        bool isTaintedWith(const Val &v, std::unordered_set<const TaintLabel *> labels) const;
     private:
         TaintLabelStore &store;
         uint64_t accumulate(const std::vector<Val *> &vals) const;

@@ -54,9 +54,9 @@ namespace vanguard {
         return v.untaint(*this, v.getTaint(*this));
     }
 
-    bool Taint::isTaintedWith(const Val &v, std::unordered_set<TaintLabel *> labels) const {
+    bool Taint::isTaintedWith(const Val &v, std::unordered_set<const TaintLabel *> labels) const {
         uint64_t tgtTaint = 0;
-        for(TaintLabel *label : labels) {
+        for(auto label : labels) {
             tgtTaint |= label->taintMask();
         }
 

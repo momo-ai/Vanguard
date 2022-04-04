@@ -10,8 +10,8 @@
 namespace flashloan {
     class TransferSink : public vanguard::FunctionTaintSink {
     public:
-        bool isSink(const llvm::Function &fn) override;
-        std::vector<std::pair<vanguard::FunctionLocation, vanguard::Val *>> sinkValues(const llvm::Function &fn) override;
+        bool isSink(const llvm::Function &fn) const override;
+        std::vector<std::pair<vanguard::FunctionLocation, vanguard::Val *>> sinkValues(const llvm::Function &fn) const override;
     private:
     };
 }
