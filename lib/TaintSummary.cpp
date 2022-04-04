@@ -103,8 +103,8 @@ namespace vanguard {
     }
 
     bool TaintSummary::propagate(const llvm::Instruction &ins) {
-        ins.print(outs());
-        std::cout << std::endl;
+        //ins.print(outs());
+        //std::cout << std::endl;
         if(auto call = dyn_cast<const llvm::CallInst>(&ins)) {
             return propagate(*call);
         }
@@ -122,8 +122,8 @@ namespace vanguard {
     }
 
     bool TaintSummary::propagate(const llvm::CallInst &call) {
-        string calledFnName = call.getCalledFunction()->getName().str();
-        std::cout << "  called: " << calledFnName << std::endl;
+        //string calledFnName = call.getCalledFunction()->getName().str();
+        //std::cout << "  called: " << calledFnName << std::endl;
         bool requiresUpdate = false;
         std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> inVals = Val::inVals(call);
         std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> outVals = Val::outVals(call);

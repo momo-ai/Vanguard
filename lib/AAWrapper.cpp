@@ -10,9 +10,6 @@ namespace vanguard {
      * having multiple wrappers and save the last alias analysis requested. If another fn requests, swap.
      */
     AAWrapper::AAWrapper(llvm::Pass &pass, llvm::Function &fn) : pass(pass), fn(fn), aa(nullptr) {}
-    void AAWrapper::invalidate() {
-        aa = nullptr;
-    }
     llvm::AAResults *AAWrapper::request() {
         if(noAlias()) {
             return nullptr;

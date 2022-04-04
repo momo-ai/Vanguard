@@ -16,7 +16,6 @@ namespace vanguard {
     class AAWrapper {
     public:
         AAWrapper(llvm::Pass &pass, llvm::Function &fn);
-        void invalidate();
         llvm::AAResults *request();
         bool noAlias();
         //llvm::AAResults *alias();

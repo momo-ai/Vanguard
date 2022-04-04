@@ -25,9 +25,9 @@ namespace vanguard {
     }
 
     bool TaintAnalysis::beginFn(Function &fn) {
-        if(fn.hasName()) {
+        /*if(fn.hasName()) {
            std::cout << fn.getName().str() << std::endl;
-        }
+        }*/
         curSummary = store->getSummary(fn);
         return false;
     }
@@ -40,7 +40,6 @@ namespace vanguard {
     bool TaintAnalysis::endFn(Function &fn) {
         string fnName = fn.getName().str();
         bool changed = curSummary->didSummaryChange();
-        curSummary->getAliasWrapper().invalidate();
         curSummary = nullptr;
         return changed;
     }

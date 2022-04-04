@@ -24,22 +24,26 @@ namespace vanguard {
     bool IntraproceduralVanguard::runOnModule(Module &m) {
         analysis->startAnalysis(*this);
 
-        unordered_set<Function *> fnWorklist;
-        vector<Function *> fns(m.getFunctionList().size());
+        unordered_set<Function *> inWorklist;
+        list<Function *> fnWorklist;
         for(Function &f : m) {
-            fns.push_back(&f);
-            fnWorklist.insert(&f);
+            fnWorklist.push_back(&f);
+            inWorklist.insert(&f);
         }
 
         while(!fnWorklist.empty()) {
-            Function *curFn = *fnWorklist.begin();
-            fnWorklist.erase(fnWorklist.begin());
+            Function *curFn = fnWorklist.front();
+            fnWorklist.pop_front();
+            inWorklist.erase(curFn);
 
             bool modified = runToFixedpoint(*curFn);
 
             if(modified) {
                 for(Function &f : m) {
-                    fnWorklist.insert(&f);
+                    if(inWorklist.find(&f) == inWorklist.end()) {
+                        fnWorklist.push_back(&f);
+                        inWorklist.insert(&f);
+                    }
                 }
             }
         }
