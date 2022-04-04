@@ -20,7 +20,9 @@ namespace Suicide {
     bool SuicideAnalysis::beginFn(Function &fn) {
         fname = fn.getName().str();
         // TODO: Move to blockchain
-        if (chain->findFunction(fn)->visibility() == blockchain::Visibility::PUBLIC) {
+        if (chain->findFunction(fn)->visibility() == blockchain::Visibility::PUBLIC ||
+            chain->findFunction(fn)->visibility() == blockchain::Visibility::EXTERNAL ||
+            chain->findFunction(fn)->visibility() == blockchain::Visibility::DEFAULT) {
 //        if (true) {
             pubFuncs.insert(fname);
         }
