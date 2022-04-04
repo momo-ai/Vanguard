@@ -3,7 +3,8 @@
 //
 
 #include "TransferSink.h"
-#include "../../RegisterVal.h"
+#include "../../MemoryVal.h"
+#include "llvm/Analysis/MemoryLocation.h"
 
 using namespace vanguard;
 using namespace llvm;
@@ -21,9 +22,19 @@ namespace flashloan {
 
     vector<pair<FunctionLocation, Val *>> TransferSink::sinkValues(const llvm::Function &fn)  {
         // TODO: taint analysis does not take ownership of these values, they should be deleted here.
-        Value *arg = fn.getArg(2);
+
+        vector<pair<FunctionLocation, Val *>> vals;
+        Value *valueArg = fn.getArg(2);
+        //return Val::functionOutputs(fn);
+        if(valueArg->getType()->isPointerTy()) {
+            vals.emplace_back(INPUT, new MemoryVal(MemoryLocation::getBeforeOrAfter(valueArg)));
+        }
+
+        return vals;
+
+        /*Value *arg = fn.getArg(2);
         //return Val::functionOutputs(fn);
         auto valArg = pair<FunctionLocation, Val *>(INPUT, new RegisterVal(*arg));
-        return {valArg};
+        return {valArg};*/
     }
 }
