@@ -33,6 +33,4 @@ Below is a list of detectors that are available on Vanguard. Note, to run them m
 | intra-example | Prints out all of the functions in the bc file  |
 
 
-[![Alternate Text]({https://veridise.com/wp-content/uploads/2022/03/full-blue.png})]({https://veridise.com/wp-content/uploads/2022/04/vanguard-demo-talk-v0.mp4} "Vanguard Demo: Real-Time Smart Contract Auditing Service")
-
 
