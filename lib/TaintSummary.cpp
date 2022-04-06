@@ -249,7 +249,6 @@ namespace vanguard {
         }
 
         if(finalStates.empty()) {
-            summary = initState;
             return false;
         }
 
