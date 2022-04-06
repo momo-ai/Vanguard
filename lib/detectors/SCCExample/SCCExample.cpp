@@ -9,10 +9,6 @@ namespace sccexample {
         printer = new ModPrint();
         Vanguard::registerAnalysis(printer);
     }
-
-    SCCExample::~SCCExample() {
-        delete printer;
-    }
 }
 
 char sccexample::SCCExample::ID = 0;

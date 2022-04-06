@@ -11,10 +11,6 @@ namespace DelegatecallLoop {
         Vanguard::registerAnalysis(analyzer);
     }
 
-    DelegatecallLoopDetector::~DelegatecallLoopDetector() {
-        delete analyzer;
-    }
-
     char DelegatecallLoopDetector::ID = 0;
     static RegisterPass<DelegatecallLoopDetector> X("delegatecall_loop", "Detects use of delegatecall in payable loop",
                                                     true /* Only looks at CFG */,

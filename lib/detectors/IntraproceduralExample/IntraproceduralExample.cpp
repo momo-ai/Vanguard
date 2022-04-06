@@ -11,10 +11,6 @@ namespace IntraExample {
         Vanguard::registerAnalysis(printer);
     }
 
-    IntraproceduralExample::~IntraproceduralExample() {
-        delete printer;
-    }
-
     char IntraproceduralExample::ID = 0;
     static RegisterPass<IntraproceduralExample> X("intra-example", "Intraprocedural Example",
                                                   true /* Only looks at CFG */,

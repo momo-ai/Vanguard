@@ -15,7 +15,6 @@ namespace IntraExample {
     public:
         static char ID;
         IntraproceduralExample();
-        ~IntraproceduralExample();
     private:
         ModPrint *printer;
     };

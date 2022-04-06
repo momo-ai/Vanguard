@@ -44,6 +44,9 @@ namespace shadowing {
         return blk->isContractFunction(fn);
     }
 
+    /*
+     * Eventually look for accesses to shadowing and shadowed variables so that we can point out where they are used.
+     */
     bool VariableShadowingAnalysis::beginFn(Function &fn) {
         return false;
     }

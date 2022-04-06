@@ -12,10 +12,6 @@ namespace Reentrancy {
         Vanguard::registerAnalysis(analyzer);
     }
 
-    ReentrancyDetector::~ReentrancyDetector() {
-        delete analyzer;
-    }
-
     char ReentrancyDetector::ID = 0;
     static RegisterPass<ReentrancyDetector> X("reentrancy", "Basic Reentrancy Detector",
                                               true /* Only looks at CFG */,

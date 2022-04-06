@@ -18,7 +18,6 @@ namespace sccexample {
     public:
         static char ID;
         SCCExample();
-        ~SCCExample();
     private:
         ModPrint *printer;
     };

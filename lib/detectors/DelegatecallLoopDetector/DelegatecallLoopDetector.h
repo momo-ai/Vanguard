@@ -16,7 +16,6 @@ namespace DelegatecallLoop {
     public:
         static char ID;
         DelegatecallLoopDetector();
-        ~DelegatecallLoopDetector();
     private:
         DelegatecallLoopAnalysis *analyzer;
 

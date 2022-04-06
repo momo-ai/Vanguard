@@ -12,10 +12,6 @@ namespace Suicide {
         Vanguard::registerAnalysis(analyzer);
     }
 
-    SuicideDetector::~SuicideDetector() {
-        delete analyzer;
-    }
-
     char SuicideDetector::ID = 0;
     static RegisterPass<SuicideDetector> X("suicide", "Basic Suicide Detector",
                                               true /* Only looks at CFG */,

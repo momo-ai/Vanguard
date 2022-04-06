@@ -12,10 +12,6 @@ namespace UninitializedState {
         Vanguard::registerAnalysis(analyzer);
     }
 
-    UninitializedStateDetector::~UninitializedStateDetector() {
-        delete analyzer;
-    }
-
     char UninitializedStateDetector::ID = 0;
     static RegisterPass<UninitializedStateDetector> X("uninitialized_state", "Basic uninitialized state detector",
                                                       true /* Only looks at CFG */,

@@ -15,7 +15,6 @@ namespace Suicide {
     public:
         static char ID;
         SuicideDetector();
-        ~SuicideDetector();
     private:
         SuicideAnalysis *analyzer;
     };

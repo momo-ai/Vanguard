@@ -8,15 +8,17 @@
 #include "../../TaintLabelStore.h"
 #include "../../TaintSummary.h"
 #include "llvm/IR/Function.h"
+#include <Blockchain.h>
 #include <sstream>
 
+using namespace blockchain;
 using namespace vanguard;
 using namespace llvm;
 using namespace std;
 
 namespace flashloan {
-    FlashloanAnalysis::FlashloanAnalysis(vector<FunctionTaintSink *> &sinks,
-                                               vector<FunctionTaintSource *> &sources) : TaintAnalysis(sinks, sources) {
+    FlashloanAnalysis::FlashloanAnalysis(const Blockchain *blockchain, vector<FunctionTaintSink *> &sinks,
+                                               vector<FunctionTaintSource *> &sources) : blockchain(blockchain), TaintAnalysis(sinks, sources) {
 
     }
 
@@ -29,9 +31,8 @@ namespace flashloan {
         ss << "Flashloan Vulnerability Report:" << endl;
         for(auto sink : sinks) {
             for(auto fn : sink->generatingFns()) {
-                ss << "Function: " << fn->getName().str() << endl;
+                ss << "Function " << fn->getName().str() << " may be vulnerable to a flashloan attack" << endl;
             }
-
         }
 
         ss << "--------" << endl << "Done!" << endl;

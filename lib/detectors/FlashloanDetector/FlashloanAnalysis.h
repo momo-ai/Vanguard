@@ -6,14 +6,17 @@
 #define VANGUARD_ANALYSISEXAMPLE_H
 
 #include "../../TaintAnalysis.h"
+#include <Blockchain.h>
 namespace flashloan {
     class FlashloanAnalysis : public vanguard::TaintAnalysis {
     public:
-        FlashloanAnalysis(vector<vanguard::FunctionTaintSink *> &sinks,
+        FlashloanAnalysis(const blockchain::Blockchain *blockchain, vector<vanguard::FunctionTaintSink *> &sinks,
                         vector<vanguard::FunctionTaintSource *> &sources);
 
         bool shouldAnalyze(Function &fn) override;
         string vulnerabilityReport() override;
+    private:
+        const blockchain::Blockchain *blockchain;
     };
 }
 

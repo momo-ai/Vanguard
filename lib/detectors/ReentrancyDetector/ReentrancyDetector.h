@@ -15,7 +15,6 @@ namespace Reentrancy {
     public:
         static char ID;
         ReentrancyDetector();
-        ~ReentrancyDetector();
     private:
         ReentrancyAnalysis *analyzer;
 

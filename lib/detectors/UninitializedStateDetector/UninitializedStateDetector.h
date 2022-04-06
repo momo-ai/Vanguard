@@ -15,7 +15,6 @@ namespace UninitializedState {
     public:
         static char ID;
         UninitializedStateDetector();
-        ~UninitializedStateDetector();
     private:
         UninitializedStateAnalysis *analyzer;
 

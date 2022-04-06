@@ -16,7 +16,6 @@ namespace MsgValueLoop {
     public:
         static char ID;
         MsgValueLoopDetector();
-        ~MsgValueLoopDetector();
     private:
         MsgValueLoopAnalysis *analyzer;
 

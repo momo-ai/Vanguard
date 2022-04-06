@@ -16,7 +16,7 @@ namespace flashloan {
         auto sink = new TransferSink();
         std::vector<FunctionTaintSource *> sources = {src};
         std::vector<FunctionTaintSink *> sinks = {sink};
-        analysis = new FlashloanAnalysis(sinks, sources);
+        analysis = new FlashloanAnalysis(blockchain(), sinks, sources);
         Vanguard::registerAnalysis(analysis);
     }
 
