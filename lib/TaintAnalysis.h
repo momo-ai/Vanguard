@@ -11,6 +11,7 @@
 #include "FunctionTaintSource.h"
 #include "FunctionTaintSink.h"
 #include "TaintSummaryStore.h"
+#include "AARequirement.h"
 
 
 //Taint analysis should be agnostic what we're running on (i.e. intraprocedural / functional)
@@ -18,10 +19,9 @@
 namespace vanguard {
     class TaintAnalysis : public Analysis {
     public:
-        TaintAnalysis(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources);
+        TaintAnalysis(blockchain::AAWrapper &aa, std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources);
         ~TaintAnalysis();
-        void startAnalysis(llvm::Pass &pass) override;
-        void registerRequirements(llvm::AnalysisUsage &Info) const override;
+        void startAnalysis() override;
         bool transfer(Instruction &ins) override;
         bool beginFn(Function &fn) override;
         bool endFn(Function &fn) override;
@@ -30,6 +30,7 @@ namespace vanguard {
         std::vector<FunctionTaintSink *> sinks;
         std::vector<FunctionTaintSource *> sources;
     private:
+        blockchain::AAWrapper &alias;
         TaintSummaryStore *store;
         TaintSummary *curSummary;
     };

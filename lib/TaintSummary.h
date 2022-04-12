@@ -13,20 +13,20 @@
 #include "FunctionTaintSink.h"
 #include "FunctionTaintSource.h"
 #include "TaintSinkProvider.h"
-#include "AAWrapper.h"
+#include <AAWrapper.h>
 #include <unordered_map>
 
 namespace vanguard {
     class TaintSummaryStore;
     class TaintSummary : public TaintSinkProvider {
     public:
-        TaintSummary(TaintSummaryStore &parent, Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources, llvm::Pass &pass);
+        TaintSummary(TaintSummaryStore &parent, Function &summaryFn, ReadWriteRetriever &rw, const std::vector<FunctionTaintSink *> &fnSinks, const std::vector<FunctionTaintSource *> &fnSources, blockchain::AAWrapper &alias);
         ~TaintSummary();
         bool propagate(const llvm::Instruction &ins);
         bool propagate(const llvm::CallInst &call);
         std::vector<TaintNode *> getTaint(const FunctionTaintSink &sink) const override;
         bool didSummaryChange();
-        AAWrapper &getAliasWrapper();
+        blockchain::AAWrapper &getAliasWrapper();
         const Function &function() const;
         const TaintSummaryStore &parent();
         bool isGenerated(const TaintLabel *) const;
@@ -35,12 +35,13 @@ namespace vanguard {
         bool computeSummary();
 
         //labels created within the function
+
         std::unordered_set<const TaintLabel *> generatedLabels;
         std::vector<TaintLabel *> getOrCreateTaintLabels(std::vector<std::pair<FunctionLocation, Val *>> &vals);
         TaintSummaryStore &store;
-        AAWrapper alias;
+        blockchain::AAWrapper &alias;
         ReadWriteRetriever &rwRetriever;
-        const Function &fn;
+        Function &fn;
         TaintLabelStore labelStore;
         std::unordered_map<RegisterVal, uint64_t> regTaint;
         std::unordered_map<const BasicBlock *, Taint *> bbInit;

@@ -13,8 +13,6 @@
 #include "MemoryTaint.h"
 #include <unordered_map>
 #include <vector>
-using namespace llvm;
-
 #include "llvm/Analysis/AliasAnalysis.h"
 /*
  * Plan: Each function can define up to 64 taint labels.
@@ -27,7 +25,7 @@ using namespace llvm;
 namespace vanguard {
     class Taint : public RegisterTaint, public MemoryTaint {
     public:
-        Taint(TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAWrapper &alias);
+        Taint(Function &taintFn, TaintLabelStore &labelStore, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, blockchain::AAWrapper &alias);
 
         bool isTainted(const Val &v) const;
         bool isTainted(const Val &v, const TaintLabel &label) const;

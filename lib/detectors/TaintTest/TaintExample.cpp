@@ -15,7 +15,9 @@ namespace vanguard {
         auto sink = new ExampleSink();
         std::vector<FunctionTaintSource *> sources = {src, src2};
         std::vector<FunctionTaintSink *> sinks = {sink};
-        auto analysis = new AnalysisExample(sinks, sources);
+        AARequirement *aliasReq = AARequirement::getRequirement(*this);
+        registerRequirement(aliasReq);
+        auto analysis = new AnalysisExample(*aliasReq, sinks, sources);
         Vanguard::registerAnalysis(analysis);
     }
 

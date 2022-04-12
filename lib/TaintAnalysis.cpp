@@ -5,10 +5,13 @@
 #include <iostream>
 #include "TaintAnalysis.h"
 #include "llvm/Analysis/AliasAnalysis.h"
+#include "AARequirement.h"
+
+using namespace blockchain;
 
 namespace vanguard {
 
-    TaintAnalysis::TaintAnalysis(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources) : sinks(sinks), sources(sources), store(nullptr) {
+    TaintAnalysis::TaintAnalysis(AAWrapper &aa, std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources) : sinks(sinks), sources(sources), store(nullptr), alias(aa) {
 
     }
 
@@ -16,12 +19,8 @@ namespace vanguard {
         delete store;
     }
 
-    void TaintAnalysis::registerRequirements(llvm::AnalysisUsage &info) const {
-        info.addRequired<AAResultsWrapperPass>();
-    }
-
-    void TaintAnalysis::startAnalysis(llvm::Pass &pass) {
-        store = new TaintSummaryStore(sinks, sources, pass);
+    void TaintAnalysis::startAnalysis() {
+        store = new TaintSummaryStore(sinks, sources, alias);
     }
 
     bool TaintAnalysis::beginFn(Function &fn) {

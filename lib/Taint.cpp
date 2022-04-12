@@ -6,8 +6,10 @@
 #include <unordered_set>
 #include "Taint.h"
 
+using namespace blockchain;
+
 namespace vanguard {
-    Taint::Taint(TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAWrapper &alias) : store(store), RegisterTaint(sharedRegTaint), MemoryTaint(alias) {}
+    Taint::Taint(Function &taintFn, TaintLabelStore &store, std::unordered_map<RegisterVal, uint64_t> &sharedRegTaint, AAWrapper &alias) : store(store), RegisterTaint(sharedRegTaint), MemoryTaint(taintFn, alias) {}
 
     bool Taint::hasValLabel(Val &val) {
         auto valIt = valToLabel.find(&val);

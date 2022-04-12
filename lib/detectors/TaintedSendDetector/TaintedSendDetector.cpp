@@ -14,7 +14,9 @@ namespace TaintedSend {
         TaintedSendSink *sink = new TaintedSendSink();
         std::vector<FunctionTaintSource *> sources = {src};
         std::vector<FunctionTaintSink *> sinks = {sink};
-        analysis = new TaintedSendAnalysis(sinks, sources);
+        AARequirement *aliasReq = AARequirement::getRequirement(*this);
+        registerRequirement(aliasReq);
+        analysis = new TaintedSendAnalysis(*aliasReq, sinks, sources);
         Vanguard::registerAnalysis(analysis);
     }
 

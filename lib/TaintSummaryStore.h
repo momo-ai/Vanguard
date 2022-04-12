@@ -17,10 +17,10 @@ namespace vanguard {
 
     class TaintSummaryStore {
     public:
-        TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass);
+        TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources, blockchain::AAWrapper &alias);
         TaintSummary *getSummary(Function &fn);
     private:
-        llvm::Pass &pass;
+        blockchain::AAWrapper &alias;
         std::vector<FunctionTaintSink *> fnSinks;
         std::vector<FunctionTaintSource *> fnSources;
         ReadWriteRetriever rwRetriever;

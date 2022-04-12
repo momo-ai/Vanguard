@@ -17,8 +17,8 @@ using namespace llvm;
 using namespace std;
 
 namespace flashloan {
-    FlashloanAnalysis::FlashloanAnalysis(const Blockchain *blockchain, vector<FunctionTaintSink *> &sinks,
-                                               vector<FunctionTaintSource *> &sources) : blockchain(blockchain), TaintAnalysis(sinks, sources) {
+    FlashloanAnalysis::FlashloanAnalysis(blockchain::AAWrapper &aa, const Blockchain *blockchain, vector<FunctionTaintSink *> &sinks,
+                                               vector<FunctionTaintSource *> &sources) : blockchain(blockchain), TaintAnalysis(aa, sinks, sources) {
 
     }
 

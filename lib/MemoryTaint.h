@@ -5,16 +5,17 @@
 #ifndef VANGUARD_MEMORYTAINT_H
 #define VANGUARD_MEMORYTAINT_H
 
+#include "llvm/IR/Function.h"
 #include "llvm/IR/Value.h"
 #include "llvm/Analysis/AliasAnalysis.h"
 #include "MemoryVal.h"
 #include <unordered_map>
-#include "AAWrapper.h"
+#include <AAWrapper.h>
 
 namespace vanguard {
     class MemoryTaint {
     public:
-        explicit MemoryTaint(AAWrapper &aa);
+        explicit MemoryTaint(llvm::Function &taintFn, blockchain::AAWrapper &aa);
 
         //static bool propagate(const Taint &from, const std::vector<Val *> &uses, Taint &to, const std::vector<Val *> &tgts);
         //static bool merge(const std::vector<Taint *> &from, Taint &to);
@@ -22,7 +23,8 @@ namespace vanguard {
         std::vector<std::pair<const MemoryVal *, uint64_t>> getMemTaint() const;
 
     private:
-        AAWrapper &aaWrapper;
+        blockchain::AAWrapper &aaWrapper;
+        llvm::Function &fn;
 
         /*
          * For now we're just going to do something quick and dirty. Get by checking for alias against all memory taint

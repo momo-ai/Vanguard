@@ -13,7 +13,7 @@ using namespace std;
 namespace TaintedSend {
     class TaintedSendAnalysis : public TaintAnalysis {
     public:
-        TaintedSendAnalysis(vector<FunctionTaintSink *> &sinks,
+        TaintedSendAnalysis(blockchain::AAWrapper &aa, vector<FunctionTaintSink *> &sinks,
                             vector<FunctionTaintSource *> &sources);
 
         bool shouldAnalyze(Function &fn) override;

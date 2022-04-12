@@ -69,17 +69,18 @@ namespace Reentrancy {
                     }
                 }
             }
-            if (cfname.compare("storageStore") == 0) {
-                // Detect store to contract state
-                if (!get<1>(fnInfo[fname])) {
-                    // Indicate function has store if not already indicated
-                    fnInfo[fname] = make_tuple(get<0>(fnInfo[fname]), true);
-                    modified = true;
-                }
-                if (lastExternalCall && potentialReentrancies.find(fname) == potentialReentrancies.end()) {
-                    // Record reentrancy if there is prev ext call in this func (and not already recorded)
-                    potentialReentrancies[fname] = lastExternalCall->getName().str();
-                }
+        }
+
+        if (chain->modifiesStorage(ins)) {
+            // Detect store to contract state
+            if (!get<1>(fnInfo[fname])) {
+                // Indicate function has store if not already indicated
+                fnInfo[fname] = make_tuple(get<0>(fnInfo[fname]), true);
+                modified = true;
+            }
+            if (lastExternalCall && potentialReentrancies.find(fname) == potentialReentrancies.end()) {
+                // Record reentrancy if there is prev ext call in this func (and not already recorded)
+                potentialReentrancies[fname] = lastExternalCall->getName().str();
             }
         }
         return false;

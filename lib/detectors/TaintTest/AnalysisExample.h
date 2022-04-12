@@ -9,7 +9,7 @@
 namespace vanguard {
     class AnalysisExample : public TaintAnalysis {
     public:
-        AnalysisExample(vector<FunctionTaintSink *> &sinks,
+        AnalysisExample(blockchain::AAWrapper &aa, vector<FunctionTaintSink *> &sinks,
                         vector<FunctionTaintSource *> &sources);
 
         bool shouldAnalyze(Function &fn) override;

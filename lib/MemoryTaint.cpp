@@ -5,11 +5,13 @@
 #include "MemoryTaint.h"
 #include <iostream>
 
+using namespace blockchain;
+
 namespace vanguard {
     /*
      * alias analysis is only null on declaration, in that case pretend like no memory is aliased
      */
-    MemoryTaint::MemoryTaint(AAWrapper &aa) : aaWrapper(aa) {}
+    MemoryTaint::MemoryTaint(llvm::Function &taintFn, AAWrapper &aa) : fn(taintFn),  aaWrapper(aa) {}
 
     std::vector<std::pair<const MemoryVal *, uint64_t>> MemoryTaint::getMemTaint() const {
         std::vector<std::pair<const MemoryVal *, uint64_t>> tainted;
@@ -28,7 +30,7 @@ namespace vanguard {
         bool modified = (memTaint[v] & mask) != mask;
         memTaint[v] |= mask;
 
-        if(aaWrapper.noAlias()) {
+        if(aaWrapper.noAlias(fn)) {
             for(auto &entry : memTaint) {
                 if(v.includes(entry.first) || entry.first.includes(v)) {
                     if((entry.second & mask) != mask) {
@@ -42,7 +44,7 @@ namespace vanguard {
         }
 
         for(auto &entry : memTaint) {
-            llvm::AAResults *alias = aaWrapper.request();
+            llvm::AAResults *alias = aaWrapper.request(fn);
             if(alias->alias(entry.first.toMemoryLocation(), v.toMemoryLocation())) {
                 if((memTaint[v] & mask) != mask) {
                     modified = true;
@@ -80,7 +82,7 @@ namespace vanguard {
             return memTaint.at(v);
         }
 
-        if(aaWrapper.noAlias()) {
+        if(aaWrapper.noAlias(fn)) {
             uint64_t taint = 0;
             for(auto &entry : memTaint) {
                 if(v.includes(entry.first)) {
@@ -93,7 +95,7 @@ namespace vanguard {
 
         uint64_t taint = 0;
         for(auto &entry : memTaint) {
-            llvm::AAResults *alias = aaWrapper.request();
+            llvm::AAResults *alias = aaWrapper.request(fn);
             if(alias->alias(entry.first.toMemoryLocation(), v.toMemoryLocation())) {
                 taint |= entry.second;
             }
@@ -118,7 +120,7 @@ namespace vanguard {
             }
         }
 
-        if(aaWrapper.noAlias()) {
+        if(aaWrapper.noAlias(fn)) {
             return modified;
         }
 

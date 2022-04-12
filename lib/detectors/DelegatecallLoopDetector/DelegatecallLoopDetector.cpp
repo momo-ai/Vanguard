@@ -6,7 +6,8 @@
 
 namespace DelegatecallLoop {
     DelegatecallLoopDetector::DelegatecallLoopDetector() : IntraproceduralVanguard(ID) {
-        const blockchain::Blockchain *chain = blockchain();
+        AARequirement *aa = AARequirement::getRequirement(*this);
+        const blockchain::Blockchain *chain = blockchain(aa);
         analyzer = new DelegatecallLoopAnalysis(chain);
         Vanguard::registerAnalysis(analyzer);
     }

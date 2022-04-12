@@ -7,7 +7,8 @@
 
 namespace UninitializedState {
     UninitializedStateDetector::UninitializedStateDetector() : IntraproceduralVanguard(ID) {
-        const blockchain::Blockchain *chain = blockchain();
+        AARequirement *aa = AARequirement::getRequirement(*this);
+        const blockchain::Blockchain *chain = blockchain(aa);
         analyzer = new UninitializedStateAnalysis(chain);
         Vanguard::registerAnalysis(analyzer);
     }

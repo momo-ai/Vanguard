@@ -10,7 +10,7 @@
 namespace flashloan {
     class FlashloanAnalysis : public vanguard::TaintAnalysis {
     public:
-        FlashloanAnalysis(const blockchain::Blockchain *blockchain, vector<vanguard::FunctionTaintSink *> &sinks,
+        FlashloanAnalysis(blockchain::AAWrapper &aa, const blockchain::Blockchain *blockchain, vector<vanguard::FunctionTaintSink *> &sinks,
                         vector<vanguard::FunctionTaintSource *> &sources);
 
         bool shouldAnalyze(Function &fn) override;

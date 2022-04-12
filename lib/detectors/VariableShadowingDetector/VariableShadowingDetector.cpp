@@ -11,7 +11,8 @@ using namespace blockchain;
 
 namespace shadowing {
     VariableShadowingDetector::VariableShadowingDetector() : LocalVanguard(ID) {
-        const Blockchain *blk = blockchain();
+        AARequirement *aa = AARequirement::getRequirement(*this);
+        const Blockchain *blk = blockchain(aa);
         auto analysis = new VariableShadowingAnalysis(blk);
         registerAnalysis(analysis);
     }

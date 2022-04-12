@@ -6,7 +6,8 @@
 
 namespace MsgValueLoop {
     MsgValueLoopDetector::MsgValueLoopDetector() : IntraproceduralVanguard(ID) {
-        const blockchain::Blockchain *chain = blockchain();
+        AARequirement *aa = AARequirement::getRequirement(*this);
+        const blockchain::Blockchain *chain = blockchain(aa);
         analyzer = new MsgValueLoopAnalysis(chain);
         Vanguard::registerAnalysis(analyzer);
     }

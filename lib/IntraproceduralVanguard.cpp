@@ -17,12 +17,14 @@
 using namespace llvm;
 
 namespace vanguard {
-    void IntraproceduralVanguard::getAnalysisUsage(llvm::AnalysisUsage &info) const {
-        analysis->registerRequirements(info);
+    void IntraproceduralVanguard::getAnalysisUsage(llvm::AnalysisUsage &info) const  {
+        for(Requirement *req : requirements) {
+            req->registerRequirement(info);
+        }
     }
 
     bool IntraproceduralVanguard::runOnModule(Module &m) {
-        analysis->startAnalysis(*this);
+        analysis->startAnalysis();
 
         unordered_set<Function *> inWorklist;
         list<Function *> fnWorklist;

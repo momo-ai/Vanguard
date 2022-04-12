@@ -12,8 +12,8 @@
 
 
 namespace vanguard {
-    AnalysisExample::AnalysisExample(vector<FunctionTaintSink *> &sinks,
-                                     vector<FunctionTaintSource *> &sources) : TaintAnalysis(sinks, sources) {
+    AnalysisExample::AnalysisExample(blockchain::AAWrapper &aa, vector<FunctionTaintSink *> &sinks,
+                                     vector<FunctionTaintSource *> &sources) : TaintAnalysis(aa, sinks, sources) {
 
     }
 

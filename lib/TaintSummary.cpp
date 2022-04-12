@@ -10,11 +10,12 @@
 #include "Val.h"
 
 using namespace std;
+using namespace blockchain;
 
 namespace vanguard {
-    TaintSummary::TaintSummary(TaintSummaryStore &parent, Function &summaryFn, ReadWriteRetriever &rw, const vector<FunctionTaintSink *> &sinks, const vector<FunctionTaintSource *> &sources, llvm::Pass &pass) : store(parent), labelStore(*this), fn(summaryFn), rwRetriever(rw), alias(pass, summaryFn) {
-        initState = new Taint(labelStore, regTaint, alias);
-        summary = new Taint(labelStore, regTaint, alias);
+    TaintSummary::TaintSummary(TaintSummaryStore &parent, Function &summaryFn, ReadWriteRetriever &rw, const vector<FunctionTaintSink *> &sinks, const vector<FunctionTaintSource *> &sources, AAWrapper &alias) : store(parent), labelStore(*this), fn(summaryFn), rwRetriever(rw), alias(alias) {
+        initState = new Taint(summaryFn, labelStore, regTaint, alias);
+        summary = new Taint(summaryFn, labelStore, regTaint, alias);
         for(auto sink : sinks) {
             if(sink->isSink(summaryFn)) {
                 sink->registerProvider(this);
@@ -98,7 +99,7 @@ namespace vanguard {
 
         Taint *blkTaint = bbInit[blk];
         if(blkTaint == nullptr) {
-            blkTaint = new Taint(labelStore, regTaint, alias);
+            blkTaint = new Taint(fn, labelStore, regTaint, alias);
             bbInit[blk] = blkTaint;
         }
 
@@ -254,7 +255,7 @@ namespace vanguard {
 
         bool updated = false;
         if(summary == initState) {
-            summary = new Taint(labelStore, regTaint, alias);
+            summary = new Taint(fn, labelStore, regTaint, alias);
             updated = true;
         }
 

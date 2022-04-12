@@ -6,8 +6,10 @@
 #include "AAWrapper.h"
 
 
+using namespace blockchain;
+
 namespace vanguard {
-    TaintSummaryStore::TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources, llvm::Pass &pass) : fnSinks(sinks), fnSources(sources), pass(pass) {
+    TaintSummaryStore::TaintSummaryStore(std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources, AAWrapper &alias) : fnSinks(sinks), fnSources(sources), alias(alias) {
 
     }
 
@@ -20,7 +22,7 @@ namespace vanguard {
             if(!fn.isDeclaration()) {
                 alias = &pass.getAnalysis<AAResultsWrapperPass>(fn).getAAResults();
             }*/
-            summary = new TaintSummary(*this, fn, rwRetriever, fnSinks, fnSources, pass);
+            summary = new TaintSummary(*this, fn, rwRetriever, fnSinks, fnSources, alias);
             fnSummaries[&fn] = summary;
         }
         else {

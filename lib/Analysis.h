@@ -18,8 +18,7 @@ namespace vanguard {
     public:
         virtual ~Analysis() = default;
         //virtual void init() = 0;
-        virtual void registerRequirements(llvm::AnalysisUsage &Info) const {}
-        virtual void startAnalysis(llvm::Pass &pass) {}
+        virtual void startAnalysis() {}
         virtual bool shouldAnalyze(Function &fn) = 0;
         virtual bool beginFn(Function &fn) = 0;
         virtual bool transfer(Instruction &ins) = 0;

@@ -4,20 +4,24 @@
 
 #ifndef VANGUARD_VANGUARD_H
 #define VANGUARD_VANGUARD_H
-#include "Analysis.h"
 #include <Blockchain.h>
 #include <unordered_set>
 #include "llvm/Pass.h"
+#include "Requirement.h"
+#include "Analysis.h"
+#include "AARequirement.h"
 
 namespace vanguard {
     class Vanguard {
     public:
         explicit Vanguard() : analysis(nullptr) {}
         ~Vanguard();
-        const blockchain::Blockchain *blockchain();
+        const blockchain::Blockchain *blockchain(AARequirement *aa);
+        void registerRequirement(Requirement *req);
     protected:
         Analysis *analysis;
 
+        unordered_set<Requirement *> requirements;
         bool runToFixedpoint(Function &fn);
         vector<BasicBlock *> *reachableBlks(BasicBlock &blk, unordered_set<BasicBlock *> *exclude);
         void registerAnalysis(Analysis *a);

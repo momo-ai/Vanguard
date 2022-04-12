@@ -11,8 +11,8 @@
 #include <sstream>
 
 namespace TaintedSend {
-    TaintedSendAnalysis::TaintedSendAnalysis(vector<FunctionTaintSink *> &sinks,
-                                             vector<FunctionTaintSource *> &sources) : TaintAnalysis(sinks, sources), sinks(sinks), sources(sources) {
+    TaintedSendAnalysis::TaintedSendAnalysis(blockchain::AAWrapper &aa, vector<FunctionTaintSink *> &sinks,
+                                             vector<FunctionTaintSource *> &sources) : TaintAnalysis(aa, sinks, sources), sinks(sinks), sources(sources) {
 
     }
 

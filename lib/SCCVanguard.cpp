@@ -4,15 +4,19 @@
 
 #include "SCCVanguard.h"
 #include "llvm/Analysis/CallGraph.h"
+#include "Analysis.h"
+
 
 namespace vanguard {
-    void SCCVanguard::getAnalysisUsage(llvm::AnalysisUsage &info) const {
-        analysis->registerRequirements(info);
+    void SCCVanguard::getAnalysisUsage(llvm::AnalysisUsage &info) const  {
+        for(Requirement *req : requirements) {
+            req->registerRequirement(info);
+        }
     }
 
     bool SCCVanguard::runOnSCC(CallGraphSCC &scc) {
         if(!started) {
-            analysis->startAnalysis(*this);
+            analysis->startAnalysis();
             started = true;
         }
 
