@@ -5,6 +5,7 @@ project(vanguard)
 if(NOT DEFINED ENV{LLVM_HOME})
     message(FATAL_ERROR "$LLVM_HOME is not defined")
 else ()
+    set(ENV{LLVM_HOME} $ENV{LLVM_HOME})
     set(ENV{LLVM_DIR} $ENV{LLVM_HOME}/lib/cmake/llvm)
 endif()
 
@@ -17,4 +18,4 @@ if (${LLVM_VERSION_MAJOR} VERSION_GREATER_EQUAL 10)
 endif ()
 
 add_subdirectory(lib)  # Use your pass name here.
-
+configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
