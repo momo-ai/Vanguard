@@ -1,0 +1,94 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": true,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "constructor"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "payable",
+          "name": "deposit"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "nonpayable",
+          "name": "withdraw1"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "external",
+          "mutability": "nonpayable",
+          "name": "withdraw2"
+        },
+        {
+          "params": [],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "internal",
+          "mutability": "nonpayable",
+          "name": "clearBalance"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "view",
+          "name": "getBalance"
+        }
+      ],
+      "variables": [
+        {
+          "name": "balances",
+          "type": {
+            "subType": "MapType",
+            "name": "mapping(address => uint256)",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint"
+            }
+          }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 111,
+      "name": "Wallet"
+    }
+  ],
+  "compiler": "cargo-contract",
+  "version": "1.1.1"
+}

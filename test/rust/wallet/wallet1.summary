@@ -1,0 +1,91 @@
+{
+  "compiler": "cargo-contract",
+  "version": "ink! 3.0.1",
+  "contracts": [
+    {
+      "id": 0,
+      "name": "wallet",
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "isConstructor": true,
+          "selector": "0x5c5593cb",
+          "name": "constructor",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "params": [],
+          "returns": [],
+          "modifiers": []
+        },
+        {
+          "isConstructor": false,
+          "selector": "0x2d10c9bd",
+          "name": "deposit",
+          "visibility": "public",
+          "mutability": "payable",
+          "params": [],
+          "returns": [],
+          "modifiers": []
+        },
+        {
+          "isConstructor": false,
+          "selector": "0x99e9a488",
+          "name": "withdraw1",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "params": [],
+          "returns": [],
+          "modifiers": []
+        },
+        {
+          "isConstructor": false,
+          "selector": "0x310b4edd",
+          "name": "withdraw2",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "params": [],
+          "returns": [],
+          "modifiers": []
+        },
+        {
+          "isConstructor": false,
+          "selector": "0x339e3296",
+          "name": "getBalance",
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "params": [],
+          "returns": [
+            {
+              "name": "Balance",
+              "type": {
+                "subType": "ElementaryType",
+                "name": "uint128"
+              }
+            }
+          ],
+          "modifiers": []
+        }
+      ],
+      "variables": [
+        {
+          "name": "balances",
+          "type": {
+            "subType": "MapType",
+            "key": {
+              "subType": "ElementaryType",
+              "name": "address"
+            },
+            "value": {
+              "subType": "ElementaryType",
+              "name": "uint128"
+            },
+            "name": "Mapping<address, uint128>"
+          }
+        }
+      ],
+      "structs": [],
+      "enums": []
+    }
+  ]
+}
