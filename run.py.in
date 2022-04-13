@@ -6,20 +6,89 @@ import shutil
 import subprocess
 from tabulate import tabulate
 
-# NOTE: Update these with correct local paths!
-SOLANG=os.path.join("/", "Users", "bmariano", "veridise", "solang", "target", "release", "solang")
-PREPROCESSOR=os.path.join("deps", "SolidityPreprocessor", "src", "preprocess.js")
+############################
+# PATHS (NOTE: Update these with correct local paths if necessary!)
+############################
 OPT_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "opt")
+# Solidity paths
+SOLANG_PATH=os.path.join("/", "Users", "bmariano", "veridise", "solang", "target", "release", "solang")
+SOLIDITY_PREPROCESSOR_PATH=os.path.join("deps", "SolidityPreprocessor", "src", "preprocessor.js")
+SOLIDITY_SUMMARIZER_PATH=os.path.join("deps", "SolidityPreprocessor", "src", "summarizer.js")
+# Rust paths
+CARGO_PATH = os.path.join("/", "Users", "bmariano", ".cargo", "bin", "cargo")
+RUST_PREPROCESSOR_PATH=os.path.join("/", "Users", "bmariano", "veridise", "RustPreprocessor", "summarizer.py")
+TOML_PATH = os.path.join("Cargo.toml")
+CARGO_TARGET_PATH = os.path.join("target", "debug", "deps")
+# Output path
+OUT_DIR="processed_examples"
 
+############################
+# Detectors
+############################
 DETECTORS = ["reentrancy", "suicide", "uninitialized_state",
              "msg_value_loop", "delegatecall_loop", "tainted_send", "flashloan"]
 
-OUT_DIR="processed_examples"
-
-IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG)
-BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG)
-PREPROCESSOR_CMD="node {} {{}}".format(PREPROCESSOR)
+############################
+# Subprocess Commands
+############################
 OPT_CMD = "{} --load=cmake-build-debug/lib/libVanguard.dylib -enable-new-pm=0 --summary={{}} --{{}} {{}} -o /dev/null".format(OPT_PATH)
+# Solidity commands
+IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG_PATH)
+BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG_PATH)
+SOLIDITY_PREPROCESSOR_CMD="node {} {{}}".format(SOLIDITY_PREPROCESSOR_PATH)
+SOLIDITY_SUMMARIZER_CMD="node {} {{}}".format(SOLIDITY_SUMMARIZER_PATH)
+# Rust commands
+IR_CARGO_CMD="{} rustc -- --emit llvm-ir".format(CARGO_PATH)
+BC_CARGO_CMD="{} rustc -- --emit llvm-bc".format(CARGO_PATH)
+CARGO_SUMMARY_CMD="{} +nightly contract build".format(CARGO_PATH)
+RUST_PREPROCESSOR_CMD="python3 {} {{}}".format(RUST_PREPROCESSOR_PATH)
+
+############################
+# Extensions
+############################
+solidity_exts = ["sol"]
+rust_exts = ["rs"]
+
+############################
+# Templates
+############################
+# Rust tempaltes
+TOML_TEMPLATE="""
+[package]
+name = "tmp"
+version = "0.1.0"
+authors = ["[your_name] <[your_email]>"]
+edition = "2021"
+
+[dependencies]
+ink_primitives = {{ version = "3.0", default-features = false }}
+ink_metadata = {{ version = "3.0", default-features = false, features = ["derive"], optional = true }}
+ink_env = {{ version = "3.0", default-features = false }}
+ink_storage = {{ version = "3.0", default-features = false }}
+ink_lang = {{ version = "3.0", default-features = false }}
+
+scale = {{ package = "parity-scale-codec", version = "3", default-features = false, features = ["derive"] }}
+scale-info = {{ version = "2", default-features = false, features = ["derive"], optional = true }}
+
+[lib]
+name = "{}"
+path = "{}"
+crate-type = [
+	# Used for normal contract Wasm blobs.
+	"cdylib",
+]
+
+[features]
+default = ["std"]
+std = [
+    "ink_metadata/std",
+    "ink_env/std",
+    "ink_storage/std",
+    "ink_primitives/std",
+    "scale/std",
+    "scale-info/std",
+]
+ink-as-dependency = []"""
 
 def get_per_func_info(s: str):
     patt = re.compile("(Function '([^']*)' [^\n]*)")
@@ -27,33 +96,92 @@ def get_per_func_info(s: str):
 
     return matches
 
-def preprocess_file(args):
+def preprocess_file(args, lang, ext):
     file_name = os.path.basename(args.src_path)
 
-    # Generate commandline command for Solang
-    solang_cmd = BC_SOLANG_CMD.format(OUT_DIR, args.src_path)
+    if lang == "solidity":
+        # Generate summarizer command
+        summarizer_cmd = SOLIDITY_SUMMARIZER_CMD.format(args.src_path,OUT_DIR)
 
-    # Generate preprocessor command
-    preprocessor_cmd = PREPROCESSOR_CMD.format(args.src_path,OUT_DIR)
+        # Run summarizer and save result to json
+        summary_name = file_name.replace(".{}".format(ext), "_summary.json")
+        summary_path = os.path.join(OUT_DIR, summary_name)
+        with open(summary_path, "wb") as f:
+            print("Running Solidity summarizer...", end="")
+            summary = subprocess.check_output(summarizer_cmd.split(), stderr=subprocess.DEVNULL)
+            f.write(summary)
+            print("Completed Solidity summarizer, summary at {}.".format(summary_path))
 
-    # Run solang
-    print("Running Solang...", end="")
-    subprocess.check_output(solang_cmd.split(), stderr=subprocess.DEVNULL)
-    print("Completed Solang, compiled files in folder at {}".format(OUT_DIR))
-    if args.create_ir:
-        print("Running Solang to create IR (becaue --create_ir used!)...", end="")
-        solang_ir_cmd = IR_SOLANG_CMD.format(OUT_DIR, args.src_path)
-        subprocess.check_output(solang_ir_cmd.split(), stderr=subprocess.DEVNULL)
-        print("Completed Solang, IR files in folder at {}".format(OUT_DIR))
+        # Generate preprocessor command
+        preprocessor_cmd = SOLIDITY_PREPROCESSOR_CMD.format(args.src_path,OUT_DIR)
 
-    # Run preprocessor and save result to json
-    summary_name = file_name.replace(".sol", "_summary.json")
-    summary_path = os.path.join(OUT_DIR, summary_name)
-    with open(summary_path, "wb") as f:
-        print("Running Solidity preprocessor...", end="")
-        summary = subprocess.check_output(preprocessor_cmd.split(), stderr=subprocess.DEVNULL)
-        f.write(summary)
-        print("Completed Solidity preprocessor, summary at {}.".format(summary_path))
+        # Run preprocessor and save result to json
+        preprocessed_name = file_name.replace(".{}".format(ext), "_instrumented.{}".format(ext))
+        preprocessed_path = os.path.join(OUT_DIR, preprocessed_name)
+        with open(preprocessed_path, "wb") as f:
+            print("Running Solidity preprocessor...", end="")
+            preprocessed = subprocess.check_output(preprocessor_cmd.split(), stderr=subprocess.DEVNULL)
+            f.write(preprocessed)
+            print("Completed Solidity preprocessor, preprocessed version at {}.".format(preprocessed_path))
+
+        # Generate commandline command for Solang
+        solang_cmd = BC_SOLANG_CMD.format(OUT_DIR, preprocessed_path)
+
+        # Run solang
+        print("Running Solang...", end="")
+        subprocess.check_output(solang_cmd.split(), stderr=subprocess.DEVNULL)
+        print("Completed Solang, compiled files in folder at {}".format(OUT_DIR))
+        if args.create_ir:
+            print("Running Solang to create IR (becaue --create_ir used!)...", end="")
+            solang_ir_cmd = IR_SOLANG_CMD.format(OUT_DIR, args.src_path)
+            subprocess.check_output(solang_ir_cmd.split(), stderr=subprocess.DEVNULL)
+            print("Completed Solang, IR files in folder at {}".format(OUT_DIR))
+    elif lang == "rust":
+        # Generate commandline command for Cargo
+        cargo_cmd = BC_CARGO_CMD.format(args.src_path)
+
+        # Make toml
+        toml_name = file_name.replace(".{}".format(ext), "")
+        with open(TOML_PATH, "w") as f:
+            f.write(TOML_TEMPLATE.format(toml_name, args.src_path))
+
+        # Run cargo
+        print("Running Cargo...", end="")
+        subprocess.check_output(cargo_cmd.split(), stderr=subprocess.DEVNULL)
+        for f in os.listdir(CARGO_TARGET_PATH):
+            # Copy bc files into processed folder
+            if f.endswith(".bc"):
+                fpath = os.path.join(CARGO_TARGET_PATH, f)
+                shutil.copy(fpath, os.path.join(OUT_DIR, f.replace(".bc", "_deploy.bc")))
+        print("Completed Cargo, compiled files in folder in {}".format(OUT_DIR))
+        if args.create_ir:
+            print("Running Cargo to create IR (becaue --create_ir used!)...", end="")
+            cargo_ir_cmd = IR_CARGO_CMD.format(args.src_path)
+            subprocess.check_output(cargo_ir_cmd.split(), stderr=subprocess.DEVNULL)
+            for f in os.listdir(CARGO_TARGET_PATH):
+                # Copy bc files into processed folder
+                if f.endswith(".ll"):
+                    fpath = os.path.join(CARGO_TARGET_PATH, f)
+                    shutil.copy(fpath, os.path.join(OUT_DIR, f))
+            print("Completed Cargo, IR files in folder at {}".format(OUT_DIR))
+
+        # Run cargo to generate metadata summary
+        print("Running cargo to generate metadata...", end="")
+        cargo_summary_cmd = CARGO_SUMMARY_CMD.format(args.src_path)
+        subprocess.check_output(cargo_summary_cmd.split(), stderr=subprocess.DEVNULL)
+        print("Completed metadata generation, available at target/ink/metadata.json.")
+
+        # Generate preprocessor command
+        preprocessor_cmd = RUST_PREPROCESSOR_CMD.format(os.path.join("target", "ink", "metadata.json"))
+
+        # Run preprocessor and save result to json
+        summary_name = file_name.replace(".{}".format(ext), "_summary.json")
+        summary_path = os.path.join(OUT_DIR, summary_name)
+        with open(summary_path, "wb") as f:
+            print("Running rust preprocessor...", end="")
+            summary = subprocess.check_output(preprocessor_cmd.split(), stderr=subprocess.DEVNULL)
+            f.write(summary)
+            print("Completed Rust preprocessor, summary at {}.".format(summary_path))
 
     return summary_path
 
@@ -99,13 +227,21 @@ def run(args):
     assert args.detector != None, "No detector given (with --detector arg)!"
     assert args.detector in DETECTORS or args.detector=='all', "{} is not a recognized detector (check DETECTORS at top of run.py)!".format(args.detector)
 
+    ext = os.path.basename(args.src_path).split(".")[-1]
+    assert ext in solidity_exts or ext in rust_exts, "File extension {} not recognized for rust or solidity!".format(ext)
+
+    if ext in solidity_exts:
+        lang = "solidity"
+    elif ext in rust_exts:
+        lang = "rust"
+
     if args.detector == 'all':
         detectors = DETECTORS
     else:
         detectors = [args.detector]
 
     print("----Preprocessing {}----".format(args.src_path))
-    summary_path = preprocess_file(args)
+    summary_path = preprocess_file(args, lang, ext)
 
     results = defaultdict(list)
     for detector in detectors:
