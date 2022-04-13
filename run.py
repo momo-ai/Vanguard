@@ -8,7 +8,7 @@ from tabulate import tabulate
 
 # NOTE: Update these with correct local paths!
 SOLANG=os.path.join("/", "Users", "bmariano", "veridise", "solang", "target", "release", "solang")
-PREPROCESSOR=os.path.join("/", "Users", "bmariano", "veridise", "SolidityPreprocessor", "src", "preprocess.js")
+PREPROCESSOR=os.path.join("deps", "SolidityPreprocessor", "src", "preprocess.js")
 OPT_PATH = os.path.join("/", "opt", "homebrew", "Cellar", "llvm", "13.0.1_1", "bin", "opt")
 
 DETECTORS = ["reentrancy", "suicide", "uninitialized_state",

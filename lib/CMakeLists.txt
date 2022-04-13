@@ -85,3 +85,4 @@ if(APPLE)
     )
 endif(APPLE)
 
+add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
