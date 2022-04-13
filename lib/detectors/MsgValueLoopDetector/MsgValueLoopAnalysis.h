@@ -23,7 +23,9 @@ namespace MsgValueLoop {
     private:
         unordered_set<string> loopWithMsgValue; // Track loop bodies with ref to msg.value
         unordered_set<string> funcsWithBadMsgValue; // Track which functions have potential bad msg.value accesses
+        unordered_set<string> fnsWithMsgValue;
         string fname; // Current function name
+        Function *curFn;
         const blockchain::Blockchain *chain;
     };
 }

@@ -26,15 +26,39 @@ namespace DelegatecallLoop {
 
     bool DelegatecallLoopAnalysis::transfer(Instruction &ins) {
         bool modified = false;
+
         if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
             // Check for call to selfDestruct
             Function *called_func = CallInstr->getCalledFunction();
             string cfname = called_func->getName().str();
 
-            // TODO: Move to libBlockchain
+            if(chain->isDelegateCall(*called_func)) {
+                modified = fnsWithDelegateCall.insert(fname).second || modified;
+                if(isReachable(ins, ins)) {
+                    modified = loopWithDelegate.insert(fname).second || modified;
+                    if(isPayable) {
+                        modified = funcsWithBadDelegate.insert(fname).second || modified;
+                    }
+                }
+            }
+            else if(loopWithDelegate.find(cfname) != loopWithDelegate.end()) {
+                if(isPayable) {
+                    funcsWithBadDelegate.insert(fname);
+                }
+            }
+            else if(fnsWithDelegateCall.find(cfname) != fnsWithDelegateCall.end() && isReachable(ins, ins)) {
+                modified = loopWithDelegate.insert(fname).second || modified;
+                if(isPayable) {
+                    modified = funcsWithBadDelegate.insert(fname).second || modified;
+                }
+            }
+
+
+            /*// TODO: Move to libBlockchain
             if (fname.find("__for_loop_body") != string::npos) {
                 // Look for delegate call in loop body
-                if (cfname.compare("callDelegate") == 0 &&
+                //if (cfname.compare("callDelegate") == 0 &&
+                if(chain->isDelegateCall(*called_func) &&
                     count(loopWithDelegate.begin(), loopWithDelegate.end(), fname) == 0) {
                     // Detect call to retrieve msg.value
                     loopWithDelegate.insert(fname);
@@ -48,7 +72,7 @@ namespace DelegatecallLoop {
                     isPayable) {
                     funcsWithBadDelegate.insert(fname);
                 }
-            }
+            }*/
         }
         return modified;
     }

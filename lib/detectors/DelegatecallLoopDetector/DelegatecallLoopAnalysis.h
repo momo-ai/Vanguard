@@ -21,6 +21,8 @@ namespace DelegatecallLoop {
         bool endFn(Function &fn) override;
         string vulnerabilityReport() override;
     private:
+        unordered_set<string> fnsWithDelegateCall;
+
         unordered_set<string> loopWithDelegate; // Track loop bodies with call to delegate call
         unordered_set<string> funcsWithBadDelegate; // Track which functions have potential bad call to delegate
         string fname; // Current function name

@@ -25,6 +25,10 @@ namespace vanguard {
         virtual bool endFn(Function &fn) = 0;
         //virtual bool isVulnerable() = 0;
         virtual string vulnerabilityReport() = 0;
+
+    protected:
+        bool isReachable(const Instruction &from, const Instruction &to) const;
+        bool isReachable(const BasicBlock &from, const BasicBlock &to) const;
     };
 }
 

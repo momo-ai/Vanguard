@@ -42,7 +42,7 @@ namespace Suicide {
                 modified = true;
             }
             // TODO: Move this to libblockchain
-            if (cfname.compare("selfDestruct") == 0 &&
+            if (chain->isSelfDestruct(ins) &&
                 !count(potentialSuicides.begin(), potentialSuicides.end(), fname)) {
                 potentialSuicides.push_back(fname);
                 modified = true;
