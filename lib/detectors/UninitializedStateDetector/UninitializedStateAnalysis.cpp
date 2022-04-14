@@ -8,6 +8,7 @@
 #include <string>
 
 using namespace std;
+using namespace blockchain;
 
 namespace UninitializedState {
     UninitializedStateAnalysis::UninitializedStateAnalysis(const blockchain::Blockchain *in_chain) : Analysis() {
@@ -19,14 +20,36 @@ namespace UninitializedState {
     }
 
     bool UninitializedStateAnalysis::beginFn(Function &fn) {
-        fname = fn.getName().str();
+        curFn = chain->findFunction(fn);
         localInitializedVars.clear();
         return false;
     }
 
     bool UninitializedStateAnalysis::transfer(Instruction &ins) {
         bool modified = false;
-        if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
+
+        if(chain->readsStorage(ins)) {
+            auto var = chain->readStorageVariable(ins);
+            if(initializedVars.find(var) == initializedVars.end() && localInitializedVars.find(var) == localInitializedVars.end()) {
+                uninitializedAccesses[curFn].insert(var);
+            }
+        }
+
+        if(chain->writesStorage(ins)) {
+            auto var = chain->writesStorageVariable(ins);
+
+            if(curFn->isConstructor()) {
+                if(initializedVars.insert(var).second) {
+                    modified = true;
+                    uninitializedAccesses.clear();
+                }
+            }
+            else {
+                localInitializedVars.insert(var);
+            }
+        }
+
+        /*if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
             // Check for call to selfDestruct
             Function *called_func = CallInstr->getCalledFunction();
             string cfname = called_func->getName().str();
@@ -55,7 +78,7 @@ namespace UninitializedState {
                 }
             }
 
-        }
+        }*/
         return modified;
     }
 
@@ -65,11 +88,11 @@ namespace UninitializedState {
 
     string UninitializedStateAnalysis::vulnerabilityReport()  {
         string report = "Uninitialized State Report:\n";
-        for(pair<string,unordered_set<string>> p : uninitializedAccesses) {
-            string funcname = get<0>(p);
-            unordered_set<string> vnames = get<1>(p);
-            for(string vname : vnames) {
-                report += "Function '" + funcname + "' has potential access to uninitialized state variable '" + vname + "' !\n";
+        for(auto p : uninitializedAccesses) {
+            string funcname = p.first->name();
+            auto vnames = p.second;
+            for(auto vname : vnames) {
+                report += "Function '" + funcname + "' has potential access to uninitialized state variable '" + vname->name() + "' !\n";
             }
         }
         report += "--------\nDone!";

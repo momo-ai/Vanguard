@@ -71,7 +71,7 @@ namespace Reentrancy {
             }
         }
 
-        if (chain->modifiesStorage(ins)) {
+        if (chain->writesStorage(ins)) {
             // Detect store to contract state
             if (!get<1>(fnInfo[fname])) {
                 // Indicate function has store if not already indicated

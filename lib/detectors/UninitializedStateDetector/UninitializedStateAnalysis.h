@@ -7,6 +7,8 @@
 
 #include "../../Analysis.h"
 #include <unordered_set>
+#include <BlkVariable.h>
+#include <BlkFunction.h>
 
 using namespace vanguard;
 
@@ -20,11 +22,10 @@ namespace UninitializedState {
         bool endFn(Function &fn) override;
         string vulnerabilityReport() override;
     private:
-        bool visited_constructor = false; // Track whether or not constructor has been visited
-        string fname; // Current function name
-        map<string, unordered_set<string>> uninitializedAccesses; // Tracks uninitialized accesses per function
-        unordered_set<string> initializedVars; // Tracks variables which are globally initialized in constructor
-        unordered_set<string> localInitializedVars; // Tracks variables which are locally initialized
+        const blockchain::BlkFunction *curFn; // Current function name
+        map<const blockchain::BlkFunction *, unordered_set<blockchain::BlkVariable *>> uninitializedAccesses; // Tracks uninitialized accesses per function
+        unordered_set<blockchain::BlkVariable *> initializedVars; // Tracks variables which are globally initialized in constructor
+        unordered_set<blockchain::BlkVariable *> localInitializedVars; // Tracks variables which are locally initialized
         const blockchain::Blockchain *chain;
     };
 }
