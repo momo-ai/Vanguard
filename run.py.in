@@ -11,12 +11,12 @@ from tabulate import tabulate
 ############################
 OPT_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "opt")
 # Solidity paths
-SOLANG_PATH=os.path.join("/", "Users", "bmariano", "veridise", "solang", "target", "release", "solang")
+SOLANG_PATH=os.path.join("solang")
 SOLIDITY_PREPROCESSOR_PATH=os.path.join("deps", "SolidityPreprocessor", "src", "preprocessor.js")
 SOLIDITY_SUMMARIZER_PATH=os.path.join("deps", "SolidityPreprocessor", "src", "summarizer.js")
 # Rust paths
-CARGO_PATH = os.path.join("/", "Users", "bmariano", ".cargo", "bin", "cargo")
-RUST_PREPROCESSOR_PATH=os.path.join("/", "Users", "bmariano", "veridise", "RustPreprocessor", "summarizer.py")
+CARGO_PATH = os.path.join("cargo")
+RUST_PREPROCESSOR_PATH=os.path.join("deps", "RustPreprocessor", "summarizer.py")
 TOML_PATH = os.path.join("Cargo.toml")
 CARGO_TARGET_PATH = os.path.join("target", "debug", "deps")
 # Output path

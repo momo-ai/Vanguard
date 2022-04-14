@@ -1,3 +1,6 @@
 [submodule "deps/SolidityPreprocessor"]
 	path = deps/SolidityPreprocessor
 	url = https://github.com/Veridise/SolidityPreprocessor.git
+[submodule "deps/RustPreprocessor"]
+	path = deps/RustPreprocessor
+	url = git@github.com:Veridise/RustPreprocessor.git
