@@ -4,3 +4,6 @@ llvm-project
 z3
 processed_examples
 run.py
+target
+Cargo.lock
+Cargo.toml
