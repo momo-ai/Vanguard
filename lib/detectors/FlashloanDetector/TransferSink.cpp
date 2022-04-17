@@ -22,8 +22,12 @@ namespace flashloan {
 
     vector<pair<FunctionLocation, Val *>> TransferSink::sinkValues(const llvm::Function &fn) const {
         // TODO: taint analysis does not take ownership of these values, they should be deleted here.
-
+        string fnname = fn.getName().str();
         vector<pair<FunctionLocation, Val *>> vals;
+        if(fn.arg_size() < 3) {
+            return vals;
+        }
+
         Value *valueArg = fn.getArg(2);
         //return Val::functionOutputs(fn);
         if(valueArg->getType()->isPointerTy()) {

@@ -133,6 +133,17 @@ namespace vanguard {
         std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> inVals = Val::inVals(call);
         std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> outVals = Val::outVals(call);
 
+        //can't resolve target. Assume that it doesn't do anything for now.
+        if(call.getCalledFunction() == nullptr) {
+            Taint *prev = getPrevTaint(call);
+            Taint *cur = insToTaint[&call];
+            if(cur == nullptr) {
+                cur = new Taint(*prev);
+                insToTaint[&call] = cur;
+            }
+            return false;
+        }
+
         TaintSummary *callee = store.getSummary(*call.getCalledFunction());
         Taint *prev = getPrevTaint(call);
         Taint *cur = insToTaint[&call];
