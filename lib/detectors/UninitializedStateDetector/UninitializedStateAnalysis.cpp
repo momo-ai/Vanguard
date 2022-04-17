@@ -31,8 +31,6 @@ namespace UninitializedState {
         if(chain->readsStorage(ins)) {
             auto var = chain->readStorageVariable(ins);
             if(initializedVars.find(var) == initializedVars.end() && localInitializedVars.find(var) == localInitializedVars.end()) {
-                ins.print(outs());
-                cout << endl;
                 auto var = chain->readStorageVariable(ins);
                 uninitializedAccesses[curFn].insert(var);
             }
