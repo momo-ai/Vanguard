@@ -6,13 +6,13 @@
 #define VANGUARD_MSGVALUEANALYSIS_H
 
 
-#include "../../Analysis.h"
+#include "../../ReachAnalysis.h"
 #include <unordered_set>
 
 using namespace vanguard;
 
 namespace MsgValueLoop {
-    class MsgValueLoopAnalysis : public Analysis {
+    class MsgValueLoopAnalysis : public ReachAnalysis {
     public:
         MsgValueLoopAnalysis(const blockchain::Blockchain *in_chain);
         bool shouldAnalyze(Function &fn) override;
@@ -21,10 +21,9 @@ namespace MsgValueLoop {
         bool endFn(Function &fn) override;
         string vulnerabilityReport() override;
     private:
-        unordered_set<string> loopWithMsgValue; // Track loop bodies with ref to msg.value
-        unordered_set<string> funcsWithBadMsgValue; // Track which functions have potential bad msg.value accesses
-        unordered_set<string> fnsWithMsgValue;
-        string fname; // Current function name
+        unordered_set<const Function *> loopWithMsgValue; // Track loop bodies with ref to msg.value
+        unordered_set<const Function *> funcsWithBadMsgValue; // Track which functions have potential bad msg.value accesses
+        unordered_set<const Function *> fnsWithMsgValue;
         Function *curFn;
         const blockchain::Blockchain *chain;
     };

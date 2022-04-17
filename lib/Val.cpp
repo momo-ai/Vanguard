@@ -9,6 +9,7 @@
 #include "unordered_map"
 #include "llvm/Analysis/MemoryLocation.h"
 #include "MemoryVal.h"
+#include <iostream>
 
 using namespace std;
 
@@ -61,6 +62,9 @@ namespace vanguard {
         const Function *callee = call.getCalledFunction();
 
         std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> outVals;
+        if(callee == nullptr) {
+            return outVals;
+        }
 
         for(int i = 0; i < callee->arg_size(); ++i) {
             auto arg = callee->getArg(i);
@@ -111,6 +115,9 @@ namespace vanguard {
         const Function *callee = call.getCalledFunction();
 
         std::unordered_map<Val *, Val *, ValPtrHash, ValPtrEq> inVals;
+        if(callee == nullptr) {
+            return inVals;
+        }
 
         for(int i = 0; i < callee->arg_size(); ++i) {
             auto calleeArg = callee->getArg(i);

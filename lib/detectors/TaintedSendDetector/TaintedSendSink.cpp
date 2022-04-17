@@ -18,6 +18,10 @@ namespace TaintedSend {
 
     std::vector<std::pair<FunctionLocation, Val *>> TaintedSendSink::sinkValues(const llvm::Function &fn) const {
         vector<pair<FunctionLocation, Val *>> vals;
+        if(fn.arg_size() < 2) {
+            return vals;
+        }
+
         Value *valueArg = fn.getArg(1);
         //return Val::functionOutputs(fn);
         if(valueArg->getType()->isPointerTy()) {

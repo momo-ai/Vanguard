@@ -11,6 +11,8 @@ add_library(Vanguard SHARED
         LocalVanguard.cpp
         AARequirement.cpp
         Analysis.cpp
+        CGRequirement.cpp
+        ReachAnalysis.cpp
         LocalVanguard.h SCCVanguard.cpp SCCVanguard.h Vanguard.h Vanguard.cpp ReadWriteRetriever.cpp ReadWriteRetriever.h Val.h RegisterVal.cpp RegisterVal.h TaintLabel.cpp TaintLabel.h TaintSink.h TaintSource.h TaintNode.h TaintSink.cpp TaintNode.cpp TaintSummary.cpp TaintSummary.h TaintLabelStore.cpp TaintLabelStore.h FunctionTaintSource.cpp FunctionTaintSource.h FunctionTaintSink.cpp FunctionTaintSink.h Val.cpp TaintSummaryStore.cpp TaintSummaryStore.h TaintSinkProvider.h MemoryTaint.cpp MemoryTaint.h RegisterTaint.cpp RegisterTaint.h StorageTaint.cpp StorageTaint.h MemoryVal.cpp MemoryVal.h StorageVal.cpp StorageVal.h detectors/VariableShadowingDetector/VariableShadowingDetector.cpp detectors/VariableShadowingDetector/VariableShadowingDetector.h detectors/VariableShadowingDetector/VariableShadowingAnalysis.cpp detectors/VariableShadowingDetector/VariableShadowingAnalysis.h)
 
 #if(DEFINED ENV{Z3_HOME})

@@ -10,7 +10,7 @@
 using namespace std;
 
 namespace MsgValueLoop {
-    MsgValueLoopAnalysis::MsgValueLoopAnalysis(const blockchain::Blockchain *in_chain) : Analysis() {
+    MsgValueLoopAnalysis::MsgValueLoopAnalysis(const blockchain::Blockchain *in_chain) : ReachAnalysis() {
         chain = in_chain;
         curFn = nullptr;
     }
@@ -20,41 +20,42 @@ namespace MsgValueLoop {
     }
 
     bool MsgValueLoopAnalysis::beginFn(Function &fn) {
-        fname = fn.getName().str();
+        ReachAnalysis::beginFn(fn);
         curFn = &fn;
         return false;
     }
 
     bool MsgValueLoopAnalysis::transfer(Instruction &ins) {
+        ReachAnalysis::transfer(ins);
         bool modified = false;
 
         if(chain->getsValue(ins)) {
-            modified = fnsWithMsgValue.insert(fname).second || modified;
-            if(isReachable(ins, ins)) {
-                modified = loopWithMsgValue.insert(fname).second || modified;
+            modified = fnsWithMsgValue.insert(curFn).second || modified;
+            if(Analysis::isReachable(ins, ins)) {
+                modified = loopWithMsgValue.insert(curFn).second || modified;
                 auto blkFn = chain->findFunction(*curFn);
                 if(blkFn != nullptr && blkFn->visibility() == blockchain::PUBLIC) {
-                    modified = funcsWithBadMsgValue.insert(fname).second || modified;
+                    modified = funcsWithBadMsgValue.insert(curFn).second || modified;
                 }
             }
         }
 
         if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
             // Check for call to selfDestruct
-            Function *called_func = CallInstr->getCalledFunction();
-            string cfname = called_func->getName().str();
+            auto calledFn = CallInstr->getCalledFunction();
+            //string cfname = called_func->getName().str();
 
-            if(loopWithMsgValue.find(cfname) != loopWithMsgValue.end()) {
+            if(loopWithMsgValue.find(calledFn) != loopWithMsgValue.end()) {
                 auto blkFn = chain->findFunction(*curFn);
                 if(blkFn != nullptr && blkFn->visibility() == blockchain::PUBLIC) {
-                    modified = funcsWithBadMsgValue.insert(fname).second || modified;
+                    modified = funcsWithBadMsgValue.insert(curFn).second || modified;
                 }
             }
-            else if(fnsWithMsgValue.find(cfname) != fnsWithMsgValue.end() && isReachable(ins, ins)) {
-                modified = loopWithMsgValue.insert(fname).second || modified;
+            else if(fnsWithMsgValue.find(calledFn) != fnsWithMsgValue.end() && Analysis::isReachable(ins, ins)) {
+                modified = loopWithMsgValue.insert(curFn).second || modified;
                 auto blkFn = chain->findFunction(*curFn);
                 if(blkFn != nullptr && blkFn->visibility() == blockchain::PUBLIC) {
-                    modified = funcsWithBadMsgValue.insert(fname).second || modified;
+                    modified = funcsWithBadMsgValue.insert(curFn).second || modified;
                 }
             }
         }
@@ -95,8 +96,10 @@ namespace MsgValueLoop {
 
     string MsgValueLoopAnalysis::vulnerabilityReport()  {
         string report = "mgs.value in Loop Report:\n";
-        for(string funcname : funcsWithBadMsgValue) {
-            report += "Function '" + funcname + "' has access to msg.value in loop!\n";
+        for(auto fn : funcsWithBadMsgValue) {
+            for(auto pubFn : reachingPublicFns(chain, fn)) {
+                report += "Function '" + pubFn->name() + "' has access to msg.value in loop!\n";
+            }
         }
         report += "--------\nDone!";
         return report;

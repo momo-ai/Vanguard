@@ -24,6 +24,7 @@ namespace vanguard {
     }
 
     bool TaintAnalysis::beginFn(Function &fn) {
+        ReachAnalysis::beginFn(fn);
         /*if(fn.hasName()) {
            std::cout << fn.getName().str() << std::endl;
         }*/
@@ -32,6 +33,7 @@ namespace vanguard {
     }
 
     bool TaintAnalysis::transfer(Instruction &ins) {
+        ReachAnalysis::transfer(ins);
         //ins.print(outs(), true);
         return curSummary->propagate(ins);
     }

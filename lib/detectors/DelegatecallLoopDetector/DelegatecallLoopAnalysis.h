@@ -6,13 +6,13 @@
 #define VANGUARD_MSGVALUEANALYSIS_H
 
 
-#include "../../Analysis.h"
+#include "../../ReachAnalysis.h"
 #include <unordered_set>
 
 using namespace vanguard;
 
 namespace DelegatecallLoop {
-    class DelegatecallLoopAnalysis : public Analysis {
+    class DelegatecallLoopAnalysis : public ReachAnalysis {
     public:
         DelegatecallLoopAnalysis(const blockchain::Blockchain *in_chain);
         bool shouldAnalyze(Function &fn) override;
@@ -21,11 +21,10 @@ namespace DelegatecallLoop {
         bool endFn(Function &fn) override;
         string vulnerabilityReport() override;
     private:
-        unordered_set<string> fnsWithDelegateCall;
-
-        unordered_set<string> loopWithDelegate; // Track loop bodies with call to delegate call
-        unordered_set<string> funcsWithBadDelegate; // Track which functions have potential bad call to delegate
-        string fname; // Current function name
+        unordered_set<const Function *> fnsWithDelegateCall;
+        unordered_set<const Function *> loopWithDelegate; // Track loop bodies with call to delegate call
+        unordered_set<const Function *> funcsWithBadDelegate; // Track which functions have potential bad call to delegate
+        const Function *curFn; // Current function name
         bool isPayable; // Whether or not current function is payable
         const blockchain::Blockchain *chain;
     };

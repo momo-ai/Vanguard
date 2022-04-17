@@ -8,11 +8,11 @@
 #include "llvm/IR/CFG.h"
 
 namespace vanguard {
-    bool Analysis::isReachable(const Instruction &from, const Instruction &to) const {
+    bool Analysis::isReachable(const Instruction &from, const Instruction &to) {
         return isReachable(*from.getParent(), *to.getParent());
     }
 
-    bool Analysis::isReachable(const BasicBlock &from, const BasicBlock &to) const {
+    bool Analysis::isReachable(const BasicBlock &from, const BasicBlock &to) {
         list<const BasicBlock *> worklist;
         unordered_set<const BasicBlock *> seen;
 
