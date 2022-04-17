@@ -10,7 +10,7 @@
 using namespace std;
 
 namespace DelegatecallLoop {
-    DelegatecallLoopAnalysis::DelegatecallLoopAnalysis(const blockchain::Blockchain *in_chain) : Analysis() {
+    DelegatecallLoopAnalysis::DelegatecallLoopAnalysis(const blockchain::Blockchain *in_chain) : ReachAnalysis() {
         chain = in_chain;
     }
 
@@ -19,37 +19,39 @@ namespace DelegatecallLoop {
     }
 
     bool DelegatecallLoopAnalysis::beginFn(Function &fn) {
-        fname = fn.getName().str();
+        ReachAnalysis::beginFn(fn);
+        curFn = &fn;
         isPayable = chain->findFunction(fn)->mutability() == blockchain::Mutability::PAYABLE;
         return false;
     }
 
     bool DelegatecallLoopAnalysis::transfer(Instruction &ins) {
+        ReachAnalysis::transfer(ins);
         bool modified = false;
 
         if (auto CallInstr = dyn_cast<CallInst>(&ins)) {
             // Check for call to selfDestruct
-            Function *called_func = CallInstr->getCalledFunction();
-            string cfname = called_func->getName().str();
+            Function *calledFn = CallInstr->getCalledFunction();
+            //string cfname = called_func->getName().str();
 
-            if(chain->isDelegateCall(*called_func)) {
-                modified = fnsWithDelegateCall.insert(fname).second || modified;
-                if(isReachable(ins, ins)) {
-                    modified = loopWithDelegate.insert(fname).second || modified;
+            if(chain->isDelegateCall(*calledFn)) {
+                modified = fnsWithDelegateCall.insert(curFn).second || modified;
+                if(Analysis::isReachable(ins, ins)) {
+                    modified = loopWithDelegate.insert(curFn).second || modified;
                     if(isPayable) {
-                        modified = funcsWithBadDelegate.insert(fname).second || modified;
+                        modified = funcsWithBadDelegate.insert(curFn).second || modified;
                     }
                 }
             }
-            else if(loopWithDelegate.find(cfname) != loopWithDelegate.end()) {
+            else if(loopWithDelegate.find(calledFn) != loopWithDelegate.end()) {
                 if(isPayable) {
-                    funcsWithBadDelegate.insert(fname);
+                    funcsWithBadDelegate.insert(curFn);
                 }
             }
-            else if(fnsWithDelegateCall.find(cfname) != fnsWithDelegateCall.end() && isReachable(ins, ins)) {
-                modified = loopWithDelegate.insert(fname).second || modified;
+            else if(fnsWithDelegateCall.find(calledFn) != fnsWithDelegateCall.end() && Analysis::isReachable(ins, ins)) {
+                modified = loopWithDelegate.insert(curFn).second || modified;
                 if(isPayable) {
-                    modified = funcsWithBadDelegate.insert(fname).second || modified;
+                    modified = funcsWithBadDelegate.insert(curFn).second || modified;
                 }
             }
 
@@ -83,8 +85,10 @@ namespace DelegatecallLoop {
 
     string DelegatecallLoopAnalysis::vulnerabilityReport()  {
         string report = "delegatecall in payable Loop Report:\n";
-        for(string funcname : funcsWithBadDelegate) {
-            report += "Function '" + funcname + "' has call to delegatecall in payable loop!\n";
+        for(auto fn : funcsWithBadDelegate) {
+            for(auto pubFn : reachingPublicFns(chain, fn)) {
+                report += "Function '" + pubFn->name() + "' has call to delegatecall in payable loop!\n";
+            }
         }
         report += "--------\nDone!";
         return report;

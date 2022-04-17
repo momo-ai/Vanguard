@@ -4,7 +4,7 @@
 
 #ifndef VANGUARD_TAINTANALYSIS_H
 #define VANGUARD_TAINTANALYSIS_H
-#include "Analysis.h"
+#include "ReachAnalysis.h"
 #include "llvm/IR/Function.h"
 #include "Taint.h"
 #include "ReadWriteRetriever.h"
@@ -17,7 +17,7 @@
 //Taint analysis should be agnostic what we're running on (i.e. intraprocedural / functional)
 
 namespace vanguard {
-    class TaintAnalysis : public Analysis {
+    class TaintAnalysis : public ReachAnalysis {
     public:
         TaintAnalysis(blockchain::AAWrapper &aa, std::vector<FunctionTaintSink *> &sinks, std::vector<FunctionTaintSource *> &sources);
         ~TaintAnalysis();
