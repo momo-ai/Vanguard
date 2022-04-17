@@ -91,8 +91,8 @@ First, make sure all above depenencies are installed and the following executabl
 To build, simply run the following instructions.
 
 ```bash
-export LLVM_HOME=<home_llvm_dir>
-export LIBBLOCKCHAIN_HOME=<home_libblockchain_dir>
+export LLVM_HOME=<LLVM_HOME_DIR>
+export LIBBLOCKCHAIN_HOME=<LIBBLOCKCHAIN_HOME_DIR>
 mkdir build && cd build
 cmake -G "Unix Makefiles" ..
 make
