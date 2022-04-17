@@ -7,6 +7,7 @@
 
 #include "../../Analysis.h"
 #include <unordered_set>
+#include <unordered_map>
 #include <BlkVariable.h>
 #include <BlkFunction.h>
 
@@ -24,6 +25,7 @@ namespace UninitializedState {
     private:
         const blockchain::BlkFunction *curFn; // Current function name
         map<const blockchain::BlkFunction *, unordered_set<blockchain::BlkVariable *>> uninitializedAccesses; // Tracks uninitialized accesses per function
+        unordered_map<llvm::Function *, unordered_set<blockchain::BlkVariable *>> fnInitializing;
         unordered_set<blockchain::BlkVariable *> initializedVars; // Tracks variables which are globally initialized in constructor
         unordered_set<blockchain::BlkVariable *> localInitializedVars; // Tracks variables which are locally initialized
         const blockchain::Blockchain *chain;

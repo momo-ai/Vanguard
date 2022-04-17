@@ -31,13 +31,16 @@ namespace UninitializedState {
         if(chain->readsStorage(ins)) {
             auto var = chain->readStorageVariable(ins);
             if(initializedVars.find(var) == initializedVars.end() && localInitializedVars.find(var) == localInitializedVars.end()) {
+                ins.print(outs());
+                cout << endl;
+                auto var = chain->readStorageVariable(ins);
                 uninitializedAccesses[curFn].insert(var);
             }
         }
 
         if(chain->writesStorage(ins)) {
             auto var = chain->writesStorageVariable(ins);
-
+            modified = fnInitializing[ins.getFunction()].insert(var).second || modified;
             if(curFn->isConstructor()) {
                 if(initializedVars.insert(var).second) {
                     modified = true;
@@ -46,6 +49,25 @@ namespace UninitializedState {
             }
             else {
                 localInitializedVars.insert(var);
+            }
+        }
+
+        if (auto call = dyn_cast<CallInst>(&ins)) {
+            Function *callee = call->getCalledFunction();
+            if(callee != nullptr) {
+                int prevSize = fnInitializing[call->getFunction()].size();
+                fnInitializing[call->getFunction()].insert(fnInitializing[callee].begin(), fnInitializing[callee].end());
+                modified = modified || prevSize != fnInitializing[call->getFunction()].size();
+                localInitializedVars.insert(fnInitializing[callee].begin(), fnInitializing[callee].end());
+            }
+
+            if(curFn->isConstructor()) {
+                int prevSize = initializedVars.size();
+                initializedVars.insert(fnInitializing[callee].begin(), fnInitializing[callee].end());
+                if(prevSize != initializedVars.size()) {
+                    modified = true;
+                    uninitializedAccesses.clear();
+                }
             }
         }
 
