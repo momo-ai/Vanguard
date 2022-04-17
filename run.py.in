@@ -21,6 +21,7 @@ TOML_PATH = os.path.join("Cargo.toml")
 CARGO_TARGET_PATH = os.path.join("target", "debug", "deps")
 # Output path
 OUT_DIR="processed_examples"
+VANGUARD_BUILD_PATH = os.path.join("cmake-build-debug", "lib")
 
 ############################
 # Detectors
@@ -31,7 +32,7 @@ DETECTORS = ["reentrancy", "suicide", "uninitialized_state",
 ############################
 # Subprocess Commands
 ############################
-OPT_CMD = "{} --load=cmake-build-debug/lib/libVanguard.dylib -enable-new-pm=0 --summary={{}} --{{}} {{}} -o /dev/null".format(OPT_PATH)
+OPT_CMD = "{} --load={}/{{}} -enable-new-pm=0 --summary={{}} --{{}} {{}} -o /dev/null".format(OPT_PATH, VANGUARD_BUILD_PATH)
 # Solidity commands
 IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG_PATH)
 BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG_PATH)
@@ -42,6 +43,7 @@ IR_CARGO_CMD="{} rustc -- --emit llvm-ir".format(CARGO_PATH)
 BC_CARGO_CMD="{} rustc -- --emit llvm-bc".format(CARGO_PATH)
 CARGO_SUMMARY_CMD="{} +nightly contract build".format(CARGO_PATH)
 RUST_PREPROCESSOR_CMD="python3 {} {{}}".format(RUST_PREPROCESSOR_PATH)
+LLVM_AS_CMD="llvm-as {} -o {}"
 
 ############################
 # Extensions
@@ -146,23 +148,19 @@ def preprocess_file(args, lang, ext):
             f.write(TOML_TEMPLATE.format(toml_name, args.src_path))
 
         # Run cargo
-        print("Running Cargo...", end="")
-        subprocess.check_output(cargo_cmd.split(), stderr=subprocess.DEVNULL)
+        print("Running Cargo to create IR (becaue --create_ir used!)...", end="")
+        cargo_ir_cmd = IR_CARGO_CMD.format(args.src_path)
+        subprocess.check_output(cargo_ir_cmd.split(), stderr=subprocess.DEVNULL)
         for f in os.listdir(CARGO_TARGET_PATH):
-            # Copy bc files into processed folder
-            if f.endswith(".bc"):
+            # Copy ll files into processed folder
+            if f.endswith(".ll"):
                 fpath = os.path.join(CARGO_TARGET_PATH, f)
-                shutil.copy(fpath, os.path.join(OUT_DIR, f.replace(".bc", "_deploy.bc")))
+                tpath = os.path.join(OUT_DIR, f)
+                shutil.copy(fpath, tpath)
+                llvm_as_cmd = LLVM_AS_CMD.format(tpath, os.path.join(OUT_DIR, f.replace(".ll", "_deploy.bc")))
+                subprocess.check_output(llvm_as_cmd.split(), stderr=subprocess.DEVNULL)
         print("Completed Cargo, compiled files in folder in {}".format(OUT_DIR))
         if args.create_ir:
-            print("Running Cargo to create IR (becaue --create_ir used!)...", end="")
-            cargo_ir_cmd = IR_CARGO_CMD.format(args.src_path)
-            subprocess.check_output(cargo_ir_cmd.split(), stderr=subprocess.DEVNULL)
-            for f in os.listdir(CARGO_TARGET_PATH):
-                # Copy bc files into processed folder
-                if f.endswith(".ll"):
-                    fpath = os.path.join(CARGO_TARGET_PATH, f)
-                    shutil.copy(fpath, os.path.join(OUT_DIR, f))
             print("Completed Cargo, IR files in folder at {}".format(OUT_DIR))
 
         # Run cargo to generate metadata summary
@@ -187,13 +185,18 @@ def preprocess_file(args, lang, ext):
 
 def run_detector(detector, summary_path):
     # Run detector!
+    lib = None
+    for f in os.listdir(VANGUARD_BUILD_PATH):
+        # Get right libVanguard (dylib vs. so)
+        if f in ["libVanguard.so", "libVanguard.dylib"]:
+            lib = f
     results = {}
     for bc_file in os.listdir(OUT_DIR):
         if bc_file.endswith("_deploy.bc"):
             # Only process bc files
             class_name = bc_file.replace("_deploy.bc", "")
             bc_path = os.path.join(OUT_DIR, bc_file)
-            opt_cmd = OPT_CMD.format(summary_path, detector, bc_path)
+            opt_cmd = OPT_CMD.format(lib, summary_path, detector, bc_path)
             # print(opt_cmd)
             print("Running Vanguard on class {}...".format(class_name), end="")
             tout = bytes.decode(subprocess.check_output(opt_cmd.split(), stderr=subprocess.DEVNULL))
