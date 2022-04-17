@@ -45,7 +45,6 @@ To run a particular detector on a compiled LLVM bytecode file, run the following
 
 ```bash
 opt --load=<PATH_TO_LIBVANGUARD> -enable-new-pm=0 <DETECTORS> --summary=<CONTRACT_SUMMARY> <PATH_TO_LLVM_BYTECODE> -o /dev/null
-opt --load=build/lib/libVanguard.dylib -enable-new-pm=0 <detectors> --summary=<summary> <llvm bytecode> -o /dev/null
 ```
 
 where `<PATH_TO_LIBVANGUARD>` is the path to the vanguard `.dylib`/`.so` file (so, if running from the Vanguard folder, this should be `build/lib/libVanguard.dylib`). `<DETECTORS>` is the list of detectors to run, each of which can be specified via `--<DETECTOR_NAME>`. `<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information; summaries can be generated for Solidity and Rust contracts using the following tools respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor) and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor). Finally, `<PATH_TO_LLVM_BYTECODE>` is the path to the `.bc` file to be analyzed.
