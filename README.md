@@ -1,6 +1,6 @@
 # Vanguard
 
-Vanguard is an open-source static analyzer for finding bugs in Smart Contracts written in C++. Vanguard detects common vulnerabilities in a *blockchain-agnostic* way by targetting any smart contract language that can be compiled to LLVM.
+Vanguard is an open-source static analyzer for finding bugs in Smart Contracts. Vanguard detects common vulnerabilities in a *blockchain-agnostic* way by targetting any smart contract language (e.g., Solidity, Rust, etc.) that can be compiled to LLVM.
 
 - [Usage](#usage)
 - [How to Install](#how-to-install)
