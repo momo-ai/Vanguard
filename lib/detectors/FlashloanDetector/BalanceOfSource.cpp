@@ -19,7 +19,7 @@ namespace flashloan {
         }
 
         std::string fnName = fn.getName().str();
-        return fnName.find("v_call_IERC20_balanceOf") != std::string::npos;
+        return fnName.find("v__call_IERC20__function_balanceOf") != std::string::npos;
     }
 
     vector<pair<FunctionLocation, Val *>> BalanceOfSource::sourceValues(const llvm::Function &fn) {

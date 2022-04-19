@@ -32,7 +32,7 @@ namespace flashloan {
         for(auto sink : sinks) {
             for(auto fn : sink->generatingFns()) {
                 for(auto pubFn : reachingPublicFns(blockchain, fn)) {
-                    ss << "Function " << pubFn->name() << " may be vulnerable to a flashloan attack" << endl;
+                    ss << "Function '" << pubFn->name() << "' may be vulnerable to a flashloan attack" << endl;
                 }
 
             }

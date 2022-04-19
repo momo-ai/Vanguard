@@ -25,35 +25,23 @@ mod wallet {
     #[ink(storage)]
     #[derive(SpreadAllocate)]
     pub struct Wallet {
-        /// Stores a single `bool` value on the storage.
-        balances: Mapping<AccountId, Balance>,
-        owner: AccountId,
-        totBal: Balance
+        balances: Mapping<AccountId, Balance>
     }
 
     impl Wallet {
         #[ink(constructor)]
         pub fn constructor() -> Self {
-            ink_lang::utils::initialize_contract(|contract: &mut Self| {contract.owner = Self::env().caller(); contract.totBal = 0;})
+            ink_lang::utils::initialize_contract(|contract: &mut Self| {})
         }
 
         #[ink(message, payable)]
         pub fn deposit(&mut self) {
-            self.totBal += self.env().transferred_value();
             let updatedBal:Balance = self.balances.get(self.env().caller()).unwrap_or_default() + self.env().transferred_value();
             self.balances.insert(self.env().caller(), &updatedBal);
         }
 
         #[ink(message)]
-        pub fn withdraw1(&mut self) {
-            let bal:Balance = self.balances.get(self.env().caller()).unwrap_or_default();
-            self.env().transfer(self.env().caller(), bal);
-            self.clearBalance();
-            self.totBal -= bal;
-        }
-
-        #[ink(message)]
-        pub fn withdraw2(&mut self) {
+        pub fn withdraw(&mut self) {
             let bal:Balance = self.balances.get(self.env().caller()).unwrap_or_default();
             build_call::<DefaultEnvironment>()
                 .call_type(Call::new()
@@ -63,14 +51,9 @@ mod wallet {
                 .returns::<()>()
                 .fire()
                 .unwrap();
-            self.clearBalance();
-            self.totBal -= bal;
-        }
-
-        fn clearBalance(&mut self) {
             self.balances.insert(self.env().caller(), &0);
         }
-    
+
         #[ink(message)]
         pub fn getBalance(&self) -> Balance {
             return self.balances.get(self.env().caller()).unwrap_or_default();
