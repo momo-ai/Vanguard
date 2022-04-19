@@ -105,7 +105,7 @@ Below is a list of detectors that are available in Vanguard. More detailed infor
 | reentrancy            | Detects possible reentrancy attacks.            | High     |
 | flashloan             | Detects possible flashloan attacks.             | High     |
 | suicide               | Detects unprotected `selfdestruct`.             | High     |
-| uniniitialized\_state | Detects state accessed with no initialization.  | High     |
+| uninitialized\_state  | Detects state accessed with no initialization.  | High     |
 | msg\_value\_loop      | Detects `msg.value` used in loop.               | Medium   |
 | delegatecall\_loop    | Detects `delegatecall` used in loop.            | Medium   |
 | tainted\_send         | Detects send to a user-defined address.         | Medium   |
