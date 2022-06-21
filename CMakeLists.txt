@@ -1,4 +1,4 @@
-cmake_minimum_required(VERSION 3.4)
+cmake_minimum_required(VERSION 3.14)
 project(vanguard)
 
 # we need LLVM_HOME in order to automatically set LLVM_DIR
@@ -9,7 +9,7 @@ else ()
     set(ENV{LLVM_DIR} $ENV{LLVM_HOME}/lib/cmake/llvm)
 endif()
 
-find_package(LLVM REQUIRED CONFIG)
+find_package(LLVM 13 REQUIRED CONFIG)
 add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
@@ -19,3 +19,12 @@ endif ()
 
 add_subdirectory(lib)  # Use your pass name here.
 configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
+
+## Install target
+
+include (GNUInstallDirs)
+
+install(TARGETS Vanguard
+  EXPORT ${PROJECT_NAME}Targets
+  INCLUDES DESTINATION ${CMAKE_INSTALL_INCLUDEDIR})
+install(EXPORT ${PROJECT_NAME}Targets DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/${PROJECT_NAME}")

@@ -20,8 +20,9 @@ add_library(Vanguard SHARED
 #endif()
 
 if(DEFINED ENV{LIBBLOCKCHAIN_HOME})
-  message(STATUS "LIBBLOCKCHAIN_HOME: ${LIBBLOCKCHAIN_HOME}")
-  set(ENV{LIBBLOCKCHAIN_DIR} $ENV{LIBBLOCKCHAIN_HOME})
+  message(STATUS "LIBBLOCKCHAIN_HOME: $ENV{LIBBLOCKCHAIN_HOME}")
+  set(libBlockchain_DIR $ENV{LIBBLOCKCHAIN_HOME})
+  message(STATUS "module dir: ${CMAKE_MODULE_PATH}")
 endif()
 
 find_package(libBlockchain
@@ -88,4 +89,4 @@ if(APPLE)
     )
 endif(APPLE)
 
-add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
+#add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
