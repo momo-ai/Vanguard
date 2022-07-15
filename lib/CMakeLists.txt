@@ -1,28 +1,15 @@
 add_library(Vanguard SHARED
         # List your source files here.
         # Skeleton.cpp
-        TaintAnalysis.cpp
-        TaintAnalysis.h
-        Analysis.h
-        Taint.cpp
-        Taint.h
-        IntraproceduralVanguard.cpp
-        IntraproceduralVanguard.h
-        LocalVanguard.cpp
-        AARequirement.cpp
-        Analysis.cpp
-        CGRequirement.cpp
-        ReachAnalysis.cpp
-        LocalVanguard.h SCCVanguard.cpp SCCVanguard.h Vanguard.h Vanguard.cpp ReadWriteRetriever.cpp ReadWriteRetriever.h Val.h RegisterVal.cpp RegisterVal.h TaintLabel.cpp TaintLabel.h TaintSink.h TaintSource.h TaintNode.h TaintSink.cpp TaintNode.cpp TaintSummary.cpp TaintSummary.h TaintLabelStore.cpp TaintLabelStore.h FunctionTaintSource.cpp FunctionTaintSource.h FunctionTaintSink.cpp FunctionTaintSink.h Val.cpp TaintSummaryStore.cpp TaintSummaryStore.h TaintSinkProvider.h MemoryTaint.cpp MemoryTaint.h RegisterTaint.cpp RegisterTaint.h StorageTaint.cpp StorageTaint.h MemoryVal.cpp MemoryVal.h StorageVal.cpp StorageVal.h detectors/VariableShadowingDetector/VariableShadowingDetector.cpp detectors/VariableShadowingDetector/VariableShadowingDetector.h detectors/VariableShadowingDetector/VariableShadowingAnalysis.cpp detectors/VariableShadowingDetector/VariableShadowingAnalysis.h)
+        )
 
 #if(DEFINED ENV{Z3_HOME})
 #  set(ENV{Z3_DIR} $ENV{Z3_HOME})
 #endif()
 
 if(DEFINED ENV{LIBBLOCKCHAIN_HOME})
-  message(STATUS "LIBBLOCKCHAIN_HOME: $ENV{LIBBLOCKCHAIN_HOME}")
-  set(libBlockchain_DIR $ENV{LIBBLOCKCHAIN_HOME})
-  message(STATUS "module dir: ${CMAKE_MODULE_PATH}")
+  message(STATUS "LIBBLOCKCHAIN_HOME: ${LIBBLOCKCHAIN_HOME}")
+  set(ENV{LIBBLOCKCHAIN_DIR} $ENV{LIBBLOCKCHAIN_HOME})
 endif()
 
 find_package(libBlockchain
@@ -41,6 +28,10 @@ find_package(libBlockchain
 #)
 
 add_subdirectory(detectors)
+add_subdirectory(analysis)
+add_subdirectory(domain)
+add_subdirectory(program)
+add_subdirectory(vanguard)
 
 #message(STATUS "Z3_FOUND: ${Z3_FOUND}")
 #message(STATUS "Found Z3 ${Z3_VERSION_STRING}")
@@ -89,4 +80,4 @@ if(APPLE)
     )
 endif(APPLE)
 
-#add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
+add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
