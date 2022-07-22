@@ -42,11 +42,10 @@
       "locked": {
         "lastModified": 1655782187,
         "narHash": "sha256-+VjuVp5mJHHxgfKDB5t4YhUO03U8eJjCnTqrOcwIDME=",
-        "ref": "nix",
+        "owner": "Veridise",
+        "repo": "libBlockchain",
         "rev": "b077e6c0178f1b2175e6d01baf44202aaf6a94d7",
-        "revCount": 32,
-        "type": "git",
-        "url": "file:///Users/bryantan/projects/libBlockchain"
+        "type": "github"
       },
       "original": {
         "owner": "Veridise",

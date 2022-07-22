@@ -25,6 +25,8 @@ if(DEFINED ENV{LIBBLOCKCHAIN_HOME})
   message(STATUS "module dir: ${CMAKE_MODULE_PATH}")
 endif()
 
+# libBlockchain needs to find_package for RapidJSON.
+list(APPEND CMAKE_MODULE_DIR "${CMAKE_CURRENT_SOURCE_DIR}/../cmake/")
 find_package(libBlockchain
         REQUIRED
         CONFIG)

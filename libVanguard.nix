@@ -20,6 +20,9 @@ stdenv.mkDerivation {
   '';
 
   outputs = [ "out" "dev" ];
+  # Set include dir to out to avoid CMake issues when using nix develop
+  outputInclude = "out";
+  # TODO: fixup the installed cmake package config file
 
   LLVM_HOME="${libllvm}";
   LIBBLOCKCHAIN_HOME="${libBlockchain}";
