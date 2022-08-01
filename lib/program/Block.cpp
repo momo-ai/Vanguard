@@ -8,12 +8,17 @@ namespace vanguard{
     }
 
     const Function* Block::getFunction(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
-        return llvmToVanguard->getVanguardFunction(block.getParent());
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateFunction(block.getParent());
     }
 
-    llvm::SymbolTableList< llvm::Instruction >* Block::getInstructionsList(){
-        return &block.getInstList();
+    std::list<Instruction*> Block::getInstructionsList(){
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        std::list<Instruction*> instructions = {};
+        for (llvm::Instruction &I : block){
+            instructions.push_back(llvmToVanguard->translateInstruction(&I));
+        }
+        return instructions;
     }
 
     bool Block::isEntryBlock(){
@@ -21,10 +26,10 @@ namespace vanguard{
     }
 
     std::unordered_set< Block* > Block::getAllSuccessors(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
         std::unordered_set<Block*> allSuccessors = {};
         for (llvm::BasicBlock *Succ : llvm::successors(&block)) {
-            allSuccessors.insert(llvmToVanguard->getVanguardBlock(Succ));
+            allSuccessors.insert(llvmToVanguard->translateBlock(Succ));
         }
         return allSuccessors;
     }

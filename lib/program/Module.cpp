@@ -14,8 +14,8 @@ namespace vanguard{
     }
 
     vanguard::Function* Module::getFunction(std::string name){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
-        return llvmToVanguard->getVanguardFunction(module.getFunction(llvm::StringRef(name)));
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateFunction(module.getFunction(llvm::StringRef(name)));
     }
 
     llvm::GlobalVariable* Module::getGlobalVariable(std::string name){
@@ -23,10 +23,10 @@ namespace vanguard{
     }
 
     std::unordered_set<Function*> Module::getAllFunctions(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
         std::unordered_set<Function*> allFunctions = {};
         for(llvm::Function& F: module){
-            allFunctions.insert(llvmToVanguard->getVanguardFunction(&F));
+            allFunctions.insert(llvmToVanguard->translateFunction(&F));
         }
         return allFunctions;
     }

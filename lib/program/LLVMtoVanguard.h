@@ -17,15 +17,15 @@ namespace vanguard{
     class LLVMtoVanguard{
 
         public:
-            static vanguard::LLVMtoVanguard* getSingletonLLVMtoVanguard();
+            static vanguard::LLVMtoVanguard* getInstance();
         
-            Module* getVanguardModule(llvm::Module* module);
+            Module* translateModule(llvm::Module* module);
 
-            Function* getVanguardFunction(llvm::Function* function);
+            Function* translateFunction(llvm::Function* function);
 
-            Instruction* getVanguardInstruction(llvm::Instruction* instruction);
+            Instruction* translateInstruction(llvm::Instruction* instruction);
 
-            Block* getVanguardBlock(llvm::BasicBlock* block);
+            Block* translateBlock(llvm::BasicBlock* block);
 
         private:
             static LLVMtoVanguard* singletonLLVMtoVanguard;

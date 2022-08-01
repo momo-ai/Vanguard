@@ -8,8 +8,8 @@ namespace vanguard{
     }
 
     Block* Instruction::getBlock(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
-        return llvmToVanguard->getVanguardBlock(instruction.getParent());
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateBlock(instruction.getParent());
     }
 
     const char* Instruction::getInstructionType(){
@@ -29,15 +29,15 @@ namespace vanguard{
     }
 
     Block* Instruction::getSuccessor(unsigned n){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
-        return llvmToVanguard->getVanguardBlock(instruction.getSuccessor(n));
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateBlock(instruction.getSuccessor(n));
     }
 
     std::unordered_set<Block*> Instruction::getAllSuccessors(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
         std::unordered_set<Block*> allSuccessors = {};
         for (llvm::BasicBlock *Succ : llvm::successors(&instruction)) {
-            allSuccessors.insert(llvmToVanguard->getVanguardBlock(Succ));
+            allSuccessors.insert(llvmToVanguard->translateBlock(Succ));
         }
         return allSuccessors;
     }
