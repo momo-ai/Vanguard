@@ -1,0 +1,45 @@
+#include "Function.h"
+#include "Block.h"
+#include "LLVMtoVanguard.h"
+#include "llvm/IR/InstIterator.h"
+
+namespace vanguard{
+    
+    Function::Function(llvm::Function& func): function(func){
+    }
+
+    std::string Function::getName(){
+        return std::string(function.getName());
+    }
+
+    bool Function::getParams(){
+        return false;
+    }
+
+    llvm::FunctionType* Function::getFunctionType(){
+        return function.getFunctionType();
+    }
+
+    llvm::Type* Function::getReturnType(){
+        return function.getReturnType();
+    }
+
+    bool Function::hasBody(){
+        return true;
+    }
+
+    Block* Function::getBody(){
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
+        return llvmToVanguard->getVanguardBlock(&function.getEntryBlock());
+    }
+
+    std::list<Instruction*> Function::getInstructionsList(){
+        std::list<Instruction*> instrctionsList = {};
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
+        for (llvm::inst_iterator I = llvm::inst_begin(function), E = llvm::inst_end(function); I != E; ++I){
+            instrctionsList.push_back(llvmToVanguard->getVanguardInstruction(&*I));
+        }
+        return instrctionsList;
+    }
+
+}
