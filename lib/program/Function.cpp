@@ -16,10 +16,6 @@ namespace vanguard{
         return false;
     }
 
-    llvm::FunctionType* Function::getFunctionType(){
-        return function.getFunctionType();
-    }
-
     llvm::Type* Function::getReturnType(){
         return function.getReturnType();
     }
@@ -29,15 +25,15 @@ namespace vanguard{
     }
 
     Block* Function::getBody(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
-        return llvmToVanguard->getVanguardBlock(&function.getEntryBlock());
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateBlock(&function.getEntryBlock());
     }
 
     std::list<Instruction*> Function::getInstructionsList(){
         std::list<Instruction*> instrctionsList = {};
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getSingletonLLVMtoVanguard();
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
         for (llvm::inst_iterator I = llvm::inst_begin(function), E = llvm::inst_end(function); I != E; ++I){
-            instrctionsList.push_back(llvmToVanguard->getVanguardInstruction(&*I));
+            instrctionsList.push_back(llvmToVanguard->translateInstruction(&*I));
         }
         return instrctionsList;
     }

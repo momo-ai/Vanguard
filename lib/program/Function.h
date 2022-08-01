@@ -15,8 +15,6 @@ namespace vanguard {
 
         std::string getName();
 
-        llvm::FunctionType * getFunctionType();
-
         bool getParams();
 
         llvm::Type* getReturnType();

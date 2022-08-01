@@ -11,26 +11,38 @@ namespace vanguard{
     LLVMtoVanguard::LLVMtoVanguard(){
     }
 
-    LLVMtoVanguard* LLVMtoVanguard::getSingletonLLVMtoVanguard(){
+    LLVMtoVanguard* LLVMtoVanguard::getInstance(){
         if (singletonLLVMtoVanguard == 0){
             singletonLLVMtoVanguard = new LLVMtoVanguard();
         }
         return singletonLLVMtoVanguard;
     }
 
-    vanguard::Module* LLVMtoVanguard::getVanguardModule(llvm::Module* module){
+    vanguard::Module* LLVMtoVanguard::translateModule(llvm::Module* module){
+        if(!moduleMap[module]){
+            moduleMap[module] = new Module(*module);
+        }
         return moduleMap[module];
     }
 
-    vanguard::Function* LLVMtoVanguard::getVanguardFunction(llvm::Function* function){
+    vanguard::Function* LLVMtoVanguard::translateFunction(llvm::Function* function){
+        if(!functionMap[function]){
+            functionMap[function] = new Function(*function);
+        }
         return functionMap[function];
     }
 
-    vanguard::Instruction* LLVMtoVanguard::getVanguardInstruction(llvm::Instruction* instruction){
+    vanguard::Instruction* LLVMtoVanguard::translateInstruction(llvm::Instruction* instruction){
+        if (!instructionMap[instruction]){
+            instructionMap[instruction] = new Instruction(*instruction);
+        }
         return instructionMap[instruction];
     }
 
-    vanguard::Block* LLVMtoVanguard::getVanguardBlock(llvm::BasicBlock* block){
+    vanguard::Block* LLVMtoVanguard::translateBlock(llvm::BasicBlock* block){
+        if (!blockMap[block]){
+            blockMap[block] = new Block(*block);
+        }
         return blockMap[block];
     }
 

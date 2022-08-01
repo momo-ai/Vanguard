@@ -4,6 +4,7 @@
 #include "Instruction.h"
 #include "LLVMtoVanguard.h"
 #include <unordered_set>
+#include <list>
 #include "llvm/IR/BasicBlock.h"
 
 namespace vanguard{
@@ -13,7 +14,7 @@ namespace vanguard{
 
         const Function* getFunction();
 
-        llvm::SymbolTableList< llvm::Instruction >* getInstructionsList();
+        std::list<Instruction *> getInstructionsList();
 
         bool isEntryBlock();
 
