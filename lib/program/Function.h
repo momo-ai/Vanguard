@@ -17,7 +17,7 @@ namespace vanguard {
 
         bool getParams();
 
-        llvm::Type* getReturnType();
+        Type* getReturnType();
 
         bool hasBody();
 

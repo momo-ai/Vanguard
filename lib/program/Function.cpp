@@ -16,8 +16,9 @@ namespace vanguard{
         return false;
     }
 
-    llvm::Type* Function::getReturnType(){
-        return function.getReturnType();
+    Type* Function::getReturnType(){
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateType(*function.getReturnType());
     }
 
     bool Function::hasBody(){
