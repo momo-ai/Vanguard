@@ -13,6 +13,7 @@ namespace vanguard{
     class Function;
     class Instruction;
     class Block;
+    class Type;
 
     class LLVMtoVanguard{
 
@@ -27,6 +28,8 @@ namespace vanguard{
 
             Block* translateBlock(llvm::BasicBlock* block);
 
+            Type* translateType(llvm::Type &t);
+
         private:
             static LLVMtoVanguard* singletonLLVMtoVanguard;
             LLVMtoVanguard();
@@ -34,6 +37,8 @@ namespace vanguard{
             std::unordered_map<llvm::Function*, Function*> functionMap;
             std::unordered_map<llvm::BasicBlock*, Block*> blockMap;
             std::unordered_map<llvm::Instruction*, Instruction*> instructionMap;
+
+            std::unordered_map<llvm::Type*, Type*> typeMap;
 
     };
 }
