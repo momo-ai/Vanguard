@@ -9,7 +9,7 @@ namespace vanguard{
     }
 
     std::string Function::getName(){
-        return std::string(function.getName());
+        return function.getName().str();
     }
 
     bool Function::getParams(){

@@ -13,13 +13,14 @@ namespace vanguard{
         return module.getSourceFileName();
     }
 
-    vanguard::Function* Module::getFunction(std::string name){
+    Function* Module::getFunction(std::string name){
         LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard->translateFunction(module.getFunction(llvm::StringRef(name)));
     }
 
-    llvm::GlobalVariable* Module::getGlobalVariable(std::string name){
-        return module.getGlobalVariable(llvm::StringRef(name));
+    Value* Module::getGlobalVariable(std::string name){
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateValue(module.getGlobalVariable(llvm::StringRef(name)));
     }
 
     std::unordered_set<Function*> Module::getAllFunctions(){
@@ -31,8 +32,13 @@ namespace vanguard{
         return allFunctions;
     }
 
-    llvm::Module::GlobalListType* Module::getAllGlobalVariables(){
-        return &(module.getGlobalList());
+    std::unordered_set<Value*> Module::getAllGlobalVariables(){
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        std::unordered_set<Value*> allGlobalVariables = {};
+        for (auto gv= module.global_begin(); gv != module.global_end(); gv++){
+            allGlobalVariables.insert(llvmToVanguard->translateValue(&*gv));
+        }
+        return allGlobalVariables;
     }
 
 }

@@ -1,3 +1,6 @@
+#ifndef VANGUARD_PROGRAM_TYPE_H
+#define VANGUARD_PROGRAM_TYPE_H
+
 #include <list>
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"
@@ -97,3 +100,5 @@ namespace vanguard{
     };
 
 }
+
+#endif
