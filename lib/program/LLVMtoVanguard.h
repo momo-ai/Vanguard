@@ -6,14 +6,16 @@
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Instruction.h"
+#include "llvm/IR/GlobalVariable.h"
 
+#include "Module.h"
+#include "Function.h"
+#include "Instruction.h"
+#include "Block.h"
+#include "Type.h"
+#include "Value.h"
 
 namespace vanguard{
-    class Module;
-    class Function;
-    class Instruction;
-    class Block;
-    class Type;
 
     class LLVMtoVanguard{
 
@@ -29,6 +31,8 @@ namespace vanguard{
             Block* translateBlock(llvm::BasicBlock* block);
 
             Type* translateType(llvm::Type &t);
+
+            Value *translateValue(llvm::GlobalVariable *v);
 
         private:
             static LLVMtoVanguard* singletonLLVMtoVanguard;
