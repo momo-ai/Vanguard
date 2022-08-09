@@ -1,22 +1,23 @@
 #ifndef VANGUARD_PROGRAM_LLVMTOVANGUARD_H
 #define VANGUARD_PROGRAM_LLVMTOVANGUARD_H
 
+#include "Module.h"
+#include "Function.h"
+#include "Instruction.h"
+#include "Block.h"
+#include "Type.h"
+#include "Value.h"
 #include <unordered_map>
 #include "llvm/IR/Function.h"
 #include "llvm/IR/BasicBlock.h"
 #include "llvm/IR/Module.h"
 #include "llvm/IR/Instruction.h"
+#include "llvm/IR/Value.h"
 
 
 namespace vanguard{
-    class Module;
-    class Function;
-    class Instruction;
-    class Block;
-    class Type;
 
     class LLVMtoVanguard{
-
         public:
             static vanguard::LLVMtoVanguard* getInstance();
         
@@ -30,6 +31,8 @@ namespace vanguard{
 
             Type* translateType(llvm::Type &t);
 
+            Value* translateValue(llvm::Value* t);
+
         private:
             static LLVMtoVanguard* singletonLLVMtoVanguard;
             LLVMtoVanguard();
@@ -39,7 +42,7 @@ namespace vanguard{
             std::unordered_map<llvm::Instruction*, Instruction*> instructionMap;
 
             std::unordered_map<llvm::Type*, Type*> typeMap;
-
+            std::unordered_map<llvm::Value*, Value*> valueMap;
     };
 }
 

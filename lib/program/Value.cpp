@@ -64,4 +64,13 @@ namespace vanguard{
         return constSeq.getAsString().str();
     }
 
+    //Boolean
+    ConstantBoolean::ConstantBoolean(bool b){
+        constBool = b;
+    }
+
+    bool ConstantBoolean::getValue(){
+        return constBool;
+    }
+
 }

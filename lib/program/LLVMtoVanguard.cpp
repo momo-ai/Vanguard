@@ -4,6 +4,7 @@
 #include "Instruction.h"
 #include "Module.h"
 #include "Type.h"
+#include "Value.h"
 
 namespace vanguard{
     
@@ -72,6 +73,30 @@ namespace vanguard{
             }
         }
         return typeMap[&t];
+    }
+
+    Value* LLVMtoVanguard::translateValue(llvm::Value* val){
+        if (!valueMap[val]){
+            if (auto globalVariable = llvm::dyn_cast<llvm::GlobalVariable>(val)){
+                valueMap[val] = llvm::dyn_cast<Value>(new GlobalVariable(*globalVariable));
+            }
+            else if (auto argument = llvm::dyn_cast<llvm::Argument>(val)){
+                valueMap[val] = llvm::dyn_cast<Value>(new Argument(*argument));
+            }
+            else if (auto instVar = llvm::dyn_cast<llvm::Instruction>(val)){
+                valueMap[val] = llvm::dyn_cast<Value>(new InstructionVariable(*instVar));
+            }
+            else if (auto integer = llvm::dyn_cast<llvm::ConstantInt>(val)){
+                valueMap[val] = llvm::dyn_cast<Value>(new ConstantInteger(*integer));
+            }
+            else if (auto string = llvm::dyn_cast<llvm::ConstantDataSequential>(val)){
+                valueMap[val] = llvm::dyn_cast<Value>(new ConstantString(*string));
+            }
+            else{
+                throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");
+            }
+            return valueMap[val];
+        }
     }
 
 }

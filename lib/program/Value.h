@@ -16,7 +16,7 @@ namespace vanguard{
             Value();
     };
 
-    class Variable: Value{
+    class Variable: public Value{
         public:
             Variable();
             virtual Type* getType() = 0;
@@ -24,7 +24,7 @@ namespace vanguard{
             virtual std::string getName() = 0;
     };
 
-    class GlobalVariable: Variable{
+    class GlobalVariable: public Variable{
         public:
             GlobalVariable(llvm::GlobalVariable &);
 
@@ -38,7 +38,7 @@ namespace vanguard{
             llvm::GlobalVariable& globalVariable;
     };
 
-    class Argument: Variable{
+    class Argument: public Variable{
         public:
             Argument(llvm::Argument&);
 
@@ -51,7 +51,7 @@ namespace vanguard{
             llvm::Argument& argument;
     };
 
-    class InstructionVariable: Variable{
+    class InstructionVariable: public Variable{
         public:
             InstructionVariable(llvm::Instruction &);
 
@@ -65,14 +65,14 @@ namespace vanguard{
     };
 
     template <class T>
-    class Constant: Value{
+    class Constant: public Value{
         public:
             Constant();
 
             virtual T getValue()=0;
     };
 
-    class ConstantInteger: Constant<int>{
+    class ConstantInteger: public Constant<int>{
         public:
             ConstantInteger(llvm::ConstantInt &);
 
@@ -82,7 +82,7 @@ namespace vanguard{
             llvm::ConstantInt& constInt;
     };
 
-    class ConstantString: Constant<std::string>{
+    class ConstantString: public Constant<std::string>{
         public:
             ConstantString(llvm::ConstantDataSequential &);
 
@@ -90,6 +90,16 @@ namespace vanguard{
 
         private:
             llvm::ConstantDataSequential& constSeq;
+    };
+
+    class ConstantBoolean: public Constant<bool>{
+        public:
+            ConstantBoolean(bool);
+
+            bool getValue() override;
+        
+        private:
+            bool constBool;
     };
 
 }
