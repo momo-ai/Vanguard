@@ -18,7 +18,7 @@ if (${LLVM_VERSION_MAJOR} VERSION_GREATER_EQUAL 10)
 endif ()
 
 add_subdirectory(lib)  # Use your pass name here.
-configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
+#configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
 
 ## Install target
 

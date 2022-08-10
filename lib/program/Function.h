@@ -2,14 +2,16 @@
 #define VANGUARD_PROGRAM_FUNCTION_H
 
 #include "llvm/IR/Function.h"
+#include "Type.h"
 #include <list>
 #include <string>
 
 namespace vanguard {
-    class Instruction;
 
-    class Function{
-        
+    class Instruction;
+    class Block;
+
+    class Function{    
     public:
         Function(llvm::Function& func);
 

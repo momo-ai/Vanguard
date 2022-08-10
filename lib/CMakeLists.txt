@@ -7,14 +7,6 @@ add_library(Vanguard SHARED
 #  set(ENV{Z3_DIR} $ENV{Z3_HOME})
 #endif()
 
-if(DEFINED ENV{LIBBLOCKCHAIN_HOME})
-  message(STATUS "LIBBLOCKCHAIN_HOME: ${LIBBLOCKCHAIN_HOME}")
-  set(ENV{LIBBLOCKCHAIN_DIR} $ENV{LIBBLOCKCHAIN_HOME})
-endif()
-
-find_package(libBlockchain
-        REQUIRED
-        CONFIG)
 
 #find_package(Z3
 #  REQUIRED
@@ -37,13 +29,13 @@ add_subdirectory(vanguard)
 #message(STATUS "Found Z3 ${Z3_VERSION_STRING}")
 #message(STATUS "Z3_DIR: ${Z3_DIR}")
 
-message(STATUS "Found libBlockchain ${LIBBLOCKCHAIN_VERSION_STRING}")
-message(STATUS "LIBBLOCKCHAIN_DIR: $ENV{LIBBLOCKCHAIN_DIR}")
+#message(STATUS "Found libBlockchain ${LIBBLOCKCHAIN_VERSION_STRING}")
+#message(STATUS "LIBBLOCKCHAIN_DIR: $ENV{LIBBLOCKCHAIN_DIR}")
 
 #target_include_directories(Vanguard PRIVATE ${Z3_CXX_INCLUDE_DIRS})
-target_include_directories(Vanguard PRIVATE ${LIBBLOCKCHAIN_INCLUDE_DIRS})
+#target_include_directories(Vanguard PRIVATE ${LIBBLOCKCHAIN_INCLUDE_DIRS})
 #target_link_libraries(Vanguard PRIVATE ${Z3_LIBRARIES})
-target_link_libraries(Vanguard PRIVATE BlockchainStatic)
+#target_link_libraries(Vanguard PRIVATE BlockchainStatic)
 
 #target_compile_options(Vanguard PRIVATE ${Z3_COMPONENT_CXX_FLAGS})
 
