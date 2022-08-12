@@ -20,6 +20,8 @@ namespace vanguard{
 
         std::unordered_set<Block *> getAllSuccessors();
 
+        llvm::BasicBlock* unwrap();
+
     private:
         llvm::BasicBlock& block;
 

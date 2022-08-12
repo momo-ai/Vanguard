@@ -8,9 +8,6 @@
 namespace vanguard{
 
     class Instruction{
-    private:
-        llvm::Instruction& instruction;
-
     public:
         Instruction(llvm::Instruction &inst);
 
@@ -33,6 +30,11 @@ namespace vanguard{
         Value* getOperand(unsigned i);
 
         unsigned getNumOperands();
+
+        llvm::Instruction* unwrap();
+
+    private:
+        llvm::Instruction& instruction;
     };
 }
 

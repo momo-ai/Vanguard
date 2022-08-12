@@ -16,6 +16,10 @@ namespace vanguard{
         return "IntegerT";
     }
 
+    llvm::IntegerType* IntegerT::unwrap(){
+        return &integer;
+    }
+
     //Array subclass
     ArrayT::ArrayT(llvm::ArrayType& arr): array(arr){}
 
@@ -30,6 +34,10 @@ namespace vanguard{
 
     std::string ArrayT::getName(){
         return "array< " + (this->getBaseType())->getName() + " >";
+    }
+
+    llvm::ArrayType* ArrayT::unwrap(){
+        return &array;
     }
 
     //Function subclass
@@ -69,6 +77,10 @@ namespace vanguard{
         return "pointer< " + (this->getPointeeType())->getName() + " >";
     }
 
+    llvm::PointerType* PointerT::unwrap(){
+        return &pointer;
+    }
+
     //Struct subclass
     StructT::StructT(llvm::StructType& structt): structT(structt){}
 
@@ -95,6 +107,10 @@ namespace vanguard{
         return std::string(structT.getName());
     }
 
+    llvm::StructType* StructT::unwrap(){
+        return &structT;
+    }
+
     //Vector subclass
     VectorT::VectorT(llvm::VectorType& vec): vector(vec){}
 
@@ -105,6 +121,10 @@ namespace vanguard{
 
     std::string VectorT::getName(){
         return "vector< " + (this->getBaseType())->getName() + " >";
+    }
+
+    llvm::VectorType* VectorT::unwrap(){
+        return &vector;
     }
 
 }

@@ -8,22 +8,25 @@
 
 namespace vanguard{
     class Module{
-    private:
-        llvm::Module& module;
-    public:
-        Module(llvm::Module& mod);
+        public:
+            Module(llvm::Module& mod);
 
-        const std::string getModuleName();
+            const std::string getModuleName();
 
-        const std::string getSourceFileName();
+            const std::string getSourceFileName();
 
-        Function* getFunction(std::string name);
+            Function* getFunction(std::string name);
 
-        Value* getGlobalVariable(std::string name);
+            Value* getGlobalVariable(std::string name);
 
-        std::unordered_set<Function *> getAllFunctions();
+            std::unordered_set<Function *> getAllFunctions();
 
-        std::unordered_set<Value*> getAllGlobalVariables();
+            std::unordered_set<Value*> getAllGlobalVariables();
+
+            llvm::Module* unwrap();
+
+        private:
+            llvm::Module& module;
 
     };
 }

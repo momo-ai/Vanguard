@@ -41,4 +41,8 @@ namespace vanguard{
         return allGlobalVariables;
     }
 
+    llvm::Module* Module::unwrap(){
+        return &module;
+    }
+
 }

@@ -34,4 +34,8 @@ namespace vanguard{
         return allSuccessors;
     }
 
+    llvm::BasicBlock* Block::unwrap(){
+        return &block;
+    }
+
 }

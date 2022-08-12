@@ -26,6 +26,8 @@ namespace vanguard {
 
         std::list<Instruction*> getInstructionsList();
 
+        llvm::Function* unwrap();
+
     private:
         llvm::Function& function;        
     };

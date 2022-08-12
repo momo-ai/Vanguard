@@ -18,6 +18,10 @@ namespace vanguard{
         return std::string(globalVariable.getName());
     }
 
+    llvm::GlobalVariable* GlobalVariable::unwrap(){
+        return &globalVariable;
+    }
+
     //Argument
     Argument::Argument(llvm::Argument& arg): argument(arg){}
 
@@ -32,6 +36,10 @@ namespace vanguard{
 
     std::string Argument::getName(){
         return std::string(argument.getName());
+    }
+
+    llvm::Argument* Argument::unwrap(){
+        return &argument;
     }
 
     //InstructionVariable
@@ -50,6 +58,10 @@ namespace vanguard{
         return std::string(instructionVariable.getName());
     }
 
+    llvm::Instruction* InstructionVariable::unwrap(){
+        return &instructionVariable;
+    }
+
     //Integer
     ConstantInteger::ConstantInteger(llvm::ConstantInt& ci): constInt(ci){}
 
@@ -57,11 +69,19 @@ namespace vanguard{
         return constInt.getValue().getLimitedValue();
     }
 
+    llvm::ConstantInt* ConstantInteger::unwrap(){
+        return &constInt;
+    }
+
     //String
     ConstantString::ConstantString(llvm::ConstantDataSequential & cs): constSeq(cs){}
 
     std::string ConstantString::getValue(){
         return constSeq.getAsString().str();
+    }
+
+    llvm::ConstantDataSequential* ConstantString::unwrap(){
+        return &constSeq;
     }
 
     //Boolean
@@ -75,5 +95,17 @@ namespace vanguard{
 
     //Memory Address
     MemoryAddress::MemoryAddress(llvm::Value* ptr, llvm::Value* idx, unsigned sz): pointer(ptr) , index(idx), size(sz){}
+
+    llvm::Value* MemoryAddress::getPointer(){
+        return pointer;
+    }
+
+    llvm::Value* MemoryAddress::getIndex(){
+        return index;
+    }
+
+    unsigned MemoryAddress::getSize(){
+        return size;
+    }
 
 }

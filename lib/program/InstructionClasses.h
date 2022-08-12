@@ -33,6 +33,8 @@ namespace vanguard{
 
             InstructionVariable* getLHS() override;
 
+            llvm::BinaryOperator* unwrap();
+
         private:
             llvm::BinaryOperator& binOp;
     };
@@ -44,6 +46,8 @@ namespace vanguard{
             unsigned getOpClass() override;
 
             InstructionVariable* getLHS() override;
+
+            llvm::CmpInst* unwrap();
 
         private:
             llvm::CmpInst& cmpInst;
@@ -69,6 +73,8 @@ namespace vanguard{
 
             std::list<Block*> getSuccessors() override;
 
+            llvm::BranchInst* unwrap();
+
         private:
             llvm::BranchInst& branchInst;
     };
@@ -80,6 +86,8 @@ namespace vanguard{
             Value * getCondition() override;
 
             std::list<Block*> getSuccessors() override;
+
+            llvm::IndirectBrInst* unwrap();
         
         private:
             llvm::IndirectBrInst& indirectBrInst;
@@ -92,6 +100,8 @@ namespace vanguard{
             Value* getCondition() override;
 
             std::list<Block*> getSuccessors() override;
+
+            llvm::SwitchInst* unwrap();
         
         private:
             llvm::SwitchInst& switchInst;
@@ -114,6 +124,8 @@ namespace vanguard{
             Value* getOperand();
 
             unsigned getOpClass();
+
+            llvm::UnaryOperator* unwrap();
         
         private:
             llvm::UnaryOperator& unaryOperator;
@@ -137,6 +149,8 @@ namespace vanguard{
 
             std::list<Value*> getArgs();
 
+            llvm::CallBase* unwrap();
+
         private:
             llvm::CallBase& call;
     };
@@ -154,6 +168,8 @@ namespace vanguard{
             UnreachableInstruction(llvm::UnreachableInst&);
 
             std::string error() override;
+
+            llvm::UnreachableInst* unwrap();
         
         private:
             llvm::UnreachableInst& unreachableInstruction;
@@ -176,6 +192,8 @@ namespace vanguard{
             bool returnsValue() override;
 
             Value* returnValue() override;
+
+            llvm::ReturnInst* unwrap();
 
         private:
             llvm::ReturnInst& returnInst;
@@ -200,6 +218,8 @@ namespace vanguard{
 
             InstructionVariable* getLHS() override;
 
+            llvm::SelectInst* unwrap();
+
         private:
             llvm::SelectInst& selectInst;
     };
@@ -209,6 +229,8 @@ namespace vanguard{
             ExtractElementInst(llvm::ExtractElementInst&);
 
             InstructionVariable* getLHS() override;
+
+            llvm::ExtractElementInst* unwrap();
         
         private:
             llvm::ExtractElementInst& extractElementInst;
@@ -226,6 +248,8 @@ namespace vanguard{
             InsertValueInst(llvm::InsertValueInst&);
 
             MemoryAddress* getMemoryAddress() override;
+
+            llvm::InsertValueInst* unwrap();
         
         private:
             llvm::InsertValueInst& insertValueInst;
@@ -236,6 +260,8 @@ namespace vanguard{
             InsertElementInst(llvm::InsertElementInst&);
 
             MemoryAddress* getMemoryAddress() override;
+
+            llvm::InsertElementInst* unwrap();
         
         private:
             llvm::InsertElementInst& insertElementInst;
@@ -246,6 +272,8 @@ namespace vanguard{
             StoreInst(llvm::StoreInst&);
 
             MemoryAddress* getMemoryAddress() override;
+
+            llvm::StoreInst* unwrap();
         
         private:
             llvm::StoreInst& storeInst;
@@ -256,6 +284,8 @@ namespace vanguard{
             ShuffleVectorInst(llvm::ShuffleVectorInst&);
 
             MemoryAddress* getMemoryAddress() override;
+
+            llvm::ShuffleVectorInst* unwrap();
         
         private:
             llvm::ShuffleVectorInst& shuffleVectorInst;
@@ -273,6 +303,8 @@ namespace vanguard{
             PHINode(llvm::PHINode&);
 
             InstructionVariable* getLHS() override;
+
+            llvm::PHINode* unwrap();
         
         private:
             llvm::PHINode& phiNode;
@@ -283,6 +315,8 @@ namespace vanguard{
             GetElementPtrInst(llvm::GetElementPtrInst&);
             
             InstructionVariable* getLHS() override;
+
+            llvm::GetElementPtrInst* unwrap();
 
         private:
             llvm::GetElementPtrInst& getElemenPtrInst;

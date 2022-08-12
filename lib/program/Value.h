@@ -34,6 +34,8 @@ namespace vanguard{
 
             std::string getName() override;
 
+            llvm::GlobalVariable* unwrap();
+
         private:
             llvm::GlobalVariable& globalVariable;
     };
@@ -47,6 +49,9 @@ namespace vanguard{
             bool hasName() override;
 
             std::string getName() override;
+
+            llvm::Argument* unwrap();
+
         private:
             llvm::Argument& argument;
     };
@@ -60,6 +65,9 @@ namespace vanguard{
             bool hasName() override;
 
             std::string getName() override;
+
+            llvm::Instruction* unwrap();
+
         private:
             llvm::Instruction& instructionVariable;
     };
@@ -78,6 +86,8 @@ namespace vanguard{
 
             int getValue() override;
 
+            llvm::ConstantInt* unwrap();
+
         private:
             llvm::ConstantInt& constInt;
     };
@@ -87,6 +97,8 @@ namespace vanguard{
             ConstantString(llvm::ConstantDataSequential &);
 
             std::string getValue() override;
+
+            llvm::ConstantDataSequential* unwrap();
 
         private:
             llvm::ConstantDataSequential& constSeq;
@@ -105,6 +117,12 @@ namespace vanguard{
     class MemoryAddress: public Value{
         public:
             MemoryAddress(llvm::Value*, llvm::Value*, unsigned);
+
+            llvm::Value* getPointer();
+
+            llvm::Value* getIndex();
+
+            unsigned getSize();
 
         private:
             llvm::Value* pointer;

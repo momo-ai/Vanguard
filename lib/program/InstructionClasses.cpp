@@ -29,6 +29,10 @@ namespace vanguard{
         return instvar;
     }
 
+    llvm::BinaryOperator* BinaryOperator::unwrap(){
+        return &binOp;
+    }
+
 
     //Compare Instruction
     CmpInst::CmpInst(llvm::CmpInst& cmpinst): cmpInst(cmpinst){}
@@ -47,6 +51,10 @@ namespace vanguard{
         auto l = cmpInst.getOperandList();
         InstructionVariable* instvar = new InstructionVariable(cmpInst);
         return instvar;
+    }
+
+    llvm::CmpInst* CmpInst::unwrap(){
+        return &cmpInst;
     }
 
     //Branch Inst
@@ -71,6 +79,10 @@ namespace vanguard{
         return successors;
     }
 
+    llvm::BranchInst* BranchInst::unwrap(){
+        return &branchInst;
+    }
+
     //Indirect Branch Instruction
     IndirectBrInst::IndirectBrInst(llvm::IndirectBrInst& ibrInst): indirectBrInst(ibrInst){}
 
@@ -87,6 +99,10 @@ namespace vanguard{
             successors.push_back(llvmToVanguard->translateBlock(indirectBrInst.getSuccessor(i)));
         }
         return successors;
+    }
+
+    llvm::IndirectBrInst* IndirectBrInst::unwrap(){
+        return &indirectBrInst;
     }
 
     //Switch Instruction
@@ -107,6 +123,10 @@ namespace vanguard{
         return successors;
     }
 
+    llvm::SwitchInst* SwitchInst::unwrap(){
+        return &switchInst;
+    }
+
     //Unary Operator
     UnaryOperator::UnaryOperator(llvm::UnaryOperator& uop): unaryOperator(uop){}
 
@@ -123,6 +143,10 @@ namespace vanguard{
     Value* UnaryOperator::getOperand(){
         LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard->translateValue(unaryOperator.getOperand(0));
+    }
+
+    llvm::UnaryOperator* UnaryOperator::unwrap(){
+        return &unaryOperator;
     }
 
 
@@ -142,6 +166,10 @@ namespace vanguard{
         }
         return args;
     }
+    
+    llvm::CallBase* Call::unwrap(){
+        return &call;
+    }
 
 
     //Unreachable Instruction
@@ -149,6 +177,10 @@ namespace vanguard{
 
     std::string UnreachableInstruction::error(){
         return "This instruction is unreachable.";
+    }
+
+    llvm::UnreachableInst* UnreachableInstruction::unwrap(){
+        return &unreachableInstruction;
     }
 
     //Return Inst
@@ -164,12 +196,20 @@ namespace vanguard{
         return llvmToVanguard->translateValue(returnInst.getReturnValue());
     }
 
+    llvm::ReturnInst* ReturnInst::unwrap(){
+        return &returnInst;
+    }
+
     //Select Inst
     SelectInst::SelectInst(llvm::SelectInst& si): selectInst(si){}
 
     InstructionVariable* SelectInst::getLHS(){
         InstructionVariable* instvar = new InstructionVariable(selectInst);
         return instvar;
+    }
+
+    llvm::SelectInst* SelectInst::unwrap(){
+        return &selectInst;
     }
 
     //Extract Element Inst
@@ -180,12 +220,20 @@ namespace vanguard{
         return instvar;
     }
 
+    llvm::ExtractElementInst* ExtractElementInst::unwrap(){
+        return &extractElementInst;
+    }
+
     //Insert Value Inst
     InsertValueInst::InsertValueInst(llvm::InsertValueInst& ivi): insertValueInst(ivi){}
 
     MemoryAddress* InsertValueInst::getMemoryAddress(){
         MemoryAddress* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
         return memAd;
+    }
+
+    llvm::InsertValueInst* InsertValueInst::unwrap(){
+        return &insertValueInst;
     }
 
     //Insert Element Inst
@@ -196,12 +244,20 @@ namespace vanguard{
         return memAd;
     }
 
+    llvm::InsertElementInst* InsertElementInst::unwrap(){
+        return &insertElementInst;
+    }
+
     //Store Inst
     StoreInst::StoreInst(llvm::StoreInst& si): storeInst(si){}
 
     MemoryAddress* StoreInst::getMemoryAddress(){
         MemoryAddress* memAd = new MemoryAddress(storeInst.getPointerOperand(), nullptr, sizeof(storeInst.getValueOperand()->getType()));
         return memAd;
+    }
+
+    llvm::StoreInst* StoreInst::unwrap(){
+        return &storeInst;
     }
 
     //Shuffule Vector Inst
@@ -212,6 +268,10 @@ namespace vanguard{
         return memAd;
     }
 
+    llvm::ShuffleVectorInst* ShuffleVectorInst::unwrap(){
+        return &shuffleVectorInst;
+    }
+
     //PHI Node
     PHINode::PHINode(llvm::PHINode& phin): phiNode(phin){}
 
@@ -220,12 +280,20 @@ namespace vanguard{
         return instvar;
     }
 
+    llvm::PHINode* PHINode::unwrap(){
+        return &phiNode;
+    }
+
     //Get element pointer
     GetElementPtrInst::GetElementPtrInst(llvm::GetElementPtrInst& gepi): getElemenPtrInst(gepi){}
 
     InstructionVariable* GetElementPtrInst::getLHS(){
         InstructionVariable* instvar = new InstructionVariable(getElemenPtrInst);
         return instvar;
+    }
+
+    llvm::GetElementPtrInst* GetElementPtrInst::unwrap(){
+        return &getElemenPtrInst;
     }
 
 }
