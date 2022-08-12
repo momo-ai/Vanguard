@@ -102,6 +102,16 @@ namespace vanguard{
             bool constBool;
     };
 
+    class MemoryAddress: public Value{
+        public:
+            MemoryAddress(llvm::Value*, llvm::Value*, unsigned);
+
+        private:
+            llvm::Value* pointer;
+            llvm::Value* index;
+            unsigned size;
+    };
+
 }
 
 #endif

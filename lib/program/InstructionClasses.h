@@ -23,8 +23,6 @@ namespace vanguard{
             virtual unsigned getOpClass() = 0;
 
             virtual InstructionVariable* getLHS() = 0;
-
-            virtual Value* getRHS() = 0;
     };
 
     class BinaryOperator: public BinaryOpInstruction{
@@ -34,8 +32,6 @@ namespace vanguard{
             unsigned getOpClass() override;
 
             InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
 
         private:
             llvm::BinaryOperator& binOp;
@@ -49,14 +45,11 @@ namespace vanguard{
 
             InstructionVariable* getLHS() override;
 
-            Value* getRHS() override;
-
         private:
             llvm::CmpInst& cmpInst;
     };
 
     // Branch Instruction
-
     class BranchInstruction: public Instruction{
         public:
             BranchInstruction();
@@ -192,15 +185,13 @@ namespace vanguard{
     class AssignInstruction: public Instruction{
         public:
             AssignInstruction();
-
-            virtual InstructionVariable* getLHS() = 0;
-
-            virtual Value* getRHS() = 0;
     };
 
     class MemoryReadInstruction: public AssignInstruction{
         public:
             MemoryReadInstruction();
+
+            virtual InstructionVariable* getLHS() = 0;
     };
 
     class SelectInst: public MemoryReadInstruction{
@@ -208,8 +199,6 @@ namespace vanguard{
             SelectInst(llvm::SelectInst&);
 
             InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
 
         private:
             llvm::SelectInst& selectInst;
@@ -220,8 +209,6 @@ namespace vanguard{
             ExtractElementInst(llvm::ExtractElementInst&);
 
             InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
         
         private:
             llvm::ExtractElementInst& extractElementInst;
@@ -230,15 +217,15 @@ namespace vanguard{
     class MemoryWriteInstruction: public AssignInstruction{
         public:
             MemoryWriteInstruction();
+
+            virtual MemoryAddress* getMemoryAddress() = 0;
     };
 
     class InsertValueInst: public MemoryWriteInstruction{
         public:
             InsertValueInst(llvm::InsertValueInst&);
 
-            InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
+            MemoryAddress* getMemoryAddress() override;
         
         private:
             llvm::InsertValueInst& insertValueInst;
@@ -248,9 +235,7 @@ namespace vanguard{
         public:
             InsertElementInst(llvm::InsertElementInst&);
 
-            InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
+            MemoryAddress* getMemoryAddress() override;
         
         private:
             llvm::InsertElementInst& insertElementInst;
@@ -260,9 +245,7 @@ namespace vanguard{
         public:
             StoreInst(llvm::StoreInst&);
 
-            InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
+            MemoryAddress* getMemoryAddress() override;
         
         private:
             llvm::StoreInst& storeInst;
@@ -272,9 +255,7 @@ namespace vanguard{
         public:
             ShuffleVectorInst(llvm::ShuffleVectorInst&);
 
-            InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
+            MemoryAddress* getMemoryAddress() override;
         
         private:
             llvm::ShuffleVectorInst& shuffleVectorInst;
@@ -283,6 +264,8 @@ namespace vanguard{
     class AssignInst: public AssignInstruction{
         public:
             AssignInst();
+
+            virtual InstructionVariable* getLHS() = 0;
     };
 
     class PHINode: public AssignInst{
@@ -290,8 +273,6 @@ namespace vanguard{
             PHINode(llvm::PHINode&);
 
             InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
         
         private:
             llvm::PHINode& phiNode;
@@ -302,8 +283,6 @@ namespace vanguard{
             GetElementPtrInst(llvm::GetElementPtrInst&);
             
             InstructionVariable* getLHS() override;
-
-            Value* getRHS() override;
 
         private:
             llvm::GetElementPtrInst& getElemenPtrInst;

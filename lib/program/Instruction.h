@@ -30,6 +30,9 @@ namespace vanguard{
 
         std::unordered_set<Block*> getAllSuccessors();
 
+        Value* getOperand(unsigned i);
+
+        unsigned getNumOperands();
     };
 }
 

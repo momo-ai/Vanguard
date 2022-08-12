@@ -29,10 +29,6 @@ namespace vanguard{
         return instvar;
     }
 
-    Value* BinaryOperator::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
-    }
 
     //Compare Instruction
     CmpInst::CmpInst(llvm::CmpInst& cmpinst): cmpInst(cmpinst){}
@@ -48,13 +44,9 @@ namespace vanguard{
     }
 
     InstructionVariable* CmpInst::getLHS(){
+        auto l = cmpInst.getOperandList();
         InstructionVariable* instvar = new InstructionVariable(cmpInst);
         return instvar;
-    }
-
-    Value* CmpInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
     }
 
     //Branch Inst
@@ -180,11 +172,6 @@ namespace vanguard{
         return instvar;
     }
 
-    Value* SelectInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
-    }
-
     //Extract Element Inst
     ExtractElementInst::ExtractElementInst(llvm::ExtractElementInst& eei): extractElementInst(eei){}
 
@@ -193,61 +180,36 @@ namespace vanguard{
         return instvar;
     }
 
-    Value* ExtractElementInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
-    }
-
     //Insert Value Inst
     InsertValueInst::InsertValueInst(llvm::InsertValueInst& ivi): insertValueInst(ivi){}
 
-    InstructionVariable* InsertValueInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(insertValueInst);
-        return instvar;
-    }
-
-    Value* InsertValueInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
+    MemoryAddress* InsertValueInst::getMemoryAddress(){
+        MemoryAddress* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
+        return memAd;
     }
 
     //Insert Element Inst
     InsertElementInst::InsertElementInst(llvm::InsertElementInst& iei): insertElementInst(iei){}
 
-    InstructionVariable* InsertElementInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(insertElementInst);
-        return instvar;
-    }
-
-    Value* InsertElementInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
+    MemoryAddress* InsertElementInst::getMemoryAddress(){
+        MemoryAddress* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
+        return memAd;
     }
 
     //Store Inst
     StoreInst::StoreInst(llvm::StoreInst& si): storeInst(si){}
 
-    InstructionVariable* StoreInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(storeInst);
-        return instvar;
-    }
-
-    Value* StoreInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
+    MemoryAddress* StoreInst::getMemoryAddress(){
+        MemoryAddress* memAd = new MemoryAddress(storeInst.getPointerOperand(), nullptr, sizeof(storeInst.getValueOperand()->getType()));
+        return memAd;
     }
 
     //Shuffule Vector Inst
     ShuffleVectorInst::ShuffleVectorInst(llvm::ShuffleVectorInst& svi): shuffleVectorInst(svi){}
 
-    InstructionVariable* ShuffleVectorInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(shuffleVectorInst);
-        return instvar;
-    }
-
-    Value* ShuffleVectorInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
+    MemoryAddress* ShuffleVectorInst::getMemoryAddress(){
+        MemoryAddress* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), nullptr, sizeof(shuffleVectorInst.getOperand(2)));
+        return memAd;
     }
 
     //PHI Node
@@ -258,22 +220,12 @@ namespace vanguard{
         return instvar;
     }
 
-    Value* PHINode::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
-    }
-
     //Get element pointer
     GetElementPtrInst::GetElementPtrInst(llvm::GetElementPtrInst& gepi): getElemenPtrInst(gepi){}
 
     InstructionVariable* GetElementPtrInst::getLHS(){
         InstructionVariable* instvar = new InstructionVariable(getElemenPtrInst);
         return instvar;
-    }
-
-    Value* GetElementPtrInst::getRHS(){
-        ConstantBoolean* b = new ConstantBoolean(true);
-        return b;
     }
 
 }

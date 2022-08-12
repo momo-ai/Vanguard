@@ -42,4 +42,13 @@ namespace vanguard{
         return allSuccessors;
     }
 
+    Value* Instruction::getOperand(unsigned i){
+        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard->translateValue(instruction.getOperand(i));
+    }
+
+    unsigned Instruction::getNumOperands(){
+        return instruction.getNumOperands();
+    }
+
 }

@@ -73,4 +73,7 @@ namespace vanguard{
         return constBool;
     }
 
+    //Memory Address
+    MemoryAddress::MemoryAddress(llvm::Value* ptr, llvm::Value* idx, unsigned sz): pointer(ptr) , index(idx), size(sz){}
+
 }
