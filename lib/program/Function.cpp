@@ -22,7 +22,7 @@ namespace vanguard{
     }
 
     bool Function::hasBody(){
-        return true;
+        return !function.isDeclaration();
     }
 
     Block* Function::getBody(){

@@ -7,7 +7,7 @@ namespace vanguard{
     Block::Block(const llvm::BasicBlock &blk): block(blk) {
     }
 
-    const Function* Block::getFunction(){
+    Function* Block::getFunction(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateFunction(block.getParent());
     }

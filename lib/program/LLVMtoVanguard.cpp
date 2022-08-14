@@ -24,7 +24,7 @@ namespace vanguard{
             return nullptr;
         }
 
-        if(!moduleMap[module]){
+        if(moduleMap.find(module) == moduleMap.end()){
             moduleMap[module] = new CompilationUnit(*module);
         }
         return moduleMap[module];
@@ -35,7 +35,7 @@ namespace vanguard{
             return nullptr;
         }
 
-        if(!functionMap[fn]){
+        if(functionMap.find(fn) == functionMap.end()) {
             functionMap[fn] = new Function(*fn);
         }
         return functionMap[fn];
@@ -46,7 +46,7 @@ namespace vanguard{
             return nullptr;
         }
 
-        if (!instructionMap[ins]){
+        if (instructionMap.find(ins) == instructionMap.end()){
             instructionMap[ins] = new Instruction(*ins);
         }
         return instructionMap[ins];
@@ -57,7 +57,7 @@ namespace vanguard{
             return nullptr;
         }
 
-        if (!blockMap[block]){
+        if (blockMap.find(block) == blockMap.end()){
             blockMap[block] = new Block(*block);
         }
         return blockMap[block];
@@ -68,7 +68,7 @@ namespace vanguard{
             return nullptr;
         }
 
-        if (!typeMap[t]){
+        if (typeMap.find(t) == typeMap.end()){
             if (auto integer = llvm::dyn_cast<llvm::IntegerType>(t)){
                 typeMap[t] = (llvm::dyn_cast<Type>(new IntegerType(*integer)));
             }

@@ -1,6 +1,8 @@
 # Vanguard
 
-Vanguard is an open-source static analyzer for finding bugs in Smart Contracts. Vanguard detects common vulnerabilities in a *blockchain-agnostic* way by targetting any smart contract language (e.g., Solidity, Rust, etc.) that can be compiled to LLVM.
+Vanguard is an open-source static analyzer for finding bugs in Smart Contracts. Vanguard detects common vulnerabilities 
+in a *blockchain-agnostic* way by targetting any smart contract language (e.g., Solidity, Rust, etc.) that 
+can be compiled to LLVM.
 
 - [Usage](#usage)
 - [How to Install](#how-to-install)
@@ -17,7 +19,8 @@ To run Vanguard on a smart contract, you can simply run the following command:
 python3 run.py --src_path=<PATH_TO_SMART_CONTRACT> --detector=<NAME_OF_DETECTOR>
 ```
 
-where `<PATH_TO_SMART_CONTRACT>` is the path to the contract to be analyzed, and `<NAME_OF_DETECTOR>` is the name of the detector to be run (e.g., `reentrancy`). To run all available detectors on the contract, use the detector name `all`.
+where `<PATH_TO_SMART_CONTRACT>` is the path to the contract to be analyzed, and `<NAME_OF_DETECTOR>` is the name 
+of the detector to be run (e.g., `reentrancy`). To run all available detectors on the contract, use the detector name `all`.
 
 As an example, running this command:
 ```bash
@@ -44,10 +47,16 @@ Running Vanguard on class reentrant1...Completed Vanguard.
 To run a particular detector on a compiled LLVM bytecode file, run the following:
 
 ```bash
-opt --load=<PATH_TO_LIBVANGUARD> -enable-new-pm=0 <DETECTORS> --summary=<CONTRACT_SUMMARY> <PATH_TO_LLVM_BYTECODE> -o /dev/null
+opt -load-pass-plugin=<PATH_TO_LIBVANGUARD> --passes="<DETECTORS>" -disable-output <PATH_TO_LLVM_BYTECODE> -o /dev/null
 ```
 
-where `<PATH_TO_LIBVANGUARD>` is the path to the vanguard `.dylib`/`.so` file (so, if running from the Vanguard folder, this should be `build/lib/libVanguard.dylib`). `<DETECTORS>` is the list of detectors to run, each of which can be specified via `--<DETECTOR_NAME>`. `<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information; summaries can be generated for Solidity and Rust contracts using the following tools respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor) and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor). Finally, `<PATH_TO_LLVM_BYTECODE>` is the path to the `.bc` file to be analyzed.
+where `<PATH_TO_LIBVANGUARD>` is the path to the vanguard `.dylib`/`.so` file (so, if running from the Vanguard folder, 
+this should be `build/lib/libVanguard.dylib`). `<DETECTORS>` is the list of detectors to run, each of which can be 
+specified via `--<DETECTOR_NAME>`. `<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information; 
+summaries can be generated for Solidity and Rust contracts using the following tools 
+respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor) 
+and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor). 
+Finally, `<PATH_TO_LLVM_BYTECODE>` is the path to the `.bc` file to be analyzed.
 
 ## How to Install
 
@@ -73,7 +82,6 @@ Vanguard has the following dependencies:
    * Tabulate
  * Cargo (Version 1.60.0)
  * Solang (Version 0.1.10-19-ga524ff5)
- * [libBlockchain](https://github.com/Veridise/libBlockchain)
 
 First, make sure all above depenencies are installed and the following executables are avaiable on the `$PATH`:
  * cmake
@@ -91,7 +99,6 @@ To build, simply run the following instructions.
 
 ```bash
 export LLVM_HOME=<LLVM_HOME_DIR>
-export LIBBLOCKCHAIN_HOME=<LIBBLOCKCHAIN_HOME_DIR>
 mkdir build && cd build
 cmake -G "Unix Makefiles" ..
 make

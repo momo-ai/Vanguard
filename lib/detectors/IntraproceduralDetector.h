@@ -19,12 +19,11 @@ namespace vanguard {
 
         static bool isRequired() { return true; }
         llvm::PreservedAnalyses run(llvm::Function &fn, llvm::FunctionAnalysisManager &fnAnalysis) {
-            if(!started) {
-                registerAnalyses();
-                startDetection();
-            }
+            registerAnalyses();
+            startDetection();
             auto &instance = LLVMtoVanguard::getInstance();
             detect(*instance.translateFunction(&fn));
+            report();
             return llvm::PreservedAnalyses::all();
         }
 

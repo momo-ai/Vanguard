@@ -9,10 +9,12 @@
 
 namespace vanguard {
     class FunctionPrinter : public IntraproceduralDetector<FunctionPrinter> {
+    public:
         void registerAnalyses() override;
         void startDetection() override;
         void detect(Function &fn) override;
         void report() override;
+    private:
     };
 }
 
