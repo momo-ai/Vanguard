@@ -32,7 +32,7 @@ VANGUARD_BUILD_PATH = os.path.join("${PROJECT_BINARY_DIR}", "lib")
 ############################
 # Detectors
 ############################
-DETECTORS = ["fnPrinter"]
+DETECTORS = ["statGen", "fnPrinter"]
 
 ############################
 # Subprocess Commands
@@ -167,18 +167,26 @@ def run_detector(detector, summary_path):
 
     return results
 
+#def print_results(results):
+#    out = [["Class", "Detector", "Function Flagged by Detector", "Detailed Output"]]
+#    for cls, ress in results.items():
+#        for info in ress:
+#            detector, res = info
+#            parsed_res = get_per_func_info(res)
+#            for note, func in parsed_res:
+#                simple_func = func.split("::")[-1].split("__")[0]
+#                row = [cls, detector, simple_func, note]
+#                out.append(row)
+
+#    print(tabulate(out, tablefmt="grid"))
+
 def print_results(results):
     out = [["Class", "Detector", "Function Flagged by Detector", "Detailed Output"]]
     for cls, ress in results.items():
         for info in ress:
             detector, res = info
-            parsed_res = get_per_func_info(res)
-            for note, func in parsed_res:
-                simple_func = func.split("::")[-1].split("__")[0]
-                row = [cls, detector, simple_func, note]
-                out.append(row)
-
-    print(tabulate(out, tablefmt="grid"))
+            print("--------- {} ---------".format(detector))
+            print(res)
 
 def run(args):
     if os.path.exists(OUT_DIR):

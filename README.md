@@ -8,6 +8,8 @@ can be compiled to LLVM.
 - [How to Install](#how-to-install)
 - [Detectors](#detectors)
 - [Documentation](#documentation)
+- [Adding a Detector](#adding-a-detector)
+- [Common Errors](#common-errors)
 
 ## Usage
 
@@ -24,22 +26,22 @@ of the detector to be run (e.g., `reentrancy`). To run all available detectors o
 
 As an example, running this command:
 ```bash
-python3 run.py --src_path=solidity_benchmarks/examples/reentrancy/reentrant1.sol --detector=reentrancy
+python3 run.py --src_path test/PuppetPool.sol --detector statGen
 ```
 should produce the following result:
 ```bash
-----Preprocessing solidity_benchmarks/examples/reentrancy/reentrant1.sol----
-Running Solidity summarizer...Completed Solidity summarizer, summary at processed_examples/reentrant1_summary.json.
-Running Solidity preprocessor...Completed Solidity preprocessor, preprocessed version at processed_examples/reentrant1_instrumented.sol.
-Running Solang...Completed Solang, compiled files in folder at processed_examples
-----Running solidity_benchmarks/examples/reentrancy/reentrant1.sol with reentrancy detector----
-Running Vanguard on class reentrant1...Completed Vanguard.
+----Preprocessing test/PuppetPool.sol----
+Running Solidity summarizer...Completed Solidity summarizer, summary at /Users/jon/Documents/veridise/vanguard-v1/processed_examples/PuppetPool_summary.json.
+Running Solidity preprocessor...Completed Solidity preprocessor, preprocessed version at /Users/jon/Documents/veridise/vanguard-v1/processed_examples/PuppetPool_instrumented.sol.
+Running Solang...Completed Solang, compiled files in folder at /Users/jon/Documents/veridise/vanguard-v1/processed_examples
+----Running test/PuppetPool.sol with statGen detector----
+Running Vanguard on class PuppetPool...Completed Vanguard.
 ----VANGUARD REPORT----
-+------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------+
-| Class      | Detector   | Function Flagged by Detector | Detailed Output                                                                                     |
-+------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------+
-| reentrant1 | reentrancy | withdraw                     | Function 'reentrant1::reentrant1::function::withdraw' has potential reentrancy after call to 'call' |
-+------------+------------+------------------------------+-----------------------------------------------------------------------------------------------------+
+--------- statGen ---------
+Statistics:
+# Functions: 101
+# Basic Blocks: 462
+# Instructions: 3316
 ```
 
 ### Opt (for running on compiled LLVM bytecode)
@@ -62,7 +64,8 @@ Finally, `<PATH_TO_LLVM_BYTECODE>` is the path to the `.bc` file to be analyzed.
 
 ### Docker
 
-You can build the Docker image from this [Dockerfile](https://github.com/Veridise/Vanguard/blob/main/Dockerfile) and enter an interactive shell in the image using the following commands (note building will take around 10 minutes):
+You can build the Docker image from this [Dockerfile](https://github.com/Veridise/Vanguard/blob/main/Dockerfile) and 
+enter an interactive shell in the image using the following commands (note building will take around 10 minutes):
 
 ```bash
 docker build -t vanguard .
@@ -105,17 +108,42 @@ make
 ```
 ## Detectors
 
-Below is a list of detectors that are available in Vanguard. More detailed information with examples can be found in the extended [detector documentation](https://github.com/Veridise/Vanguard/wiki/Detectors).
+Below is a list of detectors that are available in Vanguard. More detailed information with examples can be found in 
+the extended [detector documentation](https://github.com/Veridise/Vanguard/wiki/Detectors).
 
-| Name                  | Description                                     | Severity |
-| --------------------  | ----------------------------------------------- | -------- |
-| reentrancy            | Detects possible reentrancy attacks.            | High     |
-| flashloan             | Detects possible flashloan attacks.             | High     |
-| suicide               | Detects unprotected `selfdestruct`.             | High     |
-| uninitialized\_state  | Detects state accessed with no initialization.  | High     |
-| msg\_value\_loop      | Detects `msg.value` used in loop.               | Medium   |
-| delegatecall\_loop    | Detects `delegatecall` used in loop.            | Medium   |
-| tainted\_send         | Detects send to a user-defined address.         | Medium   |
+| Name                 | Description                                    | Severity |
+|----------------------|------------------------------------------------|----------|
+| statGen              | Prints out IR statictics                       | Test     |
+| fnPrinter            | Prints all function names                      | Test     |
+
+
+## Adding a Detector
+
+To add a detector, do the following:
+1. Create a new directory in detectors for the new detector
+2. To create the detector, extend the appropriate base detector. Currently there are: IntraproceduralDetector, IntraproceduralDetector and UnitDetector.
+3. Add add_subdirectory(DETECTOR_DIR) to lib/detectors/CMakeLists.txt
+4. Add a CMakeLists.txt in /lib/detectors/DETECTOR_DIR that adds target_sources to Vanguard
+5. In Vanguard.cpp, add the detector to registerVanguardModulePasses or registerVanguardFnPasses depending on the detector type. Note, the conditional determines the name for invoking the pass.
+
+## Common Errors
+Here we will list common errors encountered when trying build and run LLVM.
+
+### Common Build Issues
+
+### Common Runtime Issues
+Even if the pass builds, opt might not be able to invoke the pass. Here we will put some of the reasons this might 
+occur.
+
+#### Failed to Load Pass
+
+```bash
+Failed to load passes from '<Vanguard Library>'. Request ignored.
+opt: unknown pass name '<PassName>'
+```
+
+This might occur for the following reasons: 
+ * It appears that if there is any function that is declared but not defined, LLVM will fail to load the passes.
 
 
 
