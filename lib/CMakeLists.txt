@@ -1,6 +1,6 @@
 add_library(Vanguard SHARED
         # List your source files here.
-        # Skeleton.cpp
+        Vanguard.cpp
         )
 
 #if(DEFINED ENV{Z3_HOME})
@@ -20,10 +20,10 @@ add_library(Vanguard SHARED
 #)
 
 add_subdirectory(detectors)
-add_subdirectory(analysis)
-add_subdirectory(domain)
+#add_subdirectory(analysis)
+#add_subdirectory(domain)
 add_subdirectory(program)
-add_subdirectory(vanguard)
+#add_subdirectory(vanguard)
 
 #message(STATUS "Z3_FOUND: ${Z3_FOUND}")
 #message(STATUS "Found Z3 ${Z3_VERSION_STRING}")
@@ -61,7 +61,7 @@ target_compile_features(Vanguard PRIVATE cxx_range_for cxx_auto_type)
 # LLVM is (typically) built with no C++ RTTI. We need to match that;
 # otherwise, we'll get linker errors about missing RTTI data.
 set_target_properties(Vanguard PROPERTIES
-    COMPILE_FLAGS "-fno-rtti"
+    COMPILE_FLAGS "-fno-rtti -Wall"
 )
 
 # Get proper shared-library behavior (where symbols are not necessarily
@@ -71,5 +71,10 @@ if(APPLE)
         LINK_FLAGS "-undefined dynamic_lookup"
     )
 endif(APPLE)
+
+target_link_libraries(
+      Vanguard
+      "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>"
+      )   
 
 add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)

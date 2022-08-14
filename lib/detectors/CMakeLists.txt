@@ -1,3 +1,7 @@
 target_sources(Vanguard PRIVATE
-    #put source files here
+        ${CMAKE_CURRENT_SOURCE_DIR}/UnitDetector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/InterproceduralDetector.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/IntraproceduralDetector.cpp
     )
+
+add_subdirectory(FunctionPrinter)

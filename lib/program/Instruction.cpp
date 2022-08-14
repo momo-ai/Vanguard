@@ -4,12 +4,12 @@
 #include "llvm/IR/CFG.h"
 
 namespace vanguard{
-    Instruction::Instruction(llvm::Instruction &inst): instruction(inst) {
+    Instruction::Instruction(const llvm::Instruction &inst): instruction(inst) {
     }
 
     Block* Instruction::getBlock(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateBlock(instruction.getParent());
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateBlock(instruction.getParent());
     }
 
     const char* Instruction::getInstructionType(){
@@ -29,15 +29,15 @@ namespace vanguard{
     }
 
     Block* Instruction::getSuccessor(unsigned n){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateBlock(instruction.getSuccessor(n));
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateBlock(instruction.getSuccessor(n));
     }
 
     std::unordered_set<Block*> Instruction::getAllSuccessors(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::unordered_set<Block*> allSuccessors = {};
-        for (llvm::BasicBlock *Succ : llvm::successors(&instruction)) {
-            allSuccessors.insert(llvmToVanguard->translateBlock(Succ));
+        for (auto *Succ : llvm::successors(&instruction)) {
+            allSuccessors.insert(llvmToVanguard.translateBlock(Succ));
         }
         return allSuccessors;
     }
