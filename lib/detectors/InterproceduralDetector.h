@@ -7,10 +7,12 @@
 
 #include <unordered_set>
 #include "UnitDetector.h"
+#include "Detector.h"
 
 namespace vanguard {
-    template <typename Detect> class InterproceduralDetector : public UnitDetector<Detect> {
+    template <typename Detect> class InterproceduralDetector : public UnitDetector<Detect>, public Detector {
         virtual bool detect(Function &fn) = 0;
+
 
         void detect(CompilationUnit &unit) override {
             std::unordered_set<Function *> processed;

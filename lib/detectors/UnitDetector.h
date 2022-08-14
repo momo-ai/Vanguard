@@ -8,16 +8,20 @@
 #include "../program/LLVMtoVanguard.h"
 #include <llvm/IR/PassManager.h>
 #include <llvm/Passes/PassPlugin.h>
+#include "Detector.h"
 
 namespace vanguard {
-    template <typename Detect> class UnitDetector : public llvm::PassInfoMixin<Detect> {
+    template <typename Detect> class UnitDetector : public llvm::PassInfoMixin<Detect>, public Detector {
     public:
         virtual void detect(CompilationUnit &mod) = 0;
 
         static bool isRequired() { return true; }
         llvm::PreservedAnalyses run(llvm::Module &mod, llvm::ModuleAnalysisManager &modAnalysis) {
+            registerAnalyses();
+            startDetection();
             auto &instance = LLVMtoVanguard::getInstance();
             detect(instance.translateModule(&mod));
+            report();
             return llvm::PreservedAnalyses::all();
         }
     };
