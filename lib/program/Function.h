@@ -13,7 +13,9 @@ namespace vanguard {
 
     class Function{    
     public:
-        Function(llvm::Function& func);
+        explicit Function(const llvm::Function& func);
+
+        Function(const Function&) = delete;
 
         std::string getName();
 
@@ -28,7 +30,7 @@ namespace vanguard {
         std::list<Instruction*> getInstructionsList();
 
     private:
-        llvm::Function& function;        
+        const llvm::Function& function;
     };
 
 }

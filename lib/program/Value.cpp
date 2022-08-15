@@ -3,11 +3,11 @@
 
 namespace vanguard{
     // Global Variable 
-    GlobalVariable::GlobalVariable(llvm::GlobalVariable& gv): globalVariable(gv){}
+    GlobalVariable::GlobalVariable(const llvm::GlobalVariable& gv): globalVariable(gv){}
 
     Type* GlobalVariable::getType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*globalVariable.getType());
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(globalVariable.getType());
     }
 
     bool GlobalVariable::hasName(){
@@ -19,11 +19,11 @@ namespace vanguard{
     }
 
     //Argument
-    Argument::Argument(llvm::Argument& arg): argument(arg){}
+    Argument::Argument(const llvm::Argument& arg): argument(arg){}
 
     Type* Argument::getType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*argument.getType());
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(argument.getType());
     }
 
     bool Argument::hasName(){
@@ -35,11 +35,11 @@ namespace vanguard{
     }
 
     //InstructionVariable
-    InstructionVariable::InstructionVariable(llvm::Instruction& instv): instructionVariable(instv){}
+    InstructionVariable::InstructionVariable(const llvm::Instruction& instv): instructionVariable(instv){}
 
     Type* InstructionVariable::getType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*instructionVariable.getType());
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(instructionVariable.getType());
     }
 
     bool InstructionVariable::hasName(){
@@ -51,16 +51,16 @@ namespace vanguard{
     }
 
     //Integer
-    ConstantInteger::ConstantInteger(llvm::ConstantInt& ci): constInt(ci){}
+    IntegerLiteral::IntegerLiteral(const llvm::ConstantInt& ci): constInt(ci){}
 
-    int ConstantInteger::getValue(){
+    int IntegerLiteral::getValue(){
         return constInt.getValue().getLimitedValue();
     }
 
     //String
-    ConstantString::ConstantString(llvm::ConstantDataSequential & cs): constSeq(cs){}
+    StringLiteral::StringLiteral(const llvm::ConstantDataSequential & cs): constSeq(cs){}
 
-    std::string ConstantString::getValue(){
+    std::string StringLiteral::getValue(){
         return constSeq.getAsString().str();
     }
 

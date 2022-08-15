@@ -4,19 +4,19 @@
 
 namespace vanguard{
 
-    Block::Block(llvm::BasicBlock &blk): block(blk) {
+    Block::Block(const llvm::BasicBlock &blk): block(blk) {
     }
 
-    const Function* Block::getFunction(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateFunction(block.getParent());
+    Function* Block::getFunction(){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateFunction(block.getParent());
     }
 
     std::list<Instruction*> Block::getInstructionsList(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Instruction*> instructions = {};
-        for (llvm::Instruction &I : block){
-            instructions.push_back(llvmToVanguard->translateInstruction(&I));
+        for (auto &I : block){
+            instructions.push_back(llvmToVanguard.translateInstruction(&I));
         }
         return instructions;
     }
@@ -26,10 +26,10 @@ namespace vanguard{
     }
 
     std::unordered_set< Block* > Block::getAllSuccessors(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::unordered_set<Block*> allSuccessors = {};
-        for (llvm::BasicBlock *Succ : llvm::successors(&block)) {
-            allSuccessors.insert(llvmToVanguard->translateBlock(Succ));
+        for (auto *succ : llvm::successors(&block)) {
+            allSuccessors.insert(llvmToVanguard.translateBlock(succ));
         }
         return allSuccessors;
     }

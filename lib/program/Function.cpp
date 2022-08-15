@@ -5,7 +5,7 @@
 
 namespace vanguard{
     
-    Function::Function(llvm::Function& func): function(func){
+    Function::Function(const llvm::Function& func): function(func){
     }
 
     std::string Function::getName(){
@@ -17,24 +17,26 @@ namespace vanguard{
     }
 
     Type* Function::getReturnType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*function.getReturnType());
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(function.getReturnType());
     }
 
     bool Function::hasBody(){
-        return true;
+        return !function.isDeclaration();
     }
 
     Block* Function::getBody(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateBlock(&function.getEntryBlock());
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateBlock(&function.getEntryBlock());
     }
 
     std::list<Instruction*> Function::getInstructionsList(){
         std::list<Instruction*> instrctionsList = {};
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        for (llvm::inst_iterator I = llvm::inst_begin(function), E = llvm::inst_end(function); I != E; ++I){
-            instrctionsList.push_back(llvmToVanguard->translateInstruction(&*I));
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        for (auto &blk : function){
+            for(auto &ins : blk) {
+                instrctionsList.push_back(llvmToVanguard.translateInstruction(&ins));
+            }
         }
         return instrctionsList;
     }

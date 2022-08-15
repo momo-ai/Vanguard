@@ -13,12 +13,10 @@
 namespace vanguard{
     class Value{
         public:
-            Value();
     };
 
     class Variable: Value{
         public:
-            Variable();
             virtual Type* getType() = 0;
             virtual bool hasName() = 0;
             virtual std::string getName() = 0;
@@ -26,7 +24,9 @@ namespace vanguard{
 
     class GlobalVariable: Variable{
         public:
-            GlobalVariable(llvm::GlobalVariable &);
+            explicit GlobalVariable(const llvm::GlobalVariable &);
+
+            GlobalVariable(const GlobalVariable&) = delete;
 
             Type* getType() override;
 
@@ -35,12 +35,14 @@ namespace vanguard{
             std::string getName() override;
 
         private:
-            llvm::GlobalVariable& globalVariable;
+            const llvm::GlobalVariable& globalVariable;
     };
 
     class Argument: Variable{
         public:
-            Argument(llvm::Argument&);
+            explicit Argument(const llvm::Argument&);
+
+            Argument(const Argument&) = delete;
 
             Type* getType() override;
 
@@ -48,12 +50,14 @@ namespace vanguard{
 
             std::string getName() override;
         private:
-            llvm::Argument& argument;
+            const llvm::Argument& argument;
     };
 
     class InstructionVariable: Variable{
         public:
-            InstructionVariable(llvm::Instruction &);
+            explicit InstructionVariable(const llvm::Instruction &);
+
+            InstructionVariable(const InstructionVariable&) = delete;
 
             Type* getType() override;
 
@@ -61,35 +65,37 @@ namespace vanguard{
 
             std::string getName() override;
         private:
-            llvm::Instruction& instructionVariable;
+            const llvm::Instruction& instructionVariable;
     };
 
     template <class T>
-    class Constant: Value{
+    class Literal: Value{
         public:
-            Constant();
-
             virtual T getValue()=0;
     };
 
-    class ConstantInteger: Constant<int>{
+    class IntegerLiteral: Literal<int>{
         public:
-            ConstantInteger(llvm::ConstantInt &);
+            explicit IntegerLiteral(const llvm::ConstantInt &);
+
+            IntegerLiteral(const IntegerLiteral&) = delete;
 
             int getValue() override;
 
         private:
-            llvm::ConstantInt& constInt;
+            const llvm::ConstantInt& constInt;
     };
 
-    class ConstantString: Constant<std::string>{
+    class StringLiteral: Literal<std::string>{
         public:
-            ConstantString(llvm::ConstantDataSequential &);
+            explicit StringLiteral(const llvm::ConstantDataSequential &);
+
+            StringLiteral(const StringLiteral&) = delete;
 
             std::string getValue() override;
 
         private:
-            llvm::ConstantDataSequential& constSeq;
+            const llvm::ConstantDataSequential& constSeq;
     };
 
 }

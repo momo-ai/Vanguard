@@ -7,15 +7,17 @@
 #include <llvm/IR/Module.h>
 
 namespace vanguard{
-    class Module{
+    class CompilationUnit{
     private:
-        llvm::Module& module;
+        const llvm::Module& module;
     public:
-        Module(llvm::Module& mod);
+        explicit CompilationUnit(const llvm::Module& mod);
 
-        const std::string getModuleName();
+        CompilationUnit(const CompilationUnit&) = delete;
 
-        const std::string getSourceFileName();
+        std::string getModuleName();
+
+        std::string getSourceFileName();
 
         Function* getFunction(std::string name);
 

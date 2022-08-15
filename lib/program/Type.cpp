@@ -6,29 +6,29 @@ namespace vanguard{
     Type::Type(){}
 
     //Integer subclass
-    IntegerT::IntegerT(llvm::IntegerType& intT): integer(intT){}
+    IntegerType::IntegerType(const llvm::IntegerType& intT): integer(intT){}
 
-    unsigned IntegerT::getWidth(){
+    unsigned IntegerType::getWidth(){
         return integer.getBitWidth()/8;
     }
 
-    std::string IntegerT::getName(){
+    std::string IntegerType::getName(){
         return "IntegerT";
     }
 
     //Array subclass
-    ArrayT::ArrayT(llvm::ArrayType& arr): array(arr){}
+    ArrayType::ArrayType(const llvm::ArrayType& arr): array(arr){}
 
-    Type* ArrayT::getBaseType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*array.getElementType());
+    Type* ArrayType::getBaseType(){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(array.getElementType());
     }
 
-    auto ArrayT::getLength(){
+    auto ArrayType::getLength(){
         return array.getNumElements();
     }
 
-    std::string ArrayT::getName(){
+    std::string ArrayType::getName(){
         return "array< " + (this->getBaseType())->getName() + " >";
     }
 
@@ -54,56 +54,56 @@ namespace vanguard{
     // }
 
     //Pointer subclass
-    PointerT::PointerT(llvm::PointerType& ptr): pointer(ptr){}
+    PointerType::PointerType(const llvm::PointerType& ptr): pointer(ptr){}
     
-    bool PointerT::isOpaque(){
+    bool PointerType::isOpaque(){
         return pointer.isOpaque();
     }
 
-    Type* PointerT::getPointeeType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*pointer.getElementType());
+    Type* PointerType::getPointeeType(){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(pointer.getElementType());
     }
 
-    std::string PointerT::getName(){
+    std::string PointerType::getName(){
         return "pointer< " + (this->getPointeeType())->getName() + " >";
     }
 
     //Struct subclass
-    StructT::StructT(llvm::StructType& structt): structT(structt){}
+    StructType::StructType(const llvm::StructType& structt): structT(structt){}
 
-    unsigned StructT::getNumFields(){
+    unsigned StructType::getNumFields(){
         return structT.getStructNumElements();
     }
 
-    Type* StructT::getTypeAtIndex(unsigned n){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*structT.getStructElementType(n));
+    Type* StructType::getTypeAtIndex(unsigned n){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(structT.getStructElementType(n));
     }
 
-    std::list<Type*> StructT::getFieldTypes(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
+    std::list<Type*> StructType::getFieldTypes(){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Type*> fieldTypesList = {};
         int numFields = structT.getStructNumElements();
         for(int n = 0; n < numFields; n++){
-            fieldTypesList.push_back(llvmToVanguard->translateType(*structT.getStructElementType(n)));
+            fieldTypesList.push_back(llvmToVanguard.translateType(structT.getStructElementType(n)));
         }
         return fieldTypesList;
     }
 
-    std::string StructT::getName(){
+    std::string StructType::getName(){
         return std::string(structT.getName());
     }
 
     //Vector subclass
-    VectorT::VectorT(llvm::VectorType& vec): vector(vec){}
+    VectorType::VectorType(const llvm::VectorType& vec): vector(vec){}
 
-    Type* VectorT::getBaseType(){
-        LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard->translateType(*vector.getElementType());
+    Type* VectorType::getBaseType(){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(vector.getElementType());
     }
 
-    std::string VectorT::getName(){
+    std::string VectorType::getName(){
         return "vector< " + (this->getBaseType())->getName() + " >";
     }
 

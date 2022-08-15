@@ -14,21 +14,25 @@ namespace vanguard{
             virtual std::string getName() = 0;
     };
 
-    class IntegerT: public Type{
+    class IntegerType: public Type{
         public:
-            IntegerT(llvm::IntegerType& intT);
+            explicit IntegerType(const llvm::IntegerType& intT);
+
+            IntegerType(const IntegerType&) = delete;
 
             unsigned getWidth(); //returns width of integer in bytes
 
             std::string getName() override;
 
         private:
-            llvm::IntegerType& integer;
+            const llvm::IntegerType& integer;
     };
 
-    class ArrayT: public Type{
+    class ArrayType: public Type{
         public:
-            ArrayT(llvm::ArrayType& array);
+            explicit ArrayType(const llvm::ArrayType& array);
+
+            ArrayType(const ArrayType&) = delete;
 
             Type* getBaseType();
 
@@ -37,7 +41,7 @@ namespace vanguard{
             std::string getName() override;
 
         private:
-            llvm::ArrayType& array;
+            const llvm::ArrayType& array;
     };
 
     // class FunctionT: public Type{
@@ -54,9 +58,11 @@ namespace vanguard{
     //         llvm::FunctionType& function;
     // };
 
-    class PointerT: public Type{
+    class PointerType: public Type{
         public:
-            PointerT(llvm::PointerType& pointer);
+            explicit PointerType(const llvm::PointerType& pointer);
+
+            PointerType(const PointerType&) = delete;
             
             bool isOpaque();
 
@@ -65,12 +71,14 @@ namespace vanguard{
             std::string getName() override;
 
         private:
-            llvm::PointerType& pointer;
+            const llvm::PointerType& pointer;
     };
 
-    class StructT: public Type{
+    class StructType: public Type{
         public:
-            StructT(llvm::StructType& structT);
+            explicit StructType(const llvm::StructType& structT);
+
+            StructType(const StructType&) = delete;
 
             //struct name
 
@@ -83,12 +91,14 @@ namespace vanguard{
             std::string getName() override;
 
         private:
-            llvm::StructType& structT;
+            const llvm::StructType& structT;
     };
 
-    class VectorT: public Type{
+    class VectorType: public Type{
         public:
-            VectorT(llvm::VectorType& vector);
+            explicit VectorType(const llvm::VectorType& vector);
+
+            VectorType(const VectorType&) = delete;
 
             Type* getBaseType();
 
@@ -96,7 +106,7 @@ namespace vanguard{
 
             //TODO: getElementCount()
         private:
-            llvm::VectorType& vector;
+            const llvm::VectorType& vector;
     };
 
 }

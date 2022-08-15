@@ -2,7 +2,6 @@
 #define VANGUARD_PROGRAM_BLOCK_H
 
 #include "Instruction.h"
-#include "LLVMtoVanguard.h"
 #include <unordered_set>
 #include <list>
 #include "llvm/IR/BasicBlock.h"
@@ -10,9 +9,11 @@
 namespace vanguard{
     class Block{
     public:
-        Block(llvm::BasicBlock &block);
+        explicit Block(const llvm::BasicBlock &block);
 
-        const Function* getFunction();
+        Block(const Block&) = delete;
+
+        Function* getFunction();
 
         std::list<Instruction *> getInstructionsList();
 
@@ -21,7 +22,7 @@ namespace vanguard{
         std::unordered_set<Block *> getAllSuccessors();
 
     private:
-        llvm::BasicBlock& block;
+        const llvm::BasicBlock& block;
 
     };
 }
