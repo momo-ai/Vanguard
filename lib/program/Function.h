@@ -3,16 +3,20 @@
 
 #include "Type.h"
 #include "llvm/IR/Function.h"
+#include "Type.h"
 #include <list>
 #include <string>
 
 namespace vanguard {
+
     class Instruction;
     class Block;
 
-    class Function{
+    class Function{    
     public:
-        Function(llvm::Function& func);
+        explicit Function(const llvm::Function& func);
+
+        Function(const Function&) = delete;
 
         std::string getName();
 
@@ -29,7 +33,7 @@ namespace vanguard {
         llvm::Function* unwrap();
 
     private:
-        llvm::Function& function;        
+        const llvm::Function& function;
     };
 
 }

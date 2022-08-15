@@ -17,7 +17,7 @@ AS_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "llvm-as")
 LLVM_AS_CMD=AS_PATH + " {} -o {}"
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
 # Solidity paths
-SOLANG_PATH=os.path.join("solang")
+SOLANG_PATH=os.path.join("./solang")
 SOLIDITY_PREPROCESSOR_PATH=os.path.join(SCRIPT_PATH, "deps", "SolidityPreprocessor", "src", "preprocessor.js")
 SOLIDITY_SUMMARIZER_PATH=os.path.join(SCRIPT_PATH, "deps", "SolidityPreprocessor", "src", "summarizer.js")
 # Rust paths
@@ -27,18 +27,17 @@ TOML_PATH = os.path.join("Cargo.toml")
 CARGO_TARGET_PATH = os.path.join("target", "debug", "deps")
 # Output path
 OUT_DIR=os.path.join(os.getcwd(), "processed_examples")
-VANGUARD_BUILD_PATH = os.path.join("cmake-build-debug", "lib")
+VANGUARD_BUILD_PATH = os.path.join("${PROJECT_BINARY_DIR}", "lib")
 
 ############################
 # Detectors
 ############################
-DETECTORS = ["reentrancy", "suicide", "uninitialized_state",
-             "msg_value_loop", "delegatecall_loop", "tainted_send", "flashloan"]
+DETECTORS = ["statGen", "fnPrinter"]
 
 ############################
 # Subprocess Commands
 ############################
-OPT_CMD = "{} --load={}/{{}} -enable-new-pm=0 --summary={{}} --{{}} {{}} -o /dev/null".format(OPT_PATH, VANGUARD_BUILD_PATH)
+OPT_CMD = "{} -load-pass-plugin={}/{{}} --passes={{}} -disable-output {{}} -o /dev/null".format(OPT_PATH, VANGUARD_BUILD_PATH)
 # Solidity commands
 IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG_PATH)
 BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG_PATH)
@@ -159,7 +158,7 @@ def run_detector(detector, summary_path):
             # Only process bc files
             class_name = bc_file.replace("_deploy.bc", "")
             bc_path = os.path.join(OUT_DIR, bc_file)
-            opt_cmd = OPT_CMD.format(lib, summary_path, detector, bc_path)
+            opt_cmd = OPT_CMD.format(lib, detector, bc_path)
             # print(opt_cmd)
             print("Running Vanguard on class {}...".format(class_name), end="")
             tout = bytes.decode(subprocess.check_output(opt_cmd.split(), stderr=subprocess.DEVNULL))
@@ -168,18 +167,26 @@ def run_detector(detector, summary_path):
 
     return results
 
+#def print_results(results):
+#    out = [["Class", "Detector", "Function Flagged by Detector", "Detailed Output"]]
+#    for cls, ress in results.items():
+#        for info in ress:
+#            detector, res = info
+#            parsed_res = get_per_func_info(res)
+#            for note, func in parsed_res:
+#                simple_func = func.split("::")[-1].split("__")[0]
+#                row = [cls, detector, simple_func, note]
+#                out.append(row)
+
+#    print(tabulate(out, tablefmt="grid"))
+
 def print_results(results):
     out = [["Class", "Detector", "Function Flagged by Detector", "Detailed Output"]]
     for cls, ress in results.items():
         for info in ress:
             detector, res = info
-            parsed_res = get_per_func_info(res)
-            for note, func in parsed_res:
-                simple_func = func.split("::")[-1].split("__")[0]
-                row = [cls, detector, simple_func, note]
-                out.append(row)
-
-    print(tabulate(out, tablefmt="grid"))
+            print("--------- {} ---------".format(detector))
+            print(res)
 
 def run(args):
     if os.path.exists(OUT_DIR):

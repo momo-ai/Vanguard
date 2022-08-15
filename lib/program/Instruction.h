@@ -8,12 +8,17 @@
 namespace vanguard{
 
     class Instruction{
+    private:
+        const llvm::Instruction& instruction;
+
     public:
-        Instruction(llvm::Instruction &inst);
+        explicit Instruction(const llvm::Instruction &inst);
+
+        Instruction(const Instruction&) = delete;
 
         Block* getBlock();
 
-        Function* getFunction();
+        //Function* getFunction();
 
         const char* getInstructionType();
 

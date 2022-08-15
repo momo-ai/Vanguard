@@ -1,20 +1,12 @@
 add_library(Vanguard SHARED
         # List your source files here.
-        # Skeleton.cpp
+        Vanguard.cpp
         )
 
 #if(DEFINED ENV{Z3_HOME})
 #  set(ENV{Z3_DIR} $ENV{Z3_HOME})
 #endif()
 
-if(DEFINED ENV{LIBBLOCKCHAIN_HOME})
-  message(STATUS "LIBBLOCKCHAIN_HOME: ${LIBBLOCKCHAIN_HOME}")
-  set(ENV{LIBBLOCKCHAIN_DIR} $ENV{LIBBLOCKCHAIN_HOME})
-endif()
-
-find_package(libBlockchain
-        REQUIRED
-        CONFIG)
 
 #find_package(Z3
 #  REQUIRED
@@ -28,22 +20,22 @@ find_package(libBlockchain
 #)
 
 add_subdirectory(detectors)
-add_subdirectory(analysis)
-add_subdirectory(domain)
+#add_subdirectory(analysis)
+#add_subdirectory(domain)
 add_subdirectory(program)
-add_subdirectory(vanguard)
+#add_subdirectory(vanguard)
 
 #message(STATUS "Z3_FOUND: ${Z3_FOUND}")
 #message(STATUS "Found Z3 ${Z3_VERSION_STRING}")
 #message(STATUS "Z3_DIR: ${Z3_DIR}")
 
-message(STATUS "Found libBlockchain ${LIBBLOCKCHAIN_VERSION_STRING}")
-message(STATUS "LIBBLOCKCHAIN_DIR: $ENV{LIBBLOCKCHAIN_DIR}")
+#message(STATUS "Found libBlockchain ${LIBBLOCKCHAIN_VERSION_STRING}")
+#message(STATUS "LIBBLOCKCHAIN_DIR: $ENV{LIBBLOCKCHAIN_DIR}")
 
 #target_include_directories(Vanguard PRIVATE ${Z3_CXX_INCLUDE_DIRS})
-target_include_directories(Vanguard PRIVATE ${LIBBLOCKCHAIN_INCLUDE_DIRS})
+#target_include_directories(Vanguard PRIVATE ${LIBBLOCKCHAIN_INCLUDE_DIRS})
 #target_link_libraries(Vanguard PRIVATE ${Z3_LIBRARIES})
-target_link_libraries(Vanguard PRIVATE BlockchainStatic)
+#target_link_libraries(Vanguard PRIVATE BlockchainStatic)
 
 #target_compile_options(Vanguard PRIVATE ${Z3_COMPONENT_CXX_FLAGS})
 
@@ -69,7 +61,7 @@ target_compile_features(Vanguard PRIVATE cxx_range_for cxx_auto_type)
 # LLVM is (typically) built with no C++ RTTI. We need to match that;
 # otherwise, we'll get linker errors about missing RTTI data.
 set_target_properties(Vanguard PROPERTIES
-    COMPILE_FLAGS "-fno-rtti"
+    COMPILE_FLAGS "-fno-rtti -Wall"
 )
 
 # Get proper shared-library behavior (where symbols are not necessarily
@@ -79,5 +71,10 @@ if(APPLE)
         LINK_FLAGS "-undefined dynamic_lookup"
     )
 endif(APPLE)
+
+target_link_libraries(
+      Vanguard
+      "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>"
+      )   
 
 add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
