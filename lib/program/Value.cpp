@@ -18,7 +18,7 @@ namespace vanguard{
         return std::string(globalVariable.getName());
     }
 
-    llvm::GlobalVariable* GlobalVariable::unwrap(){
+    const llvm::GlobalVariable* GlobalVariable::unwrap(){
         return &globalVariable;
     }
 
@@ -38,7 +38,7 @@ namespace vanguard{
         return std::string(argument.getName());
     }
 
-    llvm::Argument* Argument::unwrap(){
+    const llvm::Argument* Argument::unwrap(){
         return &argument;
     }
 
@@ -58,7 +58,7 @@ namespace vanguard{
         return std::string(instructionVariable.getName());
     }
 
-    llvm::Instruction* InstructionVariable::unwrap(){
+    const llvm::Instruction* InstructionVariable::unwrap(){
         return &instructionVariable;
     }
 
@@ -69,7 +69,7 @@ namespace vanguard{
         return constInt.getValue().getLimitedValue();
     }
 
-    llvm::ConstantInt* ConstantInteger::unwrap(){
+    const llvm::ConstantInt* IntegerLiteral::unwrap(){
         return &constInt;
     }
 
@@ -80,31 +80,33 @@ namespace vanguard{
         return constSeq.getAsString().str();
     }
 
-    llvm::ConstantDataSequential* ConstantString::unwrap(){
+    const llvm::ConstantDataSequential* StringLiteral::unwrap(){
         return &constSeq;
     }
 
     //Boolean
-    ConstantBoolean::ConstantBoolean(bool b){
+    BooleanLiteral::BooleanLiteral(bool b){
         constBool = b;
     }
 
-    bool ConstantBoolean::getValue(){
+    bool BooleanLiteral::getValue(){
         return constBool;
     }
 
     //Memory Address
-    MemoryAddress::MemoryAddress(llvm::Value* ptr, llvm::Value* idx, unsigned sz): pointer(ptr) , index(idx), size(sz){}
+    MemoryAddress::MemoryAddress(const llvm::Value* ptr, const llvm::Value* idx, unsigned long sz): pointer(ptr) , index(idx), size(sz){}
 
-    llvm::Value* MemoryAddress::getPointer(){
+    MemoryAddress::MemoryAddress(const llvm::Value* ptr, unsigned long sz): pointer(ptr), size(sz){}
+
+    const llvm::Value* MemoryAddress::getPointer(){
         return pointer;
     }
 
-    llvm::Value* MemoryAddress::getIndex(){
+    const llvm::Value* MemoryAddress::getIndex(){
         return index;
     }
 
-    unsigned MemoryAddress::getSize(){
+    unsigned long MemoryAddress::getSize(){
         return size;
     }
 

@@ -1,10 +1,10 @@
-#ifndef VANGUARD_PROGRAM_MODULE_H
-#define VANGUARD_PROGRAM_MODULE_H
+#ifndef VANGUARD_PROGRAM_COMPILATION_UNIT_H
+#define VANGUARD_PROGRAM_COMPILATION_UNIT_H
 
 #include "Value.h"
 #include "Function.h"
 #include <unordered_set>
-#include <llvm/IR/Module.h>
+#include <llvm/IR/Module.h> 
 
 namespace vanguard{
     class CompilationUnit{
@@ -27,7 +27,8 @@ namespace vanguard{
 
         std::unordered_set<Value*> getAllGlobalVariables();
 
+        llvm::Module* unwrap();
     };
 }
 
-#endif
+#endif //VANGUARD_PROGRAM_COMPILATION_UNIT_H

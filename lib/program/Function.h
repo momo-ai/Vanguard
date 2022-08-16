@@ -2,6 +2,7 @@
 #define VANGUARD_PROGRAM_FUNCTION_H
 
 #include "Type.h"
+#include "Value.h"
 #include "llvm/IR/Function.h"
 #include "Type.h"
 #include <list>
@@ -20,7 +21,7 @@ namespace vanguard {
 
         std::string getName();
 
-        bool getParams();
+        std::list<Argument*> getParams();
 
         Type* getReturnType();
 
@@ -30,7 +31,7 @@ namespace vanguard {
 
         std::list<Instruction*> getInstructionsList();
 
-        llvm::Function* unwrap();
+        const llvm::Function* unwrap();
 
     private:
         const llvm::Function& function;

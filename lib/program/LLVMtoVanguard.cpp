@@ -95,8 +95,12 @@ namespace vanguard{
         return typeMap[t];
     }
 
-    Value* LLVMtoVanguard::translateValue(llvm::Value* val){
-        if (!valueMap[val]){
+    Value* LLVMtoVanguard::translateValue(const llvm::Value* val){
+        if(val == nullptr) {
+            return nullptr;
+        }
+
+        if (valueMap.find(val) == valueMap.end()){
             if (auto globalVariable = llvm::dyn_cast<llvm::GlobalVariable>(val)){
                 valueMap[val] = llvm::dyn_cast<Value>(new GlobalVariable(*globalVariable));
             }
@@ -107,16 +111,16 @@ namespace vanguard{
                 valueMap[val] = llvm::dyn_cast<Value>(new InstructionVariable(*instVar));
             }
             else if (auto integer = llvm::dyn_cast<llvm::ConstantInt>(val)){
-                valueMap[val] = llvm::dyn_cast<Value>(new ConstantInteger(*integer));
+                valueMap[val] = llvm::dyn_cast<Value>(new IntegerLiteral(*integer));
             }
             else if (auto string = llvm::dyn_cast<llvm::ConstantDataSequential>(val)){
-                valueMap[val] = llvm::dyn_cast<Value>(new ConstantString(*string));
+                valueMap[val] = llvm::dyn_cast<Value>(new StringLiteral(*string));
             }
             else{
                 throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");
             }
-            return valueMap[val];
         }
+        return valueMap[val];
     }
 
 }

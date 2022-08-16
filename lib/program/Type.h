@@ -24,7 +24,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::IntegerType* unwrap();
+            const llvm::IntegerType* unwrap();
 
         private:
             const llvm::IntegerType& integer;
@@ -42,7 +42,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::ArrayType* unwrap();
+            const llvm::ArrayType* unwrap();
 
         private:
             const llvm::ArrayType& array;
@@ -74,7 +74,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::PointerType* unwrap();
+            const llvm::PointerType* unwrap();
 
         private:
             const llvm::PointerType& pointer;
@@ -96,7 +96,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::StructType* unwrap();
+            const llvm::StructType* unwrap();
 
         private:
             const llvm::StructType& structT;
@@ -112,7 +112,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::VectorType* unwrap();
+            const llvm::VectorType* unwrap();
 
             //TODO: getElementCount()
         private:

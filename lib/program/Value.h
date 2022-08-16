@@ -34,7 +34,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::GlobalVariable* unwrap();
+            const llvm::GlobalVariable* unwrap();
 
         private:
             const llvm::GlobalVariable& globalVariable;
@@ -52,7 +52,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::Argument* unwrap();
+            const llvm::Argument* unwrap();
 
         private:
             const llvm::Argument& argument;
@@ -70,7 +70,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            llvm::Instruction* unwrap();
+            const llvm::Instruction* unwrap();
 
         private:
             const llvm::Instruction& instructionVariable;
@@ -90,7 +90,7 @@ namespace vanguard{
 
             int getValue() override;
 
-            llvm::ConstantInt* unwrap();
+            const llvm::ConstantInt* unwrap();
 
         private:
             const llvm::ConstantInt& constInt;
@@ -104,15 +104,15 @@ namespace vanguard{
 
             std::string getValue() override;
 
-            llvm::ConstantDataSequential* unwrap();
+            const llvm::ConstantDataSequential* unwrap();
 
         private:
             const llvm::ConstantDataSequential& constSeq;
     };
 
-    class ConstantBoolean: public Constant<bool>{
+    class BooleanLiteral: public Literal<bool>{
         public:
-            ConstantBoolean(bool);
+            BooleanLiteral(bool);
 
             bool getValue() override;
         
@@ -122,18 +122,20 @@ namespace vanguard{
 
     class MemoryAddress: public Value{
         public:
-            MemoryAddress(llvm::Value*, llvm::Value*, unsigned);
+            MemoryAddress(const llvm::Value*,const llvm::Value*, unsigned long);
 
-            llvm::Value* getPointer();
+            MemoryAddress(const llvm::Value*, unsigned long);
 
-            llvm::Value* getIndex();
+            const llvm::Value* getPointer();
 
-            unsigned getSize();
+            const llvm::Value* getIndex();
+
+            unsigned long getSize();
 
         private:
-            llvm::Value* pointer;
-            llvm::Value* index;
-            unsigned size;
+            const llvm::Value* pointer;
+            const llvm::Value* index;
+            unsigned long size;
     };
 
 }

@@ -12,8 +12,13 @@ namespace vanguard{
         return function.getName().str();
     }
 
-    bool Function::getParams(){
-        return false;
+    std::list<Argument*> Function::getParams(){
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        std::list<Argument*> params = {};
+        for (auto itr = function.arg_begin(); itr != function.arg_end(); itr++){
+            params.push_back((Argument *)llvmToVanguard.translateValue(llvm::dyn_cast<llvm::Value>(itr)));
+        }
+        return params;
     }
 
     Type* Function::getReturnType(){
@@ -41,7 +46,7 @@ namespace vanguard{
         return instrctionsList;
     }
 
-    llvm::Function* Function::unwrap(){
+    const llvm::Function* Function::unwrap(){
         return &function;
     }
 

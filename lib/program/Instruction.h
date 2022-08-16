@@ -18,8 +18,6 @@ namespace vanguard{
 
         Block* getBlock();
 
-        //Function* getFunction();
-
         const char* getInstructionType();
 
         bool mayReadOrWriteToMemory();
@@ -36,10 +34,8 @@ namespace vanguard{
 
         unsigned getNumOperands();
 
-        llvm::Instruction* unwrap();
+        const llvm::Instruction* unwrap();
 
-    private:
-        llvm::Instruction& instruction;
     };
 }
 
