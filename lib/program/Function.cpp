@@ -46,8 +46,8 @@ namespace vanguard{
         return instrctionsList;
     }
 
-    const llvm::Function* Function::unwrap(){
-        return &function;
+    const llvm::Function &Function::unwrap(){
+        return function;
     }
 
 }

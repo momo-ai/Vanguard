@@ -18,7 +18,7 @@ namespace vanguard{
     //BinaryOpInstruction
     class BinaryOpInstruction: public Instruction{
         public:
-            BinaryOpInstruction();
+            explicit BinaryOpInstruction(const llvm::Instruction &inst);
 
             virtual unsigned getOpClass() = 0;
 
@@ -27,7 +27,7 @@ namespace vanguard{
 
     class BinaryOperator: public BinaryOpInstruction{
         public:
-            explicit BinaryOperator(const llvm::BinaryOperator&);
+            explicit BinaryOperator(const llvm::Instruction &inst, const llvm::BinaryOperator &bop);
 
             BinaryOperator(const BinaryOperator&) = delete;
 
@@ -35,7 +35,7 @@ namespace vanguard{
 
             InstructionVariable* getLHS() override;
 
-            const llvm::BinaryOperator* unwrap();
+            const llvm::BinaryOperator &unwrap() override;
 
         private:
             const llvm::BinaryOperator& binOp;
@@ -43,7 +43,7 @@ namespace vanguard{
 
     class CmpInst: public BinaryOpInstruction{
         public:
-            explicit CmpInst(const llvm::CmpInst&);
+            explicit CmpInst(const llvm::Instruction &inst, const llvm::CmpInst &cmpinst);
 
             CmpInst(const CmpInst&) = delete;
 
@@ -51,7 +51,7 @@ namespace vanguard{
 
             InstructionVariable* getLHS() override;
 
-            const llvm::CmpInst* unwrap();
+            const llvm::CmpInst &unwrap() override;
 
         private:
             const llvm::CmpInst& cmpInst;
@@ -60,7 +60,7 @@ namespace vanguard{
     // Branch Instruction
     class BranchInstruction: public Instruction{
         public:
-            BranchInstruction();
+            explicit BranchInstruction(const llvm::Instruction &inst);
 
             virtual Value* getCondition() = 0;
 
@@ -69,7 +69,7 @@ namespace vanguard{
 
     class BranchInst: public BranchInstruction{
         public:
-            explicit BranchInst(const llvm::BranchInst&);
+            explicit BranchInst(const llvm::Instruction &inst, const llvm::BranchInst &brInst);
 
             BranchInst(const BranchInst&) = delete;
 
@@ -79,7 +79,7 @@ namespace vanguard{
 
             std::list<Block*> getSuccessors() override;
 
-            const llvm::BranchInst* unwrap();
+            const llvm::BranchInst &unwrap() override;
 
         private:
             const llvm::BranchInst& branchInst;
@@ -87,7 +87,7 @@ namespace vanguard{
 
     class IndirectBrInst: public BranchInstruction{
         public:
-            explicit IndirectBrInst(const llvm::IndirectBrInst&);
+            explicit IndirectBrInst(const llvm::Instruction &inst, const llvm::IndirectBrInst &ibrInst);
 
             IndirectBrInst(const IndirectBrInst&) = delete;
 
@@ -95,15 +95,15 @@ namespace vanguard{
 
             std::list<Block*> getSuccessors() override;
 
-            const llvm::IndirectBrInst* unwrap();
-        
+            const llvm::IndirectBrInst &unwrap() override;
+
         private:
             const llvm::IndirectBrInst& indirectBrInst;
     };
 
     class SwitchInst: public BranchInstruction{
         public:
-            explicit SwitchInst(const llvm::SwitchInst&);
+            explicit SwitchInst(const llvm::Instruction &inst, const llvm::SwitchInst &swInst);
 
             SwitchInst(const SwitchInst&) = delete;
 
@@ -111,8 +111,8 @@ namespace vanguard{
 
             std::list<Block*> getSuccessors() override;
 
-            const llvm::SwitchInst* unwrap();
-        
+            const llvm::SwitchInst &unwrap() override;
+
         private:
             const llvm::SwitchInst& switchInst;
     };
@@ -120,8 +120,8 @@ namespace vanguard{
     //Unary Operation Instruciton
     class  UnaryOpInstruction: public Instruction{
         public:
-            UnaryOpInstruction();
-            
+            explicit UnaryOpInstruction(const llvm::Instruction &inst);
+
             virtual Value* getOperand() = 0;
 
             virtual unsigned getOpClass() = 0;
@@ -129,16 +129,16 @@ namespace vanguard{
 
     class UnaryOperator: public UnaryOpInstruction{
         public:
-            explicit UnaryOperator(const llvm::UnaryOperator&);
+            explicit UnaryOperator(const llvm::Instruction &inst, const llvm::UnaryOperator &uop);
 
             UnaryOperator(const UnaryOperator&) = delete;
 
-            Value* getOperand();
+            Value* getOperand() override;
 
-            unsigned getOpClass();
+            unsigned getOpClass() override;
 
-            const llvm::UnaryOperator* unwrap();
-        
+            const llvm::UnaryOperator &unwrap() override;
+
         private:
             const llvm::UnaryOperator& unaryOperator;
     };
@@ -146,16 +146,16 @@ namespace vanguard{
     //Call Instruction
     class CallInstruction: public Instruction{
         public:
-            CallInstruction();
+            explicit CallInstruction(const llvm::Instruction &inst);
 
-            virtual Function* getTarget();
+            virtual Function* getTarget() = 0;
 
-            virtual std::list<Value*> getArgs();
+            virtual std::list<Value*> getArgs() = 0;
     };
 
     class Call: public CallInstruction{
         public:
-            explicit Call(const llvm::CallBase&);
+            explicit Call(const llvm::Instruction &inst, const llvm::CallBase &cb);
 
             Call(const Call&) = delete;
 
@@ -163,7 +163,7 @@ namespace vanguard{
 
             std::list<Value*> getArgs() override;
 
-            const llvm::CallBase* unwrap();
+            const llvm::CallBase &unwrap() override;
 
         private:
             const llvm::CallBase& call;
@@ -172,21 +172,21 @@ namespace vanguard{
     //Error Instruction
     class ErrorInstruction: public Instruction{
         public:
-            ErrorInstruction();
+            explicit ErrorInstruction(const llvm::Instruction &inst);
 
             virtual std::string error();
     };
 
     class UnreachableInstruction: public ErrorInstruction{
         public:
-            explicit UnreachableInstruction(const llvm::UnreachableInst&);
+            explicit UnreachableInstruction(const llvm::Instruction &inst, const llvm::UnreachableInst &ui);
 
             UnreachableInstruction(const UnreachableInstruction&) = delete;
 
             std::string error() override;
 
-            const llvm::UnreachableInst* unwrap();
-        
+            const llvm::UnreachableInst &unwrap() override;
+
         private:
             const llvm::UnreachableInst& unreachableInstruction;
     };
@@ -194,16 +194,16 @@ namespace vanguard{
     //Return Instruction
     class ReturnInstruction: public Instruction{
         public:
-            ReturnInstruction();
+            explicit ReturnInstruction(const llvm::Instruction &inst);
 
-            virtual bool returnsValue();
+            virtual bool returnsValue() = 0;
 
-            virtual Value* returnValue();
+            virtual Value* returnValue() = 0;
     };
 
     class ReturnInst: public ReturnInstruction{
         public:
-            explicit ReturnInst(const llvm::ReturnInst&);
+            explicit ReturnInst(const llvm::Instruction &inst, const llvm::ReturnInst &retInst);
 
             ReturnInst(const ReturnInst&) = delete;
 
@@ -211,7 +211,7 @@ namespace vanguard{
 
             Value* returnValue() override;
 
-            const llvm::ReturnInst* unwrap();
+            const llvm::ReturnInst &unwrap() override;
 
         private:
             const llvm::ReturnInst& returnInst;
@@ -220,25 +220,25 @@ namespace vanguard{
     // Assign Instruction
     class AssignInstruction: public Instruction{
         public:
-            AssignInstruction();
+            explicit AssignInstruction(const llvm::Instruction &inst);
     };
 
     class MemoryReadInstruction: public AssignInstruction{
         public:
-            MemoryReadInstruction();
+            explicit MemoryReadInstruction(const llvm::Instruction &inst);
 
             virtual InstructionVariable* getLHS() = 0;
     };
 
     class SelectInst: public MemoryReadInstruction{
         public:
-            explicit SelectInst(const llvm::SelectInst&);
+            explicit SelectInst(const llvm::Instruction &inst, const llvm::SelectInst &si);
 
             SelectInst(const SelectInst&) = delete;
 
             InstructionVariable* getLHS() override;
 
-            const llvm::SelectInst* unwrap();
+            const llvm::SelectInst &unwrap() override;
 
         private:
             const llvm::SelectInst& selectInst;
@@ -246,113 +246,114 @@ namespace vanguard{
 
     class ExtractElementInst: public MemoryReadInstruction{
         public:
-            explicit ExtractElementInst(const llvm::ExtractElementInst&);
+            explicit ExtractElementInst(const llvm::Instruction &inst, const llvm::ExtractElementInst &eei);
 
             ExtractElementInst(const ExtractElementInst&) = delete;
 
             InstructionVariable* getLHS() override;
 
-            const llvm::ExtractElementInst* unwrap();
-        
+            const llvm::ExtractElementInst &unwrap() override;
+
         private:
             const llvm::ExtractElementInst& extractElementInst;
     };
 
     class MemoryWriteInstruction: public AssignInstruction{
         public:
-            MemoryWriteInstruction();
+            explicit MemoryWriteInstruction(const llvm::Instruction &inst);
 
             virtual MemoryAddress* getMemoryAddress() = 0;
     };
 
     class InsertValueInst: public MemoryWriteInstruction{
         public:
-            explicit InsertValueInst(const llvm::InsertValueInst&);
+            explicit InsertValueInst(const llvm::Instruction &inst, const llvm::InsertValueInst &ivi);
 
             InsertValueInst(const InsertValueInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
 
-            const llvm::InsertValueInst* unwrap();
-        
+            const llvm::InsertValueInst &unwrap() override;
+
         private:
             const llvm::InsertValueInst& insertValueInst;
     };
 
     class InsertElementInst: public MemoryWriteInstruction{
         public:
-            explicit InsertElementInst(const llvm::InsertElementInst&);
+            explicit InsertElementInst(const llvm::Instruction &inst, const llvm::InsertElementInst &iei);
 
             InsertElementInst(const InsertElementInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
 
-            const llvm::InsertElementInst* unwrap();
-        
+            const llvm::InsertElementInst &unwrap() override;
+
         private:
             const llvm::InsertElementInst& insertElementInst;
     };
 
     class StoreInst: public MemoryWriteInstruction{
         public:
-            explicit StoreInst(const llvm::StoreInst&);
+            explicit StoreInst(const llvm::Instruction &inst, const llvm::StoreInst &si);
 
             StoreInst(const StoreInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
 
-            const llvm::StoreInst* unwrap();
-        
+            const llvm::StoreInst &unwrap() override;
+
         private:
             const llvm::StoreInst& storeInst;
     };
 
     class ShuffleVectorInst: public MemoryWriteInstruction{
         public:
-            explicit ShuffleVectorInst(const llvm::ShuffleVectorInst&);
+            explicit ShuffleVectorInst(const llvm::Instruction &inst, const llvm::ShuffleVectorInst &svi);
 
             ShuffleVectorInst(const ShuffleVectorInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
 
-            const llvm::ShuffleVectorInst* unwrap();
-        
+            const llvm::ShuffleVectorInst &unwrap() override;
+
         private:
             const llvm::ShuffleVectorInst& shuffleVectorInst;
     };
 
     class AssignInst: public AssignInstruction{
         public:
-            AssignInst();
+            explicit AssignInst(const llvm::Instruction &inst);
 
             virtual InstructionVariable* getLHS() = 0;
     };
 
     class PHINode: public AssignInst{
         public:
-            explicit PHINode(const llvm::PHINode&);
+            explicit PHINode(const llvm::Instruction &inst, const llvm::PHINode &phin);
 
             PHINode(const PHINode&) = delete;
 
             InstructionVariable* getLHS() override;
 
-            const llvm::PHINode* unwrap();
-        
+            const llvm::PHINode &unwrap() override;
+
         private:
             const llvm::PHINode& phiNode;
     };
 
     class GetElementPtrInst: public AssignInst{
         public:
-            explicit GetElementPtrInst(const llvm::GetElementPtrInst&);
-            
+            explicit GetElementPtrInst(const llvm::Instruction &inst, const llvm::GetElementPtrInst &gepi);
+
             InstructionVariable* getLHS() override;
 
-            const llvm::GetElementPtrInst* unwrap();
+            const llvm::GetElementPtrInst &unwrap() override;
 
         private:
-            const llvm::GetElementPtrInst& getElemenPtrInst;
+            const llvm::GetElementPtrInst& getElementPtrInst;
     };
+
 }
 
 #endif

@@ -27,7 +27,7 @@ namespace vanguard{
 
         std::unordered_set<Value*> getAllGlobalVariables();
 
-        llvm::Module* unwrap();
+        const llvm::Module& unwrap();
     };
 }
 

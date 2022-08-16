@@ -34,7 +34,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            const llvm::GlobalVariable* unwrap();
+            const llvm::GlobalVariable &unwrap();
 
         private:
             const llvm::GlobalVariable& globalVariable;
@@ -52,7 +52,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            const llvm::Argument* unwrap();
+            const llvm::Argument &unwrap();
 
         private:
             const llvm::Argument& argument;
@@ -70,7 +70,7 @@ namespace vanguard{
 
             std::string getName() override;
 
-            const llvm::Instruction* unwrap();
+            const llvm::Instruction &unwrap();
 
         private:
             const llvm::Instruction& instructionVariable;
@@ -79,7 +79,7 @@ namespace vanguard{
     template <class T>
     class Literal: Value{
         public:
-            virtual T getValue()=0;
+            virtual T getValue() = 0;
     };
 
     class IntegerLiteral: Literal<int>{
@@ -90,7 +90,7 @@ namespace vanguard{
 
             int getValue() override;
 
-            const llvm::ConstantInt* unwrap();
+            const llvm::ConstantInt &unwrap();
 
         private:
             const llvm::ConstantInt& constInt;
@@ -104,7 +104,7 @@ namespace vanguard{
 
             std::string getValue() override;
 
-            const llvm::ConstantDataSequential* unwrap();
+            const llvm::ConstantDataSequential &unwrap();
 
         private:
             const llvm::ConstantDataSequential& constSeq;
@@ -112,7 +112,9 @@ namespace vanguard{
 
     class BooleanLiteral: public Literal<bool>{
         public:
-            BooleanLiteral(bool);
+            explicit BooleanLiteral(bool);
+
+            BooleanLiteral(const BooleanLiteral&) = delete;
 
             bool getValue() override;
         
@@ -126,6 +128,8 @@ namespace vanguard{
 
             MemoryAddress(const llvm::Value*, unsigned long);
 
+            MemoryAddress(const MemoryAddress&) = delete;
+
             const llvm::Value* getPointer();
 
             const llvm::Value* getIndex();
@@ -135,7 +139,7 @@ namespace vanguard{
         private:
             const llvm::Value* pointer;
             const llvm::Value* index;
-            unsigned long size;
+            unsigned long size = 0;
     };
 
 }

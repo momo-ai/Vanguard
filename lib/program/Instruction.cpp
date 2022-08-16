@@ -51,8 +51,8 @@ namespace vanguard{
         return instruction.getNumOperands();
     }
 
-    const llvm::Instruction* Instruction::unwrap(){
-        return &instruction;
+    const llvm::Instruction &Instruction::unwrap(){
+        return instruction;
     }
 
 }

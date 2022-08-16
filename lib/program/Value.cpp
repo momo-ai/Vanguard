@@ -2,7 +2,7 @@
 #include "LLVMtoVanguard.h"
 
 namespace vanguard{
-    // Global Variable 
+    // Global Variable
     GlobalVariable::GlobalVariable(const llvm::GlobalVariable& gv): globalVariable(gv){}
 
     Type* GlobalVariable::getType(){
@@ -18,8 +18,8 @@ namespace vanguard{
         return std::string(globalVariable.getName());
     }
 
-    const llvm::GlobalVariable* GlobalVariable::unwrap(){
-        return &globalVariable;
+    const llvm::GlobalVariable &GlobalVariable::unwrap(){
+        return globalVariable;
     }
 
     //Argument
@@ -38,8 +38,8 @@ namespace vanguard{
         return std::string(argument.getName());
     }
 
-    const llvm::Argument* Argument::unwrap(){
-        return &argument;
+    const llvm::Argument &Argument::unwrap(){
+        return argument;
     }
 
     //InstructionVariable
@@ -58,8 +58,8 @@ namespace vanguard{
         return std::string(instructionVariable.getName());
     }
 
-    const llvm::Instruction* InstructionVariable::unwrap(){
-        return &instructionVariable;
+    const llvm::Instruction &InstructionVariable::unwrap(){
+        return instructionVariable;
     }
 
     //Integer
@@ -69,8 +69,8 @@ namespace vanguard{
         return constInt.getValue().getLimitedValue();
     }
 
-    const llvm::ConstantInt* IntegerLiteral::unwrap(){
-        return &constInt;
+    const llvm::ConstantInt &IntegerLiteral::unwrap(){
+        return constInt;
     }
 
     //String
@@ -80,8 +80,8 @@ namespace vanguard{
         return constSeq.getAsString().str();
     }
 
-    const llvm::ConstantDataSequential* StringLiteral::unwrap(){
-        return &constSeq;
+    const llvm::ConstantDataSequential &StringLiteral::unwrap(){
+        return constSeq;
     }
 
     //Boolean

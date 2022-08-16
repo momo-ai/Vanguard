@@ -34,7 +34,7 @@ namespace vanguard{
 
         unsigned getNumOperands();
 
-        const llvm::Instruction* unwrap();
+        virtual const llvm::Instruction &unwrap();
 
     };
 }
