@@ -119,6 +119,20 @@ namespace vanguard{
             const llvm::VectorType& vector;
     };
 
+    class VoidType: public Type{
+        public:
+            explicit VoidType(const llvm::Type&);
+
+            VoidType(const VoidType&) = delete;
+
+            std::string getName() override;
+
+            const llvm::Type &unwrap();
+
+        private:
+            const llvm::Type& voidType;
+    };
+
 }
 
 #endif

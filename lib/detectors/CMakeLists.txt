@@ -6,3 +6,4 @@ target_sources(Vanguard PRIVATE
 
 add_subdirectory(FunctionPrinter)
 add_subdirectory(StatGen)
+add_subdirectory(IRValidator)

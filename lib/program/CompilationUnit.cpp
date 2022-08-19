@@ -15,12 +15,20 @@ namespace vanguard{
 
     Function* CompilationUnit::getFunction(std::string name){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateFunction(module.getFunction(llvm::StringRef(name)));
+        auto function = module.getFunction(llvm::StringRef(name));
+        if (function == nullptr) {
+            return nullptr;
+        }
+        return llvmToVanguard.translateFunction(function);
     }
 
     Value* CompilationUnit::getGlobalVariable(std::string name){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateValue(module.getGlobalVariable(llvm::StringRef(name)));
+        auto globalVariable = module.getGlobalVariable(llvm::StringRef(name), true);
+        if (globalVariable == nullptr){
+            return nullptr;
+        }
+        return llvmToVanguard.translateValue(globalVariable);
     }
 
     std::unordered_set<Function*> CompilationUnit::getAllFunctions(){

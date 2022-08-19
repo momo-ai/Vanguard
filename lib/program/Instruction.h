@@ -24,6 +24,8 @@ namespace vanguard{
 
         bool willReturn();
 
+        bool isTerminator();
+
         unsigned getNumSuccessors();
 
         Block* getSuccessor(unsigned n);
@@ -37,6 +39,9 @@ namespace vanguard{
         virtual const llvm::Instruction &unwrap();
 
     };
+
+    // INstructionClass Template
+    //
 }
 
 #endif

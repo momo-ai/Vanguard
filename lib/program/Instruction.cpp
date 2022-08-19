@@ -24,22 +24,46 @@ namespace vanguard{
         return instruction.willReturn();
     }
 
+    bool Instruction::isTerminator() {
+        return instruction.isTerminator();
+    }
+
     unsigned Instruction::getNumSuccessors(){
-        return instruction.getNumSuccessors();
+        if (instruction.isTerminator()) {
+            return instruction.getNumSuccessors();
+        }
+        else {
+            throw std::runtime_error("Instruction is not a terminator.");
+        }
     }
 
     Block* Instruction::getSuccessor(unsigned n){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateBlock(instruction.getSuccessor(n));
+        if (instruction.isTerminator()) {
+            if (n < instruction.getNumSuccessors()) {
+                auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+                return llvmToVanguard.translateBlock(instruction.getSuccessor(n));
+            } else {
+                throw std::runtime_error("Argument to getSuccessor() is greater number of successors");
+            }
+        }
+        else{
+            throw std::runtime_error("Instruction is not a terminator.");
+        }
+        return nullptr;
     }
 
     std::unordered_set<Block*> Instruction::getAllSuccessors(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        std::unordered_set<Block*> allSuccessors = {};
-        for (auto *Succ : llvm::successors(&instruction)) {
-            allSuccessors.insert(llvmToVanguard.translateBlock(Succ));
+        std::unordered_set<Block *> allSuccessors = {};
+        if (instruction.isTerminator()) {
+            int numSuccessors = instruction.getNumSuccessors();
+            for (int i = 0; i < numSuccessors; i++) {
+                allSuccessors.insert(this->getSuccessor(i));
+            }
+            return allSuccessors;
         }
-        return allSuccessors;
+        else{
+            return allSuccessors;
+        }
     }
 
     Value* Instruction::getOperand(unsigned i){

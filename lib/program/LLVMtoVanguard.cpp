@@ -71,7 +71,7 @@ namespace vanguard{
 
         if (typeMap.find(t) == typeMap.end()){
             if (auto integer = llvm::dyn_cast<llvm::IntegerType>(t)){
-                typeMap[t] = (llvm::dyn_cast<Type>(new IntegerType(*integer)));
+                typeMap[t] = (llvm::dyn_cast<Type>((new IntegerType(*integer))));
             }
             else if (auto array = llvm::dyn_cast<llvm::ArrayType>(t)){
                 typeMap[t] = (llvm::dyn_cast<Type>(new ArrayType(*array)));
@@ -87,6 +87,9 @@ namespace vanguard{
             }
             else if (auto vector = llvm::dyn_cast<llvm::VectorType>(t)){
                 typeMap[t] = (llvm::dyn_cast<Type>(new VectorType(*vector)));
+            }
+            else if (t->isVoidTy()){
+                typeMap[t] = new VoidType(*t);
             }
             else {
                 throw std::runtime_error("Given type cannot be translated since it does not exist in vanguard yet.");

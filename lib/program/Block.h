@@ -13,6 +13,8 @@ namespace vanguard{
 
         Block(const Block&) = delete;
 
+        std::string getName();
+
         Function* getFunction();
 
         std::list<Instruction *> getInstructionsList();

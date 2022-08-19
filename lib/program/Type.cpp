@@ -127,4 +127,13 @@ namespace vanguard{
         return vector;
     }
 
+    VoidType::VoidType(const llvm::Type &vt): voidType(vt) {}
+
+    std::string VoidType::getName() {
+        return "VoidType";
+    }
+
+    const llvm::Type &VoidType::unwrap() {
+        return voidType;
+    }
 }

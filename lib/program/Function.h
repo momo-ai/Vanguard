@@ -23,6 +23,8 @@ namespace vanguard {
 
         std::list<Argument*> getParams();
 
+        std::list<Type *> getParamTypes();
+
         Type* getReturnType();
 
         bool hasBody();

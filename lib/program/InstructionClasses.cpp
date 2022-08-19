@@ -26,7 +26,7 @@ namespace vanguard{
     }
 
     InstructionVariable* BinaryOperator::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(binOp);
+        auto* instvar = new InstructionVariable(binOp);
         return instvar;
     }
 
@@ -50,7 +50,7 @@ namespace vanguard{
     }
 
     InstructionVariable* CmpInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(cmpInst);
+        auto* instvar = new InstructionVariable(cmpInst);
         return instvar;
     }
 
@@ -131,8 +131,7 @@ namespace vanguard{
     }
 
     //Unary Operator
-    UnaryOperator::UnaryOperator(const llvm::Instruction &inst, const llvm::UnaryOperator &uop) : UnaryOpInstruction(
-            inst), unaryOperator(uop) {}
+    UnaryOperator::UnaryOperator(const llvm::Instruction &inst, const llvm::UnaryOperator &uop) : UnaryOpInstruction(inst), unaryOperator(uop) {}
 
     unsigned UnaryOperator::getOpClass(){
         unsigned opcode = unaryOperator.getOpcode();
@@ -153,6 +152,70 @@ namespace vanguard{
         return unaryOperator;
     }
 
+    //Cast Instruction
+    CastInst::CastInst(const llvm::Instruction &inst, const llvm::CastInst &ci): UnaryOpInstruction(inst), castInst(ci){}
+
+    unsigned CastInst::getOpClass() {
+        unsigned opcode = castInst.getOpcode();
+        CastInstClass castInstClass;
+        if (opcode == 38) castInstClass = Trunc;
+        else if(opcode == 39) castInstClass = ZExt;
+        else if(opcode == 40) castInstClass = SExt;
+        else if(41 <= opcode && opcode <= 46) castInstClass = FPCasts;
+        else if(opcode == 47) castInstClass = PtrToInt;
+        else if (opcode == 48) castInstClass = IntToPtr;
+        else if (opcode == 49) castInstClass = BitCast;
+        else if (opcode == 50) castInstClass = AddrSpaceCast;
+        else{
+            throw std::runtime_error("The opcode "+ std::string(castInst.getOpcodeName()) + " is not a unary cast operator class in vanguard.");
+        }
+        return castInstClass;
+    }
+
+    Value* CastInst::getOperand() {
+        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
+        return llvMtoVanguard.translateValue(castInst.getOperand(0));
+    }
+
+    const llvm::CastInst &CastInst::unwrap() {
+        return castInst;
+    }
+
+    //Alloca Instruction
+    AllocaInst::AllocaInst(const llvm::Instruction &inst, const llvm::AllocaInst &ai): UnaryOpInstruction(inst), allocaInst(ai) {}
+
+    Value *AllocaInst::getOperand() {
+        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
+        return llvMtoVanguard.translateValue(allocaInst.getOperand(0));
+    }
+
+    const llvm::AllocaInst &AllocaInst::unwrap() {
+        return allocaInst;
+    }
+
+    //Load Instruction
+    LoadInst::LoadInst(const llvm::Instruction &inst, const llvm::LoadInst &li): UnaryOpInstruction(inst), loadInst(li) {}
+
+    Value *LoadInst::getOperand() {
+        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
+        return llvMtoVanguard.translateValue(loadInst.getOperand(0));
+    }
+
+    const llvm::LoadInst &LoadInst::unwrap() {
+        return loadInst;
+    }
+
+    //Freeze Instruction
+    FreezeInst::FreezeInst(const llvm::Instruction &inst, const llvm::FreezeInst &fi): UnaryOpInstruction(inst), freezeInst(fi) {}
+
+    Value *FreezeInst::getOperand() {
+        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
+        return llvMtoVanguard.translateValue(freezeInst.getOperand(0));
+    }
+
+    const llvm::FreezeInst &FreezeInst::unwrap() {
+        return freezeInst;
+    }
 
     //Call
     Call::Call(const llvm::Instruction &inst, const llvm::CallBase &cb) : CallInstruction(inst), call(cb) {}
@@ -211,7 +274,7 @@ namespace vanguard{
                                                                                         selectInst(si) {}
 
     InstructionVariable* SelectInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(selectInst);
+        auto* instvar = new InstructionVariable(selectInst);
         return instvar;
     }
 
@@ -224,7 +287,7 @@ namespace vanguard{
             : MemoryReadInstruction(inst), extractElementInst(eei) {}
 
     InstructionVariable* ExtractElementInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(extractElementInst);
+        auto* instvar = new InstructionVariable(extractElementInst);
         return instvar;
     }
 
@@ -237,7 +300,7 @@ namespace vanguard{
             : MemoryWriteInstruction(inst), insertValueInst(ivi) {}
 
     MemoryAddress* InsertValueInst::getMemoryAddress(){
-        MemoryAddress* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
+        auto* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
         return memAd;
     }
 
@@ -250,7 +313,7 @@ namespace vanguard{
             : MemoryWriteInstruction(inst), insertElementInst(iei) {}
 
     MemoryAddress* InsertElementInst::getMemoryAddress(){
-        MemoryAddress* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
+        auto* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
         return memAd;
     }
 
@@ -263,7 +326,7 @@ namespace vanguard{
                                                                                      storeInst(si) {}
 
     MemoryAddress* StoreInst::getMemoryAddress(){
-        MemoryAddress* memAd = new MemoryAddress(storeInst.getPointerOperand(), sizeof(storeInst.getValueOperand()->getType()));
+        auto* memAd = new MemoryAddress(storeInst.getPointerOperand(), sizeof(storeInst.getValueOperand()->getType()));
         return memAd;
     }
 
@@ -276,7 +339,7 @@ namespace vanguard{
             : MemoryWriteInstruction(inst), shuffleVectorInst(svi) {}
 
     MemoryAddress* ShuffleVectorInst::getMemoryAddress(){
-        MemoryAddress* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), sizeof(shuffleVectorInst.getOperand(2)));
+        auto* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), sizeof(shuffleVectorInst.getOperand(2)));
         return memAd;
     }
 
@@ -288,7 +351,7 @@ namespace vanguard{
     PHINode::PHINode(const llvm::Instruction &inst, const llvm::PHINode &phin) : AssignInst(inst), phiNode(phin) {}
 
     InstructionVariable* PHINode::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(phiNode);
+        auto* instvar = new InstructionVariable(phiNode);
         return instvar;
     }
 
@@ -301,7 +364,7 @@ namespace vanguard{
             : AssignInst(inst), getElementPtrInst(gepi) {}
 
     InstructionVariable* GetElementPtrInst::getLHS(){
-        InstructionVariable* instvar = new InstructionVariable(getElementPtrInst);
+        auto* instvar = new InstructionVariable(getElementPtrInst);
         return instvar;
     }
 
@@ -329,10 +392,6 @@ namespace vanguard{
 
     }
 
-    std::string ErrorInstruction::error() {
-        return "";
-    }
-
     ReturnInstruction::ReturnInstruction(const llvm::Instruction &inst) : Instruction(inst) {
 
     }
@@ -352,4 +411,5 @@ namespace vanguard{
     AssignInst::AssignInst(const llvm::Instruction &inst) : AssignInstruction(inst) {
 
     }
+
 }

@@ -8,6 +8,7 @@
 #include <llvm/IR/PassInstrumentation.h>
 #include "detectors/StatGen/StatGen.h"
 #include "detectors/FunctionPrinter/FunctionPrinter.h"
+#include "detectors/IRValidator/IRValidator.h"
 #include <llvm/Transforms/IPO/PassManagerBuilder.h>
 
 //registering args: https://stackoverflow.com/questions/67206238/how-to-define-and-read-cli-arguments-for-an-llvm-pass-with-the-new-pass-manager
@@ -30,6 +31,10 @@ namespace vanguard {
     bool registerVanguardModulePasses(llvm::StringRef name, llvm::ModulePassManager &passMgr, llvm::ArrayRef<llvm::PassBuilder::PipelineElement>) {
         if (name == "statGen") {
             passMgr.addPass(vanguard::StatGen());
+            return true;
+        }
+        if (name == "irValidator"){
+            passMgr.addPass(vanguard::IRValidator());
             return true;
         }
         return false;

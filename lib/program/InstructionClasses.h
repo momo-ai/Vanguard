@@ -15,6 +15,8 @@ namespace vanguard{
 
     enum UnaryOpClass{Neg, Not};
 
+    enum CastInstClass{AddrSpaceCast, BitCast, FPCasts, IntToPtr, PtrToInt, SExt, Trunc, ZExt};
+
     //BinaryOpInstruction
     class BinaryOpInstruction: public Instruction{
         public:
@@ -123,8 +125,6 @@ namespace vanguard{
             explicit UnaryOpInstruction(const llvm::Instruction &inst);
 
             virtual Value* getOperand() = 0;
-
-            virtual unsigned getOpClass() = 0;
     };
 
     class UnaryOperator: public UnaryOpInstruction{
@@ -135,12 +135,67 @@ namespace vanguard{
 
             Value* getOperand() override;
 
-            unsigned getOpClass() override;
+            unsigned getOpClass();
 
             const llvm::UnaryOperator &unwrap() override;
 
         private:
             const llvm::UnaryOperator& unaryOperator;
+    };
+
+    class CastInst: public UnaryOpInstruction{
+    public:
+        explicit CastInst(const llvm::Instruction &inst, const llvm::CastInst &ci);
+
+        CastInst(const CastInst&) = delete;
+
+        unsigned getOpClass();
+
+        Value* getOperand() override;
+
+        const llvm::CastInst &unwrap() override;
+
+    private:
+        const llvm::CastInst& castInst;
+    };
+
+    class AllocaInst: public UnaryOpInstruction{
+        public:
+            explicit AllocaInst(const llvm::Instruction&, const llvm::AllocaInst&);
+
+            AllocaInst(const AllocaInst&) = delete;
+
+            Value* getOperand() override;
+
+            const llvm::AllocaInst &unwrap() override;
+        private:
+            const llvm::AllocaInst &allocaInst;
+    };
+
+    class LoadInst: public UnaryOpInstruction{
+    public:
+        explicit LoadInst(const llvm::Instruction&, const llvm::LoadInst&);
+
+        LoadInst(const LoadInst&) = delete;
+
+        Value* getOperand() override;
+
+        const llvm::LoadInst &unwrap() override;
+    private:
+        const llvm::LoadInst& loadInst;
+    };
+
+    class FreezeInst: public UnaryOpInstruction{
+    public:
+        explicit FreezeInst(const llvm::Instruction&, const llvm::FreezeInst&);
+
+        FreezeInst(const FreezeInst&) = delete;
+
+        Value* getOperand() override;
+
+        const llvm::FreezeInst &unwrap() override;
+    private:
+        const llvm::FreezeInst& freezeInst;
     };
 
     //Call Instruction
@@ -174,7 +229,7 @@ namespace vanguard{
         public:
             explicit ErrorInstruction(const llvm::Instruction &inst);
 
-            virtual std::string error();
+            virtual std::string error() = 0;
     };
 
     class UnreachableInstruction: public ErrorInstruction{
