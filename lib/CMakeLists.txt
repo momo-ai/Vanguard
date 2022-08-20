@@ -1,7 +1,10 @@
-add_library(Vanguard SHARED
+add_executable(Vanguard
         # List your source files here.
         Vanguard.cpp
         )
+
+list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+include(AddLLVM)
 
 #if(DEFINED ENV{Z3_HOME})
 #  set(ENV{Z3_DIR} $ENV{Z3_HOME})
@@ -19,11 +22,12 @@ add_library(Vanguard SHARED
   #NO_DEFAULT_PATH
 #)
 
+#list(APPEND VANGUARD_SOURCES Driver.cpp)
+
 add_subdirectory(detectors)
 #add_subdirectory(analysis)
 #add_subdirectory(domain)
 add_subdirectory(program)
-#add_subdirectory(vanguard)
 
 #message(STATUS "Z3_FOUND: ${Z3_FOUND}")
 #message(STATUS "Found Z3 ${Z3_VERSION_STRING}")
@@ -56,25 +60,58 @@ add_subdirectory(program)
 #endif()
 
 # Use C++11 to compile your pass (i.e., supply -std=c++11).
-target_compile_features(Vanguard PRIVATE cxx_range_for cxx_auto_type)
+#target_compile_features(Vanguard PRIVATE cxx_range_for cxx_auto_type)
 
 # LLVM is (typically) built with no C++ RTTI. We need to match that;
 # otherwise, we'll get linker errors about missing RTTI data.
-set_target_properties(Vanguard PROPERTIES
-    COMPILE_FLAGS "-fno-rtti -Wall"
-)
+#set_target_properties(Vanguard PROPERTIES
+#    COMPILE_FLAGS "-fno-rtti -Wall"
+#)
 
 # Get proper shared-library behavior (where symbols are not necessarily
 # resolved when the shared library is linked) on OS X.
-if(APPLE)
-    set_target_properties(Vanguard PROPERTIES
-        LINK_FLAGS "-undefined dynamic_lookup"
-    )
-endif(APPLE)
+#if(APPLE)
+#    set_target_properties(Vanguard PROPERTIES
+#        LINK_FLAGS "-undefined dynamic_lookup"
+#    )
+#endif(APPLE)
 
-target_link_libraries(
-      Vanguard
-      "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>"
-      )   
+#target_link_libraries(
+#      Vanguard
+#      "$<$<PLATFORM_ID:Darwin>:-undefined dynamic_lookup>"
+#      )
+
+set(LLVM_LINK_COMPONENTS
+        LLVM
+        #AllTargetsAsmParsers
+        #AllTargetsCodeGens
+        #AllTargetsDescs
+        #AllTargetsInfos
+        #AggressiveInstCombine
+        LLVMAnalysis
+        LLVMAsmParser
+        LLVMBitWriter
+        LLVMCodeGen
+        LLVMCore
+        LLVMCoroutines
+        LLVMExtensions
+        #IPO
+        LLVMIRReader
+        LLVMInstCombine
+        LLVMInstrumentation
+        LLVMMC
+        LLVMObjCARCOpts
+        LLVMRemarks
+        LLVMScalarOpts
+        LLVMSupport
+        LLVMTarget
+        LLVMTransformUtils
+        LLVMVectorize
+        LLVMPasses
+        )
+
+target_link_libraries(Vanguard PUBLIC
+        ${LLVM_LINK_COMPONENTS}
+        )
 
 add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
