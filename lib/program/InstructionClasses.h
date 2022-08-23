@@ -13,7 +13,7 @@
 namespace vanguard{
 
     template<typename T> class InstructionClass: public Instruction{
-//        static_assert(std::is_base_of<llvm::Instruction, T>::value, "T must inherit from instruction.");
+        static_assert(std::is_base_of<llvm::Instruction, T>::value, "T must inherit from instruction.");
     public:
 
         explicit InstructionClass(InstructionClassEnum ice, const T &inst): Instruction(ice), instructionClassEnum(ice), instr(inst){
@@ -129,7 +129,15 @@ namespace vanguard{
         public:
             explicit CmpInst(const llvm::CmpInst &cmpinst);
 
-            CmpInst(const CmpInst&) = delete;
+            static inline bool classof(const CmpInst &) { return true; }
+            static inline bool classof(const CmpInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == CMP_INST){ return true; }
+                return false;
+            }
+
+        CmpInst(const CmpInst&) = delete;
 
             unsigned getOpClass() override;
 
@@ -153,6 +161,14 @@ namespace vanguard{
         public:
             explicit BranchInst( const llvm::BranchInst &brInst);
 
+            static inline bool classof(const BranchInst &) { return true; }
+            static inline bool classof(const BranchInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == BRANCH_INST){ return true; }
+                return false;
+            }
+
             BranchInst(const BranchInst&) = delete;
 
             bool isConditional();
@@ -171,6 +187,14 @@ namespace vanguard{
         public:
             explicit IndirectBrInst(const llvm::IndirectBrInst &ibrInst);
 
+            static inline bool classof(const IndirectBrInst &) { return true; }
+            static inline bool classof(const IndirectBrInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == INDIRECT_BR_INST){ return true; }
+                return false;
+            }
+
             IndirectBrInst(const IndirectBrInst&) = delete;
 
             Value * getCondition() override;
@@ -186,6 +210,14 @@ namespace vanguard{
     class SwitchInst: public InstructionClass<llvm::SwitchInst>, public BranchInstruction{
         public:
             explicit SwitchInst(const llvm::SwitchInst &swInst);
+
+            static inline bool classof(const SwitchInst &) { return true; }
+            static inline bool classof(const SwitchInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == SWITCH_INST){ return true; }
+                return false;
+            }
 
             SwitchInst(const SwitchInst&) = delete;
 
@@ -209,6 +241,14 @@ namespace vanguard{
         public:
             explicit UnaryOperator(const llvm::UnaryOperator &uop);
 
+            static inline bool classof(const UnaryOperator &) { return true; }
+            static inline bool classof(const UnaryOperator *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == UNARY_OPERATOR){ return true; }
+                return false;
+            }
+
             UnaryOperator(const UnaryOperator&) = delete;
 
             Value* getUnaryOperand() override;
@@ -224,6 +264,14 @@ namespace vanguard{
     class CastInst: public InstructionClass<llvm::CastInst>, public UnaryOpInstruction{
     public:
         explicit CastInst(const llvm::CastInst &ci);
+
+        static inline bool classof(const CastInst &) { return true; }
+        static inline bool classof(const CastInst *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.getInstructionClassEnum() == CAST_INST){ return true; }
+            return false;
+        }
 
         CastInst(const CastInst&) = delete;
 
@@ -249,6 +297,14 @@ namespace vanguard{
         public:
             explicit Call(const llvm::CallBase &cb);
 
+            static inline bool classof(const Call &) { return true; }
+            static inline bool classof(const Call *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == CALL){ return true; }
+                return false;
+            }
+
             Call(const Call&) = delete;
 
             Function* getTarget() override;
@@ -271,6 +327,14 @@ namespace vanguard{
         public:
             explicit UnreachableInstruction(const llvm::UnreachableInst &ui);
 
+            static inline bool classof(const UnreachableInstruction &) { return true; }
+            static inline bool classof(const UnreachableInstruction *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == UNREACHABLE_INSTRUCTION){ return true; }
+                return false;
+            }
+
             UnreachableInstruction(const UnreachableInstruction&) = delete;
 
             std::string error() override;
@@ -292,6 +356,14 @@ namespace vanguard{
     class ReturnInst: public InstructionClass<llvm::ReturnInst>, public ReturnInstruction{
         public:
             explicit ReturnInst(const llvm::ReturnInst &retInst);
+
+            static inline bool classof(const ReturnInst &) { return true; }
+            static inline bool classof(const ReturnInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == RETURN_INST){ return true; }
+                return false;
+            }
 
             ReturnInst(const ReturnInst&) = delete;
 
@@ -319,6 +391,14 @@ namespace vanguard{
         public:
             explicit SelectInst(const llvm::SelectInst &si);
 
+            static inline bool classof(const SelectInst &) { return true; }
+            static inline bool classof(const SelectInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == SELECT_INST){ return true; }
+                return false;
+            }
+
             SelectInst(const SelectInst&) = delete;
 
             InstructionVariable* getLHS() override;
@@ -332,6 +412,14 @@ namespace vanguard{
     class ExtractElementInst: public InstructionClass<llvm::ExtractElementInst>, public MemoryReadInstruction{
         public:
             explicit ExtractElementInst(const llvm::ExtractElementInst &eei);
+
+            static inline bool classof(const ExtractElementInst &) { return true; }
+            static inline bool classof(const ExtractElementInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == EXTRACT_ELEMENT_INST){ return true; }
+                return false;
+            }
 
             ExtractElementInst(const ExtractElementInst&) = delete;
 
@@ -347,6 +435,14 @@ namespace vanguard{
     public:
         explicit ExtractValueInst(const llvm::ExtractValueInst &evi);
 
+        static inline bool classof(const ExtractValueInst &) { return true; }
+        static inline bool classof(const ExtractValueInst *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.getInstructionClassEnum() == EXTRACT_VALUE_INST){ return true; }
+            return false;
+        }
+
         ExtractValueInst(const ExtractValueInst&) = delete;
 
         InstructionVariable* getLHS() override;
@@ -360,6 +456,14 @@ namespace vanguard{
     class LoadInst: public InstructionClass<llvm::LoadInst>, public MemoryReadInstruction{
     public:
         explicit LoadInst(const llvm::LoadInst&);
+
+        static inline bool classof(const LoadInst &) { return true; }
+        static inline bool classof(const LoadInst *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.getInstructionClassEnum() == LOAD_INST){ return true; }
+            return false;
+        }
 
         LoadInst(const LoadInst&) = delete;
 
@@ -381,6 +485,14 @@ namespace vanguard{
         public:
             explicit InsertValueInst(const llvm::InsertValueInst &ivi);
 
+            static inline bool classof(const InsertValueInst &) { return true; }
+            static inline bool classof(const InsertValueInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == INSERT_VALUE_INST){ return true; }
+                return false;
+            }
+
             InsertValueInst(const InsertValueInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
@@ -394,6 +506,14 @@ namespace vanguard{
     class InsertElementInst: public InstructionClass<llvm::InsertElementInst>, public MemoryWriteInstruction{
         public:
             explicit InsertElementInst(const llvm::InsertElementInst &iei);
+
+            static inline bool classof(const InsertElementInst &) { return true; }
+            static inline bool classof(const InsertElementInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == INSERT_ELEMENT_INST){ return true; }
+                return false;
+            }
 
             InsertElementInst(const InsertElementInst&) = delete;
 
@@ -409,6 +529,14 @@ namespace vanguard{
         public:
             explicit StoreInst(const llvm::StoreInst &si);
 
+            static inline bool classof(const StoreInst &) { return true; }
+            static inline bool classof(const StoreInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == STORE_INST){ return true; }
+                return false;
+            }
+
             StoreInst(const StoreInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
@@ -423,6 +551,14 @@ namespace vanguard{
         public:
             explicit ShuffleVectorInst(const llvm::ShuffleVectorInst &svi);
 
+            static inline bool classof(const ShuffleVectorInst &) { return true; }
+            static inline bool classof(const ShuffleVectorInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == SHUFFLE_VECTOR_INST){ return true; }
+                return false;
+            }
+
             ShuffleVectorInst(const ShuffleVectorInst&) = delete;
 
             MemoryAddress* getMemoryAddress() override;
@@ -436,6 +572,14 @@ namespace vanguard{
     class AllocaInst: public InstructionClass<llvm::AllocaInst>, public MemoryWriteInstruction{
     public:
         explicit AllocaInst(const llvm::AllocaInst&);
+
+        static inline bool classof(const AllocaInst &) { return true; }
+        static inline bool classof(const AllocaInst *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.getInstructionClassEnum() == ALLOCA_INST){ return true; }
+            return false;
+        }
 
         AllocaInst(const AllocaInst&) = delete;
 
@@ -457,6 +601,14 @@ namespace vanguard{
         public:
             explicit PHINode(const llvm::PHINode &phin);
 
+            static inline bool classof(const PHINode &) { return true; }
+            static inline bool classof(const PHINode *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == PHI_NODE){ return true; }
+                return false;
+            }
+
             PHINode(const PHINode&) = delete;
 
             InstructionVariable* getLHS() override;
@@ -471,6 +623,14 @@ namespace vanguard{
         public:
             explicit GetElementPtrInst(const llvm::GetElementPtrInst &gepi);
 
+            static inline bool classof(const GetElementPtrInst &) { return true; }
+            static inline bool classof(const GetElementPtrInst *) { return true; }
+            static inline bool classof(const Instruction *inst) { return classof(*inst); }
+            static inline bool classof(const Instruction &inst) {
+                if (inst.getInstructionClassEnum() == GET_ELEMENT_PTR_INST){ return true; }
+                return false;
+            }
+
             InstructionVariable* getLHS() override;
 
             const llvm::GetElementPtrInst &unwrap() override;
@@ -482,6 +642,14 @@ namespace vanguard{
     class FreezeInst: public InstructionClass<llvm::FreezeInst>, public AssignInst{
     public:
         explicit FreezeInst(const llvm::FreezeInst&);
+
+        static inline bool classof(const FreezeInst &) { return true; }
+        static inline bool classof(const FreezeInst *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.getInstructionClassEnum() == FREEZE_INST){ return true; }
+            return false;
+        }
 
         FreezeInst(const FreezeInst&) = delete;
 

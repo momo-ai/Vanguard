@@ -7,6 +7,8 @@
 #include <vector>
 #include <cassert>
 #include "../../Vanguard.h"
+#include "../../program/InstructionClasses.h"
+
 
 namespace vanguard {
     void IRValidator::registerAnalyses() { }
@@ -101,21 +103,25 @@ namespace vanguard {
 
         out << "---- Listing all Instructions with their types ---- \n";
         for(auto fn : unit.getAllFunctions()) {
-            out << fn->getName() << ":\n";
+//            out << fn->getName() << ":\n";
             std::list<Instruction*> instructionsList = fn->getInstructionsList();
             if(!instructionsList.empty()) {
                 for(auto instruction : instructionsList){
-                    out << (instruction)->getName() << ":";
-                    out << instruction->getInstructionType() << " :::: ";
-                    if (instruction->getSuccessor() != nullptr){
-                        out << instruction->getSuccessor()->getInstructionType();
+                    auto call = llvm::dyn_cast<Call>(instruction);
+                    if (call != nullptr){
+                        out << call->getName() << " : " << call->getInstructionType() << "\n";
                     }
-                    else{
-                        for(auto inst : instruction->getAllSuccessors()){
-                            out << inst->getName() << ", ";
-                        }
-                    }
-                    out << "\n";
+//                    out << (instruction)->getName() << ":";
+//                    out << instruction->getInstructionType() << " :::: ";
+//                    if (instruction->getSuccessor() != nullptr){
+//                        out << instruction->getSuccessor()->getInstructionType();
+//                    }
+//                    else{
+//                        for(auto inst : instruction->getAllSuccessors()){
+//                            out << inst->getName() << ", ";
+//                        }
+//                    }
+//                    out << "\n";
                 }
             }
         }
