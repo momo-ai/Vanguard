@@ -22,7 +22,7 @@ namespace vanguard{
         public:
             LLVMtoVanguard(const LLVMtoVanguard&) = delete;
 
-            static vanguard::LLVMtoVanguard& getInstance();
+            static LLVMtoVanguard& getInstance();
         
             CompilationUnit *translateModule(const llvm::Module *module);
 

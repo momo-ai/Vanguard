@@ -5,15 +5,17 @@
 #ifndef VANGUARD_FUNCTIONPRINTER_H
 #define VANGUARD_FUNCTIONPRINTER_H
 
-#include "../IntraproceduralDetector.h"
+#include "../FunctionDetector.h"
 
 namespace vanguard {
-    class FunctionPrinter : public IntraproceduralDetector<FunctionPrinter> {
+    class FunctionPrinter : public FunctionDetector {
     public:
         void registerAnalyses() override;
         void startDetection() override;
-        void detect(Function &fn) override;
+        bool detect(Function &fn) override;
         void report() override;
+
+        static std::string name();
     private:
     };
 }

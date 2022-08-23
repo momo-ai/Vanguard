@@ -44,21 +44,21 @@ Statistics:
 # Instructions: 3316
 ```
 
-### Opt (for running on compiled LLVM bytecode)
+### Vanguard (for running on compiled LLVM bytecode)
 
 To run a particular detector on a compiled LLVM bytecode file, run the following:
 
 ```bash
-opt -load-pass-plugin=<PATH_TO_LIBVANGUARD> --passes="<DETECTORS>" -disable-output <PATH_TO_LLVM_BYTECODE> -o /dev/null
+<PATH_TO_VANGUARD>/Vanguard --detectors "<DETECTORS>" --summary <CONTRACT_SUMMARY> [LLVM_Bytecode_Files]
 ```
 
-where `<PATH_TO_LIBVANGUARD>` is the path to the vanguard `.dylib`/`.so` file (so, if running from the Vanguard folder, 
-this should be `build/lib/libVanguard.dylib`). `<DETECTORS>` is the list of detectors to run, each of which can be 
-specified via `--<DETECTOR_NAME>`. `<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information; 
+where `<PATH_TO_VANGUARD>` is the path to the vanguard executable (so, if running from the Vanguard folder, 
+this should be `build/lib/Vanguard`). `<DETECTORS>` is the list of detectors to run, as a comma separated list. 
+`<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information;
 summaries can be generated for Solidity and Rust contracts using the following tools 
 respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor) 
 and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor). 
-Finally, `<PATH_TO_LLVM_BYTECODE>` is the path to the `.bc` file to be analyzed.
+Finally, `<LLVM_Bytecode_Files>` is the path to one or more `.bc` file to be analyzed.
 
 ## How to Install
 
@@ -121,29 +121,12 @@ the extended [detector documentation](https://github.com/Veridise/Vanguard/wiki/
 
 To add a detector, do the following:
 1. Create a new directory in detectors for the new detector
-2. To create the detector, extend the appropriate base detector. Currently there are: IntraproceduralDetector, IntraproceduralDetector and UnitDetector.
+2. To create the detector, extend the appropriate base detector. Currently there are: ProgramDetector, UnitDetector and FunctionDetector.
 3. Add add_subdirectory(DETECTOR_DIR) to lib/detectors/CMakeLists.txt
 4. Add a CMakeLists.txt in /lib/detectors/DETECTOR_DIR that adds target_sources to Vanguard
-5. In Vanguard.cpp, add the detector to registerVanguardModulePasses or registerVanguardFnPasses depending on the detector type. Note, the conditional determines the name for invoking the pass.
+5. In DetectorRegistry.cpp, add the detector to the registry in the constructor.
 
-## Common Errors
-Here we will list common errors encountered when trying build and run LLVM.
 
-### Common Build Issues
-
-### Common Runtime Issues
-Even if the pass builds, opt might not be able to invoke the pass. Here we will put some of the reasons this might 
-occur.
-
-#### Failed to Load Pass
-
-```bash
-Failed to load passes from '<Vanguard Library>'. Request ignored.
-opt: unknown pass name '<PassName>'
-```
-
-This might occur for the following reasons: 
- * It appears that if there is any function that is declared but not defined, LLVM will fail to load the passes.
 
 
 

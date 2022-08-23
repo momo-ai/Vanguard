@@ -12,7 +12,6 @@ from tabulate import tabulate
 ############################
 # PATHS (NOTE: Update these with correct local paths if necessary!)
 ############################
-OPT_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "opt")
 AS_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "llvm-as")
 LLVM_AS_CMD=AS_PATH + " {} -o {}"
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
@@ -28,6 +27,7 @@ CARGO_TARGET_PATH = os.path.join("target", "debug", "deps")
 # Output path
 OUT_DIR=os.path.join(os.getcwd(), "processed_examples")
 VANGUARD_BUILD_PATH = os.path.join("${PROJECT_BINARY_DIR}", "lib")
+VANGUARD_EXEC = os.path.join(VANGUARD_BUILD_PATH, "Vanguard")
 
 ############################
 # Detectors
@@ -37,7 +37,7 @@ DETECTORS = ["statGen", "fnPrinter"]
 ############################
 # Subprocess Commands
 ############################
-OPT_CMD = "{} -load-pass-plugin={}/{{}} --passes={{}} -disable-output {{}} -o /dev/null".format(OPT_PATH, VANGUARD_BUILD_PATH)
+VANGUARD_CMD = "{} --detectors {{}} {{}}".format(VANGUARD_EXEC)
 # Solidity commands
 IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG_PATH)
 BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG_PATH)
@@ -158,10 +158,10 @@ def run_detector(detector, summary_path):
             # Only process bc files
             class_name = bc_file.replace("_deploy.bc", "")
             bc_path = os.path.join(OUT_DIR, bc_file)
-            opt_cmd = OPT_CMD.format(lib, detector, bc_path)
-            # print(opt_cmd)
+            vanguard_cmd = VANGUARD_CMD.format(detector, bc_path)
+            #print(vanguard_cmd)
             print("Running Vanguard on class {}...".format(class_name), end="")
-            tout = bytes.decode(subprocess.check_output(opt_cmd.split(), stderr=subprocess.DEVNULL))
+            tout = bytes.decode(subprocess.check_output(vanguard_cmd.split(), stderr=subprocess.DEVNULL))
             print("Completed Vanguard.")
             results[class_name] = tout
 

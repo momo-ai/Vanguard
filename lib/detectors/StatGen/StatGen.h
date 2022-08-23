@@ -8,12 +8,14 @@
 #include "../UnitDetector.h"
 
 namespace vanguard {
-    class StatGen : public UnitDetector<StatGen> {
+    class StatGen : public UnitDetector {
     public:
         void registerAnalyses() override;
         void startDetection() override;
         void detect(CompilationUnit &unit) override;
         void report() override;
+
+        static std::string name();
     private:
         void countBody(Block *blk);
 

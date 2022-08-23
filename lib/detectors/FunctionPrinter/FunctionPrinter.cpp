@@ -3,20 +3,23 @@
 //
 
 #include "FunctionPrinter.h"
-#include "../../Vanguard.h"
+#include <iostream>
 
 namespace vanguard {
+    std::string FunctionPrinter::name() {
+        return "fnPrinter";
+    }
+
     void FunctionPrinter::registerAnalyses() {}
 
     void FunctionPrinter::startDetection() {}
 
-    void FunctionPrinter::detect(Function &fn) {
-        auto &out = Vanguard::out();
-        out << "Found Function: " << fn.getName() << "\n";
+    bool FunctionPrinter::detect(Function &fn) {
+        std::cout << "Found Function: " << fn.getName() << std::endl;
+        return false;
     }
 
     void FunctionPrinter::report() {
-        auto &out = Vanguard::out();
-        out << "Done!\n";
+        std::cout << "Done!" << std::endl;
     }
 }
