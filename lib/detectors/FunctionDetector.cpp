@@ -3,12 +3,13 @@
 //
 
 #include "FunctionDetector.h"
+#include <deque>
 
 namespace vanguard {
 
     void FunctionDetector::detect(CompilationUnit &unit) {
         std::unordered_set<Function *> processed;
-        std::list<Function *> fnWorklist;
+        std::deque<Function *> fnWorklist;
         for(auto f : unit.getAllFunctions()) {
             fnWorklist.push_back(f);
         }

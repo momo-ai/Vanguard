@@ -39,13 +39,12 @@ void performDetection(vanguard::ProgramDetector *detector, vanguard::Program &pr
     detector->report();
 }
 
-int main(int argc, char **argv) {
+void initializeLLVM(int argc, char **argv) {
     llvm::InitLLVM init(argc, argv);
     llvm::InitializeAllTargets();
     llvm::InitializeAllTargetMCs();
     llvm::InitializeAllAsmParsers();
     llvm::InitializeAllAsmParsers();
-
     llvm::PassRegistry &registry = *llvm::PassRegistry::getPassRegistry();
     llvm::initializeCore(registry);
     llvm::initializeCoroutines(registry);
@@ -87,8 +86,10 @@ int main(int argc, char **argv) {
     llvm::initializeReplaceWithVeclibLegacyPass(registry);
 
     llvm::cl::ParseCommandLineOptions(argc, argv, "Vanguard Static Analyzer\n");
+}
 
-    llvm::Optional<llvm::PGOOptions> P = llvm::None;
+int main(int argc, char **argv) {
+    initializeLLVM(argc, argv);
 
     llvm::LoopAnalysisManager LAM;
     llvm::FunctionAnalysisManager FAM;
@@ -100,9 +101,7 @@ int main(int argc, char **argv) {
     PrintPassOpts.Verbose = true;
     PrintPassOpts.SkipAnalyses = false;
     llvm::StandardInstrumentations SI(true, true, PrintPassOpts);
-
     llvm::PipelineTuningOptions PTO;
-
     PTO.LoopUnrolling = false;
 
     /*llvm::Triple ModuleTriple(modules[0]->getTargetTriple());
@@ -123,11 +122,11 @@ int main(int argc, char **argv) {
     }
 
     std::unique_ptr<llvm::TargetMachine> TM(Machine);*/
-    llvm::PassBuilder PB(nullptr, PTO, P, &PIC);
+    llvm::PassBuilder PB(nullptr, PTO, llvm::None, &PIC);
 
     llvm::AAManager AA;
     if (auto Err = PB.parseAAPipeline(AA, "default")) {
-        return 1;
+        return EXIT_FAILURE;
     }
 
     FAM.registerPass([&] { return std::move(AA); });
@@ -183,7 +182,11 @@ int main(int argc, char **argv) {
             if(detector == nullptr) {
                 llvm::errs() << "Unknown pass: " << name << "\n";
             }
-            else {
+        }
+
+        for(auto name : detectors) {
+            auto detector = detectorRegistry.get(name);
+            if(detector != nullptr) {
                 performDetection(detector, prog);
             }
         }
