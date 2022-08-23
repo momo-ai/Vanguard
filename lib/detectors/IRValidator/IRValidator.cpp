@@ -30,7 +30,7 @@ namespace vanguard {
             totBlks++;
 
             for(auto ins : curBlk->getInstructionsList()) {
-                assert(curBlk == ins->getBlock() && "Block does not match instruction block");
+//                assert(curBlk == ins->getBlock() && "Block does not match instruction block");
                 totIns++;
             }
 
@@ -60,7 +60,7 @@ namespace vanguard {
 
         out << "\n ---- Listing global variables with their types ---- \n";
         for (auto globalVariableValue: unit.getAllGlobalVariables()){
-            auto globalVariable = (GlobalVariable *)(globalVariableValue);
+            auto globalVariable = llvm::dyn_cast<GlobalVariable>(globalVariableValue);
             if (globalVariable->hasName()) {
                 auto globalVariableFromName = (GlobalVariable *)unit.getGlobalVariable(globalVariable->getName());
                 assert(globalVariableFromName == globalVariable && "globalVariable and globalVariableFromName ");
@@ -73,10 +73,10 @@ namespace vanguard {
         std::vector< std::string > functionsNames = {};
         std::vector< std::list< Argument* > > functionsArguments = {};
         std::vector< std::list< Type* > > functionsArgumentTypes = {};
-        std::vector< Type*> functionReturnTypes = {};
+        std::vector< Type* > functionReturnTypes = {};
         int numFunctions = 0;
         for (auto function: unit.getAllFunctions()){
-            auto functionFromName = (Function *)unit.getFunction(function->getName());
+            auto functionFromName = unit.getFunction(function->getName());
             assert(functionFromName != nullptr && "Function from name is null.");
             assert(function == functionFromName && "Function and function from name are not the same." );
             functionsNames.push_back(function->getName());
@@ -105,16 +105,20 @@ namespace vanguard {
             std::list<Instruction*> instructionsList = fn->getInstructionsList();
             if(!instructionsList.empty()) {
                 for(auto instruction : instructionsList){
-                    out << instruction->getInstructionType() << "\n";
-//                    out << instruction->getInstructionType() << ": \n";
-//                    for(auto block: instruction->getAllSuccessors()){
-//                        out << block->getName() << ", ";
-//                    }
-//                    out << "\n";
+                    out << (instruction)->getName() << ":";
+                    out << instruction->getInstructionType() << " :::: ";
+                    if (instruction->getSuccessor() != nullptr){
+                        out << instruction->getSuccessor()->getInstructionType();
+                    }
+                    else{
+                        for(auto inst : instruction->getAllSuccessors()){
+                            out << inst->getName() << ", ";
+                        }
+                    }
+                    out << "\n";
                 }
             }
         }
-
     }
 
     void IRValidator::report() {
