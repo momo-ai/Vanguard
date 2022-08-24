@@ -48,19 +48,21 @@ namespace vanguard{
             const llvm::ArrayType& array;
     };
 
-    // class FunctionT: public Type{
-    //     public:
-    //         FunctionT(llvm::FunctionType& function);
-
-    //         Type* getReturnType();
-
-    //         unsigned getNumParams();
-
-    //         std::list<Type*> getParamsType();
-
-    //     private:
-    //         llvm::FunctionType& function;
-    // };
+//     class FunctionT: public Type{
+//         public:
+//             explicit FunctionT(const llvm::FunctionType& function);
+//
+//             std::string getName() override;
+//
+//             Type* getReturnType();
+//
+//             unsigned getNumParams();
+//
+//             std::list<Type*> getParamsType();
+//
+//         private:
+//             const llvm::FunctionType& function;
+//     };
 
     class PointerType: public Type{
         public:

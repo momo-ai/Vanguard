@@ -34,6 +34,10 @@ namespace vanguard{
         return binOp;
     }
 
+    void BinaryOperator::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
 
     //Compare Instruction
     CmpInst::CmpInst(const llvm::CmpInst &cmpinst) : InstructionClass<llvm::CmpInst>(CMP_INST, cmpinst), cmpInst(cmpinst) {}
@@ -56,6 +60,11 @@ namespace vanguard{
     const llvm::CmpInst &CmpInst::unwrap(){
         return cmpInst;
     }
+
+    void CmpInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
 
     //Branch Inst
     BranchInst::BranchInst(const llvm::BranchInst &brInst) : InstructionClass<llvm::BranchInst>(BRANCH_INST,brInst), branchInst(brInst) {}
@@ -83,6 +92,10 @@ namespace vanguard{
         return branchInst;
     }
 
+    void BranchInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Indirect Branch Instruction
     IndirectBrInst::IndirectBrInst(const llvm::IndirectBrInst &ibrInst) : InstructionClass<llvm::IndirectBrInst>(INDIRECT_BR_INST,ibrInst), indirectBrInst(ibrInst) {}
 
@@ -102,6 +115,10 @@ namespace vanguard{
 
     const llvm::IndirectBrInst &IndirectBrInst::unwrap(){
         return indirectBrInst;
+    }
+
+    void IndirectBrInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Switch Instruction
@@ -126,6 +143,10 @@ namespace vanguard{
         return switchInst;
     }
 
+    void SwitchInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Unary Operator
     UnaryOperator::UnaryOperator(const llvm::UnaryOperator &uop) : InstructionClass<llvm::UnaryOperator>(UNARY_OPERATOR,uop), unaryOperator(uop) {}
 
@@ -146,6 +167,10 @@ namespace vanguard{
 
     const llvm::UnaryOperator &UnaryOperator::unwrap(){
         return unaryOperator;
+    }
+
+    void UnaryOperator::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Cast Instruction
@@ -177,6 +202,10 @@ namespace vanguard{
         return castInst;
     }
 
+    void CastInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Call
     Call::Call(const llvm::CallBase &cb) : InstructionClass<llvm::CallBase>(CALL, cb), call(cb) {}
 
@@ -198,6 +227,9 @@ namespace vanguard{
         return call;
     }
 
+    void Call::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
 
     //Unreachable Instruction
     UnreachableInstruction::UnreachableInstruction(const llvm::UnreachableInst &ui)
@@ -209,6 +241,10 @@ namespace vanguard{
 
     const llvm::UnreachableInst &UnreachableInstruction::unwrap(){
         return unreachableInstruction;
+    }
+
+    void UnreachableInstruction::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Return Inst
@@ -229,6 +265,10 @@ namespace vanguard{
         return returnInst;
     }
 
+    void ReturnInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Select Inst
     SelectInst::SelectInst(const llvm::SelectInst &si) : InstructionClass<llvm::SelectInst>(SELECT_INST, si),
                                                                                         selectInst(si) {}
@@ -240,6 +280,10 @@ namespace vanguard{
 
     const llvm::SelectInst &SelectInst::unwrap(){
         return selectInst;
+    }
+
+    void SelectInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Extract Element Inst
@@ -255,6 +299,10 @@ namespace vanguard{
         return extractElementInst;
     }
 
+    void ExtractElementInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Extract Value Inst
     ExtractValueInst::ExtractValueInst(const llvm::ExtractValueInst &evi)
             : InstructionClass<llvm::ExtractValueInst>(EXTRACT_VALUE_INST, evi), extractValueInst(evi) {}
@@ -266,6 +314,10 @@ namespace vanguard{
 
     const llvm::ExtractValueInst &ExtractValueInst::unwrap(){
         return extractValueInst;
+    }
+
+    void ExtractValueInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Load Instruction
@@ -285,6 +337,10 @@ namespace vanguard{
         return loadInst;
     }
 
+    void LoadInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Insert Value Inst
     InsertValueInst::InsertValueInst(const llvm::InsertValueInst &ivi)
             : InstructionClass<llvm::InsertValueInst>(INSERT_VALUE_INST, ivi), insertValueInst(ivi) {}
@@ -296,6 +352,10 @@ namespace vanguard{
 
     const llvm::InsertValueInst &InsertValueInst::unwrap(){
         return insertValueInst;
+    }
+
+    void InsertValueInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Insert Element Inst
@@ -311,6 +371,10 @@ namespace vanguard{
         return insertElementInst;
     }
 
+    void InsertElementInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Store Inst
     StoreInst::StoreInst(const llvm::StoreInst &si) : InstructionClass<llvm::StoreInst>(STORE_INST, si),
                                                                                      storeInst(si) {}
@@ -324,6 +388,10 @@ namespace vanguard{
         return storeInst;
     }
 
+    void StoreInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //Shuffule Vector Inst
     ShuffleVectorInst::ShuffleVectorInst(const llvm::ShuffleVectorInst &svi)
             : InstructionClass<llvm::ShuffleVectorInst>(SHUFFLE_VECTOR_INST, svi), shuffleVectorInst(svi) {}
@@ -335,6 +403,10 @@ namespace vanguard{
 
     const llvm::ShuffleVectorInst &ShuffleVectorInst::unwrap(){
         return shuffleVectorInst;
+    }
+
+    void ShuffleVectorInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Alloca Instruction
@@ -354,6 +426,10 @@ namespace vanguard{
         return allocaInst;
     }
 
+    void AllocaInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
     //PHI Node
     PHINode::PHINode(const llvm::PHINode &phin) : InstructionClass<llvm::PHINode>(PHI_NODE, phin), phiNode(phin) {}
 
@@ -364,6 +440,10 @@ namespace vanguard{
 
     const llvm::PHINode &PHINode::unwrap(){
         return phiNode;
+    }
+
+    void PHINode::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Get element pointer
@@ -377,6 +457,10 @@ namespace vanguard{
 
     const llvm::GetElementPtrInst &GetElementPtrInst::unwrap(){
         return getElementPtrInst;
+    }
+
+    void GetElementPtrInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
     //Freeze Instruction
@@ -394,6 +478,10 @@ namespace vanguard{
     InstructionVariable* FreezeInst::getLHS(){
         auto* instvar = new InstructionVariable(freezeInst);
         return instvar;
+    }
+
+    void FreezeInst::accept(InstructionClassVisitor &v) const {
+        return v.visit(*this);
     }
 
 }

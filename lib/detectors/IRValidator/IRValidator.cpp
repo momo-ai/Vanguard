@@ -1,7 +1,3 @@
-//
-// Created by Jon Stephens on 8/14/22.
-//
-
 #include "IRValidator.h"
 #include <unordered_set>
 #include <vector>
@@ -32,7 +28,7 @@ namespace vanguard {
             totBlks++;
 
             for(auto ins : curBlk->getInstructionsList()) {
-//                assert(curBlk == ins->getBlock() && "Block does not match instruction block");
+                assert(curBlk == ins->getBlock() && "Block does not match instruction block");
                 totIns++;
             }
 
@@ -103,25 +99,11 @@ namespace vanguard {
 
         out << "---- Listing all Instructions with their types ---- \n";
         for(auto fn : unit.getAllFunctions()) {
-//            out << fn->getName() << ":\n";
+            out << fn->getName() << ":\n";
             std::list<Instruction*> instructionsList = fn->getInstructionsList();
             if(!instructionsList.empty()) {
-                for(auto instruction : instructionsList){
-                    auto call = llvm::dyn_cast<Call>(instruction);
-                    if (call != nullptr){
-                        out << call->getName() << " : " << call->getInstructionType() << "\n";
-                    }
-//                    out << (instruction)->getName() << ":";
-//                    out << instruction->getInstructionType() << " :::: ";
-//                    if (instruction->getSuccessor() != nullptr){
-//                        out << instruction->getSuccessor()->getInstructionType();
-//                    }
-//                    else{
-//                        for(auto inst : instruction->getAllSuccessors()){
-//                            out << inst->getName() << ", ";
-//                        }
-//                    }
-//                    out << "\n";
+                for (auto instruction: instructionsList) {
+                    out << instruction->getName() << " : " << instruction->getInstructionType() << "\n";
                 }
             }
         }

@@ -2,7 +2,6 @@
 #define VANGUARD_PROGRAM_INSTRUCTION_H
 
 #include "Function.h"
-#include <unordered_set>
 #include "llvm/IR/Instruction.h"
 
 namespace vanguard{
@@ -75,7 +74,7 @@ namespace vanguard{
 
         virtual Instruction * getSuccessor() = 0;
 
-        virtual std::unordered_set<Instruction*> getAllSuccessors() = 0;
+        virtual std::list<Instruction*> getAllSuccessors() = 0;
 
         virtual Value* getOperand(unsigned i) = 0;
 

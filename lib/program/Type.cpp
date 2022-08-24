@@ -41,25 +41,29 @@ namespace vanguard{
     }
 
     //Function subclass
-    // FunctionT::FunctionT(llvm::FunctionType& func): function(func){}
-
-    // Type* FunctionT::getReturnType(){
-    //     LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-    //     return llvmToVanguard->translateType(*function.getReturnType());
-    // }
-
-    // unsigned FunctionT::getNumParams(){
-    //     return function.getNumParams();
-    // }
-
-    // std::list<Type*> FunctionT::getParamsType(){
-    //     LLVMtoVanguard* llvmToVanguard = LLVMtoVanguard::getInstance();
-    //     std::list<Type*> paramsTypeList = {};
-    //     for(auto param: function.params()){
-    //         paramsTypeList.push_back(llvmToVanguard->translateType(*param));
-    //     }
-    //     return paramsTypeList;
-    // }
+//     FunctionT::FunctionT(const llvm::FunctionType& func): function(func){}
+//
+//     Type* FunctionT::getReturnType(){
+//         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
+//         return llvmToVanguard.translateType(function.getReturnType());
+//     }
+//
+//     unsigned FunctionT::getNumParams(){
+//         return function.getNumParams();
+//     }
+//
+//     std::list<Type*> FunctionT::getParamsType(){
+//         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
+//         std::list<Type*> paramsTypeList = {};
+//         for(auto param: function.params()){
+//             paramsTypeList.push_back(llvmToVanguard.translateType(param));
+//         }
+//         return paramsTypeList;
+//     }
+//
+//     std::string FunctionT::getName() {
+//        return "Function";
+//    }
 
     //Pointer subclass
     PointerType::PointerType(const llvm::PointerType& ptr): pointer(ptr){}
@@ -96,8 +100,8 @@ namespace vanguard{
     std::list<Type*> StructType::getFieldTypes(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Type*> fieldTypesList = {};
-        int numFields = structT.getStructNumElements();
-        for(int n = 0; n < numFields; n++){
+        unsigned numFields = structT.getStructNumElements();
+        for(unsigned n = 0; n < numFields; n++){
             fieldTypesList.push_back(llvmToVanguard.translateType(structT.getStructElementType(n)));
         }
         return fieldTypesList;

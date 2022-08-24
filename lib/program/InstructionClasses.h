@@ -11,7 +11,7 @@
 #include <list>
 
 namespace vanguard{
-
+    class InstructionClassVisitor;
     template<typename T> class InstructionClass: public Instruction{
         static_assert(std::is_base_of<llvm::Instruction, T>::value, "T must inherit from instruction.");
     public:
@@ -42,6 +42,9 @@ namespace vanguard{
         }
 
         Instruction* getSuccessor() override{
+            if (instruction->isTerminator()){
+                return nullptr;
+            }
             auto nextInst = instruction->getNextNonDebugInstruction();
             if (nextInst == nullptr){
                 return nullptr;
@@ -52,13 +55,13 @@ namespace vanguard{
             }
         }
 
-        std::unordered_set<Instruction*> getAllSuccessors() override{
-            std::unordered_set<Instruction *> allSuccessors = {};
+        std::list<Instruction*> getAllSuccessors() override{
+            std::list<Instruction *> allSuccessors = {};
             if (instruction->isTerminator()) {
                 auto &llvmToVanguard = LLVMtoVanguard::getInstance();
                 int numSuccessors = instruction->getNumSuccessors();
                 for (int i = 0; i < numSuccessors; i++) {
-                    allSuccessors.insert(llvmToVanguard.translateBlock(instruction->getSuccessor(i))->getInstructionsList().front());
+                    allSuccessors.push_back(llvmToVanguard.translateBlock(instruction->getSuccessor(i))->getInstructionsList().front());
                 }
                 return allSuccessors;
             }
@@ -79,6 +82,8 @@ namespace vanguard{
         const llvm::Instruction &unwrap() override{
             return *instruction;
         }
+
+        virtual void accept(InstructionClassVisitor &v) const = 0;
 
     private:
         InstructionClassEnum  instructionClassEnum;
@@ -112,14 +117,15 @@ namespace vanguard{
                 return false;
             }
 
-
-        BinaryOperator(const BinaryOperator&) = delete;
+            BinaryOperator(const BinaryOperator&) = delete;
 
             unsigned getOpClass() override;
 
             InstructionVariable* getLHS() override;
 
             const llvm::BinaryOperator &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::BinaryOperator& binOp;
@@ -144,6 +150,8 @@ namespace vanguard{
             InstructionVariable* getLHS() override;
 
             const llvm::CmpInst &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::CmpInst& cmpInst;
@@ -179,6 +187,8 @@ namespace vanguard{
 
             const llvm::BranchInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::BranchInst& branchInst;
     };
@@ -203,6 +213,8 @@ namespace vanguard{
 
             const llvm::IndirectBrInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::IndirectBrInst& indirectBrInst;
     };
@@ -226,6 +238,8 @@ namespace vanguard{
             std::list<Block*> getSuccessors() override;
 
             const llvm::SwitchInst &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::SwitchInst& switchInst;
@@ -257,6 +271,8 @@ namespace vanguard{
 
             const llvm::UnaryOperator &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::UnaryOperator& unaryOperator;
     };
@@ -280,6 +296,8 @@ namespace vanguard{
         Value* getUnaryOperand() override;
 
         const llvm::CastInst &unwrap() override;
+
+        void accept(InstructionClassVisitor &v) const override;
 
     private:
         const llvm::CastInst& castInst;
@@ -313,6 +331,8 @@ namespace vanguard{
 
             const llvm::CallBase &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::CallBase& call;
     };
@@ -340,6 +360,8 @@ namespace vanguard{
             std::string error() override;
 
             const llvm::UnreachableInst &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::UnreachableInst& unreachableInstruction;
@@ -373,6 +395,8 @@ namespace vanguard{
 
             const llvm::ReturnInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::ReturnInst& returnInst;
     };
@@ -405,6 +429,8 @@ namespace vanguard{
 
             const llvm::SelectInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::SelectInst& selectInst;
     };
@@ -427,6 +453,8 @@ namespace vanguard{
 
             const llvm::ExtractElementInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::ExtractElementInst& extractElementInst;
     };
@@ -448,6 +476,8 @@ namespace vanguard{
         InstructionVariable* getLHS() override;
 
         const llvm::ExtractValueInst &unwrap() override;
+
+        void accept(InstructionClassVisitor &v) const override;
 
     private:
         const llvm::ExtractValueInst& extractValueInst;
@@ -472,6 +502,9 @@ namespace vanguard{
         InstructionVariable* getLHS() override;
 
         const llvm::LoadInst &unwrap() override;
+
+        void accept(InstructionClassVisitor &v) const override;
+
     private:
         const llvm::LoadInst& loadInst;
     };
@@ -499,6 +532,8 @@ namespace vanguard{
 
             const llvm::InsertValueInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::InsertValueInst& insertValueInst;
     };
@@ -520,6 +555,8 @@ namespace vanguard{
             MemoryAddress* getMemoryAddress() override;
 
             const llvm::InsertElementInst &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::InsertElementInst& insertElementInst;
@@ -543,6 +580,8 @@ namespace vanguard{
 
             const llvm::StoreInst &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::StoreInst& storeInst;
     };
@@ -564,6 +603,8 @@ namespace vanguard{
             MemoryAddress* getMemoryAddress() override;
 
             const llvm::ShuffleVectorInst &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::ShuffleVectorInst& shuffleVectorInst;
@@ -588,6 +629,9 @@ namespace vanguard{
         Value* getUnaryOperand();
 
         const llvm::AllocaInst &unwrap() override;
+
+        void accept(InstructionClassVisitor &v) const override;
+
     private:
         const llvm::AllocaInst &allocaInst;
     };
@@ -615,6 +659,8 @@ namespace vanguard{
 
             const llvm::PHINode &unwrap() override;
 
+            void accept(InstructionClassVisitor &v) const override;
+
         private:
             const llvm::PHINode& phiNode;
     };
@@ -634,6 +680,8 @@ namespace vanguard{
             InstructionVariable* getLHS() override;
 
             const llvm::GetElementPtrInst &unwrap() override;
+
+            void accept(InstructionClassVisitor &v) const override;
 
         private:
             const llvm::GetElementPtrInst& getElementPtrInst;
@@ -658,8 +706,37 @@ namespace vanguard{
         InstructionVariable* getLHS() override;
 
         const llvm::FreezeInst &unwrap() override;
+
+        void accept(InstructionClassVisitor &v) const override;
+
     private:
         const llvm::FreezeInst& freezeInst;
+    };
+
+    class InstructionClassVisitor{
+    public:
+        virtual void visit(const BinaryOperator &v) = 0;
+        virtual void visit(const CmpInst &v) = 0;
+        virtual void visit(const BranchInst &v) = 0;
+        virtual void visit(const IndirectBrInst &v) = 0;
+        virtual void visit(const SwitchInst &v) = 0;
+        virtual void visit(const UnaryOperator &v) = 0;
+        virtual void visit(const CastInst &v) = 0;
+        virtual void visit(const Call &v) = 0;
+        virtual void visit(const UnreachableInstruction &v) = 0;
+        virtual void visit(const ReturnInst &v) = 0;
+        virtual void visit(const SelectInst &v) = 0;
+        virtual void visit(const ExtractElementInst &v) = 0;
+        virtual void visit(const ExtractValueInst &v) = 0;
+        virtual void visit(const LoadInst &v) = 0;
+        virtual void visit(const InsertValueInst &v) = 0;
+        virtual void visit(const InsertElementInst &v) = 0;
+        virtual void visit(const StoreInst &v) = 0;
+        virtual void visit(const ShuffleVectorInst &v) = 0;
+        virtual void visit(const AllocaInst &v) = 0;
+        virtual void visit(const PHINode &v) = 0;
+        virtual void visit(const GetElementPtrInst &v) = 0;
+        virtual void visit(const FreezeInst &v) = 0;
     };
 
 }

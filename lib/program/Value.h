@@ -9,10 +9,11 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/Instruction.h"
+//#include "LLVMtoVanguard.h"
 
 namespace vanguard{
 
-    enum ValueClass{
+    enum ValueClassEnum{
         VARIABLE_BEGIN,
         GLOBAL_VARIABLE = VARIABLE_BEGIN,
         ARGUMENT,
@@ -25,214 +26,262 @@ namespace vanguard{
         LITERAL_END = BOOLEAN_LITERAL,
         MEMORY_ADDRESS_BEGIN,
         MEMORY_ADDRESS = MEMORY_ADDRESS_BEGIN,
-        MEMORY_ADDRESS_END = MEMORY_ADDRESS
+        MEMORY_ADDRESS_END = MEMORY_ADDRESS,
+        CONSTANT_BEGIN,
+        CONSTANT = CONSTANT_BEGIN,
+        CONSTANT_END = CONSTANT
     };
 
+    class ValueClassVisitor;
     class Value{
-        public:
-            explicit Value(ValueClass vc);
+    public:
+        explicit Value(ValueClassEnum vc);
 
-            static inline bool classof(const Value &) { return true; }
-            static inline bool classof(const Value *) { return true; }
+        static inline bool classof(const Value &) { return true; }
+        static inline bool classof(const Value *) { return true; }
 
-            ValueClass getClass() const;
+        virtual Type* getType() = 0;
 
-        private:
-            ValueClass valueClass;
+        ValueClassEnum getClass() const;
+
+        virtual void accept(ValueClassVisitor &v) const = 0;
+
+    private:
+        ValueClassEnum valueClass;
     };
 
-    class Variable: public Value{
-        public:
-            explicit Variable(ValueClass);
-
-            virtual Type* getType() = 0;
-            virtual bool hasName() = 0;
-            virtual std::string getName() = 0;
-
-        private:
-            ValueClass valueClass;
+    class Variable{
+    public:
+        virtual Type* getType() = 0;
+        virtual bool hasName() = 0;
+        virtual std::string getName() = 0;
     };
 
-    class GlobalVariable: public Variable{
-        public:
-            explicit GlobalVariable(const llvm::GlobalVariable &);
+    class GlobalVariable: public Value, public Variable{
+    public:
+        explicit GlobalVariable(const llvm::GlobalVariable &);
 
-            static inline bool classof(const GlobalVariable &) { return true; }
-            static inline bool classof(const GlobalVariable *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == GLOBAL_VARIABLE){ return true; }
-                return false;
-            }
+        static inline bool classof(const GlobalVariable &) { return true; }
+        static inline bool classof(const GlobalVariable *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == GLOBAL_VARIABLE){ return true; }
+            return false;
+        }
 
-            GlobalVariable(const GlobalVariable&) = delete;
+        GlobalVariable(const GlobalVariable&) = delete;
 
-            Type* getType() override;
+        Type* getType() override;
 
-            bool hasName() override;
+        bool hasName() override;
 
-            std::string getName() override;
+        std::string getName() override;
 
-            const llvm::GlobalVariable &unwrap();
+        const llvm::GlobalVariable &unwrap();
 
-        private:
-            const llvm::GlobalVariable& globalVariable;
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::GlobalVariable& globalVariable;
     };
 
-    class Argument: public Variable{
-        public:
-            explicit Argument(const llvm::Argument&);
+    class Argument: public Value, public Variable{
+    public:
+        explicit Argument(const llvm::Argument&);
 
-            static inline bool classof(const Argument &) { return true; }
-            static inline bool classof(const Argument *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == ARGUMENT){ return true; }
-                return false;
-            }
+        static inline bool classof(const Argument &) { return true; }
+        static inline bool classof(const Argument *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == ARGUMENT){ return true; }
+            return false;
+        }
 
-            Argument(const Argument&) = delete;
+        Argument(const Argument&) = delete;
 
-            Type* getType() override;
+        Type* getType() override;
 
-            bool hasName() override;
+        bool hasName() override;
 
-            std::string getName() override;
+        std::string getName() override;
 
-            const llvm::Argument &unwrap();
+        const llvm::Argument &unwrap();
 
-        private:
-            const llvm::Argument& argument;
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::Argument& argument;
     };
 
-    class InstructionVariable: public Variable{
-        public:
-            explicit InstructionVariable(const llvm::Instruction &);
+    class InstructionVariable: public Value, public Variable{
+    public:
+        explicit InstructionVariable(const llvm::Instruction &);
 
-            static inline bool classof(const InstructionVariable &) { return true; }
-            static inline bool classof(const InstructionVariable *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == INSTRUCTION_VARIABLE){ return true; }
-                return false;
-            }
+        static inline bool classof(const InstructionVariable &) { return true; }
+        static inline bool classof(const InstructionVariable *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == INSTRUCTION_VARIABLE){ return true; }
+            return false;
+        }
 
-            InstructionVariable(const InstructionVariable&) = delete;
+        InstructionVariable(const InstructionVariable&) = delete;
 
-            Type* getType() override;
+        Type* getType() override;
 
-            bool hasName() override;
+        bool hasName() override;
 
-            std::string getName() override;
+        std::string getName() override;
 
-            const llvm::Instruction &unwrap();
+        const llvm::Instruction &unwrap();
 
-        private:
-            const llvm::Instruction& instructionVariable;
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::Instruction& instructionVariable;
     };
 
     template <class T>
-    class Literal: public Value{
-        public:
-            explicit Literal(ValueClass vc): Value(vc), valueClass(vc){};
-
-            virtual T getValue() = 0;
-        private:
-            ValueClass valueClass;
+    class Literal{
+    public:
+        virtual T getValue() = 0;
     };
 
-    class IntegerLiteral: public Literal<int>{
-        public:
-            explicit IntegerLiteral(const llvm::ConstantInt &);
+    class IntegerLiteral: public Value, public Literal<int>{
+    public:
+        explicit IntegerLiteral(const llvm::ConstantInt &);
 
-            static inline bool classof(const IntegerLiteral &) { return true; }
-            static inline bool classof(const IntegerLiteral *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == INTEGER_LITERAL){ return true; }
-                return false;
-            }
+        static inline bool classof(const IntegerLiteral &) { return true; }
+        static inline bool classof(const IntegerLiteral *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == INTEGER_LITERAL){ return true; }
+            return false;
+        }
 
-            IntegerLiteral(const IntegerLiteral&) = delete;
+        IntegerLiteral(const IntegerLiteral&) = delete;
 
-            int getValue() override;
+        int getValue() override;
 
-            const llvm::ConstantInt &unwrap();
+        Type* getType() override;
 
-        private:
-            const llvm::ConstantInt& constInt;
+        const llvm::ConstantInt &unwrap();
+
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::ConstantInt& constInt;
     };
 
-    class StringLiteral: public Literal<std::string>{
-        public:
-            explicit StringLiteral(const llvm::ConstantDataSequential &);
+    class StringLiteral: public Value, public Literal<std::string>{
+    public:
+        explicit StringLiteral(const llvm::ConstantDataSequential &);
 
-            static inline bool classof(const StringLiteral &) { return true; }
-            static inline bool classof(const StringLiteral *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == STRING_LITERAL){ return true; }
-                return false;
-            }
+        static inline bool classof(const StringLiteral &) { return true; }
+        static inline bool classof(const StringLiteral *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == STRING_LITERAL){ return true; }
+            return false;
+        }
 
-            StringLiteral(const StringLiteral&) = delete;
+        StringLiteral(const StringLiteral&) = delete;
 
-            std::string getValue() override;
+        std::string getValue() override;
 
-            const llvm::ConstantDataSequential &unwrap();
+        Type* getType() override;
 
-        private:
-            const llvm::ConstantDataSequential& constSeq;
+        const llvm::ConstantDataSequential &unwrap();
+
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::ConstantDataSequential& constSeq;
     };
 
     class BooleanLiteral: public Literal<bool>{
-        public:
-            explicit BooleanLiteral(bool);
+    public:
+        explicit BooleanLiteral(bool);
 
-            static inline bool classof(const BooleanLiteral &) { return true; }
-            static inline bool classof(const BooleanLiteral *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == BOOLEAN_LITERAL){ return true; }
-                return false;
-            }
+        static inline bool classof(const BooleanLiteral &) { return true; }
+        static inline bool classof(const BooleanLiteral *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == BOOLEAN_LITERAL){ return true; }
+            return false;
+        }
 
-            BooleanLiteral(const BooleanLiteral&) = delete;
+        BooleanLiteral(const BooleanLiteral&) = delete;
 
-            bool getValue() override;
-        
-        private:
-            bool constBool;
+        bool getValue() override;
+
+    private:
+        bool constBool;
     };
 
     class MemoryAddress: public Value{
-        public:
-            MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
+    public:
+        MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
 
-            MemoryAddress(const llvm::Value* ptr, unsigned long sz);
+        MemoryAddress(const llvm::Value* ptr, unsigned long sz);
 
-            static inline bool classof(const MemoryAddress &) { return true; }
-            static inline bool classof(const MemoryAddress *) { return true; }
-            static inline bool classof(const Value *value) { return classof(*value); }
-            static inline bool classof(const Value &value) {
-                if (value.getClass() == MEMORY_ADDRESS){ return true; }
-                return false;
-            }
+        static inline bool classof(const MemoryAddress &) { return true; }
+        static inline bool classof(const MemoryAddress *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == MEMORY_ADDRESS){ return true; }
+            return false;
+        }
 
-            MemoryAddress(const MemoryAddress&) = delete;
+        MemoryAddress(const MemoryAddress&) = delete;
 
-            const llvm::Value* getPointer();
+        const llvm::Value* getPointer();
 
-            const llvm::Value* getIndex();
+        const llvm::Value* getIndex();
 
-            unsigned long getSize();
+        unsigned long getSize();
 
-        private:
-            const llvm::Value* pointer;
-            const llvm::Value* index{};
-            unsigned long size = 0;
+        Type* getType() override;
+
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::Value* pointer;
+        const llvm::Value* index{};
+        unsigned long size = 0;
     };
 
+    class Constant: public Value{
+    private:
+        const llvm::Constant &constant;
+
+    public:
+        explicit Constant(const llvm::Constant &);
+
+        static inline bool classof(const Constant &) { return true; }
+        static inline bool classof(const Constant *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == CONSTANT){ return true; }
+            if (value.getClass() == STRING_LITERAL || value.getClass() == INTEGER_LITERAL){ return true; }
+            return false;
+        }
+
+        Type* getType() override;
+
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class ValueClassVisitor{
+    public:
+        virtual void visit(const GlobalVariable &v) = 0;
+        virtual void visit(const Argument &v) = 0;
+        virtual void visit(const InstructionVariable &v) = 0;
+        virtual void visit(const StringLiteral &v) = 0;
+        virtual void visit(const IntegerLiteral &v) = 0;
+        virtual void visit(const MemoryAddress &v) = 0;
+        virtual void visit(const Constant &v) = 0;
+    };
 }
 
 #endif

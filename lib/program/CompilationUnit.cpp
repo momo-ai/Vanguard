@@ -31,20 +31,20 @@ namespace vanguard{
         return llvmToVanguard.translateValue(globalVariable);
     }
 
-    std::unordered_set<Function*> CompilationUnit::getAllFunctions(){
+    std::list<Function*> CompilationUnit::getAllFunctions(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        std::unordered_set<Function*> allFunctions = {};
+        std::list<Function*> allFunctions = {};
         for(auto &F: module){
-            allFunctions.insert(llvmToVanguard.translateFunction(&F));
+            allFunctions.push_back(llvmToVanguard.translateFunction(&F));
         }
         return allFunctions;
     }
 
-    std::unordered_set<Value*> CompilationUnit::getAllGlobalVariables(){
+    std::list<Value*> CompilationUnit::getAllGlobalVariables(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        std::unordered_set<Value*> allGlobalVariables = {};
+        std::list<Value*> allGlobalVariables = {};
         for (auto gv= module.global_begin(); gv != module.global_end(); gv++){
-            allGlobalVariables.insert(llvmToVanguard.translateValue(&*gv));
+            allGlobalVariables.push_back(llvmToVanguard.translateValue(&*gv));
         }
         return allGlobalVariables;
     }

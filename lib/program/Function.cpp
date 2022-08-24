@@ -55,6 +55,15 @@ namespace vanguard{
         return instructionsList;
     }
 
+    std::list<Block *> Function::getAllBlocks(){
+        std::list<Block *> blocks = {};
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        for (auto &blk : function){
+            blocks.push_back(llvmToVanguard.translateBlock(&blk));
+        }
+        return blocks;
+    }
+
     const llvm::Function &Function::unwrap(){
         return function;
     }

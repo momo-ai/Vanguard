@@ -33,6 +33,8 @@ namespace vanguard {
 
         std::list<Instruction*> getInstructionsList();
 
+        std::list<Block *> getAllBlocks();
+
         const llvm::Function &unwrap();
 
     private:
