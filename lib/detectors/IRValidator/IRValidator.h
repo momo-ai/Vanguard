@@ -8,12 +8,14 @@
 #include "../UnitDetector.h"
 
 namespace vanguard {
-    class IRValidator : public UnitDetector<IRValidator> {
+    class IRValidator : public UnitDetector {
     public:
         void registerAnalyses() override;
         void startDetection() override;
         void detect(CompilationUnit &unit) override;
         void report() override;
+
+        static std::string name();
     private:
         void countBody(Block *blk);
 
