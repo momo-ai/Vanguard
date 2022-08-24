@@ -7,3 +7,4 @@ run.py
 target
 Cargo.lock
 Cargo.toml
+.idea/*

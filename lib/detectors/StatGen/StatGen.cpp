@@ -6,7 +6,7 @@
 #include <unordered_set>
 #include <vector>
 #include <cassert>
-#include "../../Vanguard.h"
+#include <iostream>
 
 namespace vanguard {
     void StatGen::registerAnalyses() { }
@@ -14,6 +14,10 @@ namespace vanguard {
         totBlks = 0;
         totFns = 0;
         totIns = 0;
+    }
+
+    std::string StatGen::name() {
+        return "statGen";
     }
 
     void StatGen::countBody(Block *blk) {
@@ -56,10 +60,9 @@ namespace vanguard {
     }
 
     void StatGen::report() {
-        auto &out = Vanguard::out();
-        out << "Statistics:\n";
-        out << "# Functions: " << totFns << "\n";
-        out << "# Basic Blocks: " << totBlks << "\n";
-        out << "# Instructions: " << totIns << "\n";
+        std::cout << "Statistics:" << std::endl;
+        std::cout << "# Functions: " << totFns << std::endl;
+        std::cout << "# Basic Blocks: " << totBlks << std::endl;
+        std::cout << "# Instructions: " << totIns << std::endl;
     }
 }

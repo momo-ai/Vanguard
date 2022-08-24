@@ -9,13 +9,13 @@
 
 namespace vanguard{
     
-    LLVMtoVanguard* LLVMtoVanguard::singletonLLVMtoVanguard = 0;
+    LLVMtoVanguard* LLVMtoVanguard::singletonLLVMtoVanguard = nullptr;
 
     LLVMtoVanguard::LLVMtoVanguard(){
     }
 
     LLVMtoVanguard& LLVMtoVanguard::getInstance(){
-        if (singletonLLVMtoVanguard == 0){
+        if (singletonLLVMtoVanguard == nullptr){
             singletonLLVMtoVanguard = new LLVMtoVanguard();
         }
         return *singletonLLVMtoVanguard;
