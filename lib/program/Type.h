@@ -16,7 +16,7 @@ namespace vanguard{
 
     class IntegerType: public Type{
         public:
-            explicit IntegerType(const llvm::IntegerType& intT);
+            explicit IntegerType(const llvm::IntegerType&);
 
             IntegerType(const IntegerType&) = delete;
 
@@ -24,21 +24,25 @@ namespace vanguard{
 
             std::string getName() override;
 
+            const llvm::IntegerType &unwrap();
+
         private:
             const llvm::IntegerType& integer;
     };
 
     class ArrayType: public Type{
         public:
-            explicit ArrayType(const llvm::ArrayType& array);
+            explicit ArrayType(const llvm::ArrayType&);
 
             ArrayType(const ArrayType&) = delete;
 
             Type* getBaseType();
 
-            auto getLength();
+            uint64_t getLength();
 
             std::string getName() override;
+
+            const llvm::ArrayType &unwrap();
 
         private:
             const llvm::ArrayType& array;
@@ -70,6 +74,8 @@ namespace vanguard{
 
             std::string getName() override;
 
+            const llvm::PointerType &unwrap();
+
         private:
             const llvm::PointerType& pointer;
     };
@@ -90,6 +96,8 @@ namespace vanguard{
 
             std::string getName() override;
 
+            const llvm::StructType &unwrap();
+
         private:
             const llvm::StructType& structT;
     };
@@ -104,9 +112,25 @@ namespace vanguard{
 
             std::string getName() override;
 
+            const llvm::VectorType &unwrap();
+
             //TODO: getElementCount()
         private:
             const llvm::VectorType& vector;
+    };
+
+    class VoidType: public Type{
+        public:
+            explicit VoidType(const llvm::Type&);
+
+            VoidType(const VoidType&) = delete;
+
+            std::string getName() override;
+
+            const llvm::Type &unwrap();
+
+        private:
+            const llvm::Type& voidType;
     };
 
 }

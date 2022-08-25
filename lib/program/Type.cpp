@@ -13,7 +13,11 @@ namespace vanguard{
     }
 
     std::string IntegerType::getName(){
-        return "IntegerT";
+        return "IntegerType";
+    }
+
+    const llvm::IntegerType &IntegerType::unwrap(){
+        return integer;
     }
 
     //Array subclass
@@ -24,12 +28,16 @@ namespace vanguard{
         return llvmToVanguard.translateType(array.getElementType());
     }
 
-    auto ArrayType::getLength(){
+    uint64_t ArrayType::getLength(){
         return array.getNumElements();
     }
 
     std::string ArrayType::getName(){
-        return "array< " + (this->getBaseType())->getName() + " >";
+        return "ArrayType< " + (this->getBaseType())->getName() + " >";
+    }
+
+    const llvm::ArrayType &ArrayType::unwrap(){
+        return array;
     }
 
     //Function subclass
@@ -66,7 +74,11 @@ namespace vanguard{
     }
 
     std::string PointerType::getName(){
-        return "pointer< " + (this->getPointeeType())->getName() + " >";
+        return "PointerType< " + (this->getPointeeType())->getName() + " >";
+    }
+
+    const llvm::PointerType &PointerType::unwrap(){
+        return pointer;
     }
 
     //Struct subclass
@@ -95,6 +107,10 @@ namespace vanguard{
         return std::string(structT.getName());
     }
 
+    const llvm::StructType &StructType::unwrap(){
+        return structT;
+    }
+
     //Vector subclass
     VectorType::VectorType(const llvm::VectorType& vec): vector(vec){}
 
@@ -104,7 +120,20 @@ namespace vanguard{
     }
 
     std::string VectorType::getName(){
-        return "vector< " + (this->getBaseType())->getName() + " >";
+        return "VectorType< " + (this->getBaseType())->getName() + " >";
     }
 
+    const llvm::VectorType &VectorType::unwrap(){
+        return vector;
+    }
+
+    VoidType::VoidType(const llvm::Type &vt): voidType(vt) {}
+
+    std::string VoidType::getName() {
+        return "VoidType";
+    }
+
+    const llvm::Type &VoidType::unwrap() {
+        return voidType;
+    }
 }

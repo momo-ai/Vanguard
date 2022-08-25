@@ -13,6 +13,8 @@ namespace vanguard{
 
         Block(const Block&) = delete;
 
+        std::string getName();
+
         Function* getFunction();
 
         std::list<Instruction *> getInstructionsList();
@@ -20,6 +22,8 @@ namespace vanguard{
         bool isEntryBlock();
 
         std::unordered_set<Block *> getAllSuccessors();
+
+        const llvm::BasicBlock& unwrap();
 
     private:
         const llvm::BasicBlock& block;

@@ -2,8 +2,15 @@
 #include "LLVMtoVanguard.h"
 
 namespace vanguard{
-    // Global Variable 
-    GlobalVariable::GlobalVariable(const llvm::GlobalVariable& gv): globalVariable(gv){}
+    Value::Value(const ValueClass vc): valueClass(vc){}
+
+    ValueClass Value::getClass() const{
+        return valueClass;
+    }
+
+    Variable::Variable(const ValueClass vc): Value(vc), valueClass(vc){}
+
+    GlobalVariable::GlobalVariable(const llvm::GlobalVariable &gv): Variable(GLOBAL_VARIABLE), globalVariable(gv) {}
 
     Type* GlobalVariable::getType(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
@@ -18,8 +25,12 @@ namespace vanguard{
         return std::string(globalVariable.getName());
     }
 
+    const llvm::GlobalVariable &GlobalVariable::unwrap(){
+        return globalVariable;
+    }
+
     //Argument
-    Argument::Argument(const llvm::Argument& arg): argument(arg){}
+    Argument::Argument(const llvm::Argument& arg): Variable(ARGUMENT), argument(arg){}
 
     Type* Argument::getType(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
@@ -34,8 +45,12 @@ namespace vanguard{
         return std::string(argument.getName());
     }
 
+    const llvm::Argument &Argument::unwrap(){
+        return argument;
+    }
+
     //InstructionVariable
-    InstructionVariable::InstructionVariable(const llvm::Instruction& instv): instructionVariable(instv){}
+    InstructionVariable::InstructionVariable(const llvm::Instruction& instv): Variable(INSTRUCTION_VARIABLE), instructionVariable(instv){}
 
     Type* InstructionVariable::getType(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
@@ -50,18 +65,54 @@ namespace vanguard{
         return std::string(instructionVariable.getName());
     }
 
+    const llvm::Instruction &InstructionVariable::unwrap(){
+        return instructionVariable;
+    }
+
     //Integer
-    IntegerLiteral::IntegerLiteral(const llvm::ConstantInt& ci): constInt(ci){}
+    IntegerLiteral::IntegerLiteral(const llvm::ConstantInt& ci): Literal<int>(INTEGER_LITERAL), constInt(ci){}
 
     int IntegerLiteral::getValue(){
-        return constInt.getValue().getLimitedValue();
+        return (int)constInt.getValue().getLimitedValue();
+    }
+
+    const llvm::ConstantInt &IntegerLiteral::unwrap(){
+        return constInt;
     }
 
     //String
-    StringLiteral::StringLiteral(const llvm::ConstantDataSequential & cs): constSeq(cs){}
+    StringLiteral::StringLiteral(const llvm::ConstantDataSequential & cs): Literal<std::string>(STRING_LITERAL), constSeq(cs){}
 
     std::string StringLiteral::getValue(){
         return constSeq.getAsString().str();
+    }
+
+    const llvm::ConstantDataSequential &StringLiteral::unwrap(){
+        return constSeq;
+    }
+
+    //Boolean
+    BooleanLiteral::BooleanLiteral(bool b): Literal<bool>(BOOLEAN_LITERAL), constBool(b){}
+
+    bool BooleanLiteral::getValue(){
+        return constBool;
+    }
+
+    //Memory Address
+    MemoryAddress::MemoryAddress(const llvm::Value* ptr, const llvm::Value* idx, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr) , index(idx), size(sz){}
+
+    MemoryAddress::MemoryAddress(const llvm::Value* ptr, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr), size(sz){}
+
+    const llvm::Value* MemoryAddress::getPointer(){
+        return pointer;
+    }
+
+    const llvm::Value* MemoryAddress::getIndex(){
+        return index;
+    }
+
+    unsigned long MemoryAddress::getSize(){
+        return size;
     }
 
 }
