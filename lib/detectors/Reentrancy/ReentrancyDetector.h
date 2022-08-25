@@ -8,6 +8,7 @@
 #include "../FunctionDetector.h"
 //#import "../../Vanguard.cpp"
 #include "../../domain/libBlockchain/include/Blockchain.h"
+#include "../AARequirement.h"
 
 namespace vanguard {
     class ReentrancyDetector : public FunctionDetector {
@@ -30,8 +31,8 @@ namespace vanguard {
         static char ID;
 
     private:
-        std::vector<Requirement *> reqs;
-        const blockchain::Blockchain *chain = nullptr;
+        AARequirement *aa;
+        blockchain::Blockchain *chain = nullptr;
         // taken from ReentrancyAnalysis
         Function *lastExternalCall = nullptr; // Tracks last external call
         Function *curFn; // Current function name

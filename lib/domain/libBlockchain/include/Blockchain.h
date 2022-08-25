@@ -10,7 +10,7 @@
 //#include "llvm/IR/Instruction.h"
 #include "../../../program/Instruction.h"
 #include "BlkContract.h"
-#include "AAWrapper.h"
+#include "../../../detectors/AAWrapper.h"
 #include "../../Domain.h"
 #include <vector>
 #include "../../../program/LLVMtoVanguard.h"

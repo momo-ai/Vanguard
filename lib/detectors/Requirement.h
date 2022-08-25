@@ -10,7 +10,7 @@
 namespace vanguard {
     class Requirement {
     public:
-        virtual void fetch(llvm::ModuleAnalysisManager &modAnalysis, llvm::Module &module) = 0;
+        virtual void fetch(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam) = 0;
     };
 }
 

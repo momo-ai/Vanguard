@@ -11,7 +11,9 @@
 #include "../../domain/libBlockchain/include/Blockchain.h"
 
 namespace vanguard {
-    void StatGen::registerAnalyses() { }
+    std::vector<Requirement *> StatGen::registerAnalyses() {
+        return {};
+    }
     void StatGen::startDetection() {
         totBlks = 0;
         totFns = 0;

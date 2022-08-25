@@ -6,7 +6,7 @@
 #define LIBBLOCKCHAIN_INKTOLLVM_H
 
 #include "BlockchainToLLVM.h"
-#include "AAWrapper.h"
+#include "../../../detectors/AAWrapper.h"
 #include "llvm/Analysis/MemoryLocation.h"
 //#include "llvm/IR/Function.h"
 #include "../../../program/Function.h"
@@ -16,7 +16,7 @@
 namespace blockchain {
     class InkToLLVM : public BlockchainToLLVM {
     public:
-        explicit InkToLLVM(AAWrapper &alias);
+        explicit InkToLLVM(vanguard::AAWrapper &alias);
         bool isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const override;
         bool isAnyExternalCall(vanguard::Function &fn) const override;
         bool isCall(vanguard::Function &fn) const override;
@@ -36,7 +36,7 @@ namespace blockchain {
         static llvm::Value *getSelfRef(const BlkFunction &blkFn, vanguard::Function &fn);
 
     private:
-        AAWrapper &alias;
+        vanguard::AAWrapper &alias;
 
         static bool isConstructorClosure(const BlkFunction &blockchainFn, vanguard::Function &fn);
     };

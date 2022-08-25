@@ -15,12 +15,12 @@
 #include "../include/BlkContract.h"
 #include "llvm/IR/Constants.h"
 #include "../../../program/Instruction.h"
-//#include "llvm/IR/Instructions.h"
+#include "llvm/IR/Instructions.h"
 #include <iostream>
 #include "llvm/IR/IntrinsicInst.h"
 
 namespace blockchain {
-    InkToLLVM::InkToLLVM(AAWrapper &alias) : alias(alias) {}
+    InkToLLVM::InkToLLVM(vanguard::AAWrapper &alias) : alias(alias) {}
 
     llvm::Value *InkToLLVM::getSelfRef(const BlkFunction &blkFn, vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
@@ -50,11 +50,11 @@ namespace blockchain {
             throw runtime_error("Should be pointer type");
         }
 
-        auto argType = cast<llvm::PointerType>(arg->getType());
+        auto argType = llvm::dyn_cast<llvm::PointerType>(arg->getType());
         if(!argType->getElementType()->isStructTy()) {
             throw runtime_error("Should be struct type");
         }
-        auto structType = cast<llvm::StructType>(argType->getElementType());
+        auto structType = llvm::dyn_cast<llvm::StructType>(argType->getElementType());
         llvm::IntegerType *intType = llvm::IntegerType::get(llvmIns.getContext(), 32);
         llvm::Value* indexList[2] = {llvm::ConstantInt::get(intType, 0), llvm::ConstantInt::get(intType, id)};
         auto gep = llvm::GetElementPtrInst::Create(argType->getElementType(), arg, llvm::ArrayRef<llvm::Value*>(indexList, 2), "acc");
@@ -120,8 +120,7 @@ namespace blockchain {
                 }
                 llvm::MemoryLocation varLoc = getContractVarLocation(*contract, var, ins);
 
-                llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn);
-                auto aa = alias.request(*fnNoConst);
+                auto aa = alias.request(*fnV);
                 if(aa->alias(storeLoc, varLoc) > llvm::AliasResult::MayAlias) {
                     return true;
                 }
@@ -151,8 +150,7 @@ namespace blockchain {
                     }
 
                     llvm::MemoryLocation varLoc = getContractVarLocation(*contract, var, ins);
-                    llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn);
-                    auto aa = alias.request(*fnNoConst);
+                    auto aa = alias.request(*fnV);
                     if (aa->alias(loc, varLoc) > llvm::AliasResult::MayAlias) {
                         return true;
                     }
@@ -184,8 +182,7 @@ namespace blockchain {
                 }
 
                 llvm::MemoryLocation varLoc = getContractVarLocation(*contract, var, ins);
-                llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn);
-                auto aa = alias.request(*fnNoConst);
+                auto aa = alias.request(*fnV);
                 if(aa->alias(readLoc, varLoc) > llvm::AliasResult::MayAlias) {
                     return true;
                 }
@@ -215,8 +212,7 @@ namespace blockchain {
                     }
 
                     llvm::MemoryLocation varLoc = getContractVarLocation(*contract, var, ins);
-                    llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn);
-                    auto aa = alias.request(*fnNoConst);
+                    auto aa = alias.request(*fnV);
                     if (aa->alias(loc, varLoc) > llvm::AliasResult::MayAlias) {
                         return true;
                     }

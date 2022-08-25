@@ -10,7 +10,7 @@
 namespace blockchain {
     class Ink : public Blockchain {
     public:
-        Ink(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts, AAWrapper &alias);
+        Ink(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts, vanguard::AAWrapper &alias);
 
         static inline bool classof(const Ink &) { return true; }
         static inline bool classof(const Ink *) { return true; }
@@ -27,7 +27,7 @@ namespace blockchain {
         bool getsValue(vanguard::Instruction &ins) const override;
         bool isSelfDestruct(vanguard::Instruction &ins) const override;
     private:
-        AAWrapper &alias;
+        vanguard::AAWrapper &alias;
     };
 }
 

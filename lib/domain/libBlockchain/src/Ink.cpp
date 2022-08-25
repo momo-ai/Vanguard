@@ -9,7 +9,7 @@
 #include "../include/InkToLLVM.h"
 
 namespace blockchain {
-    Ink::Ink(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts, AAWrapper &alias) : Blockchain(INK, blk2llvm, c, v, contracts), alias(alias) {}
+    Ink::Ink(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts, vanguard::AAWrapper &alias) : Blockchain(INK, blk2llvm, c, v, contracts), alias(alias) {}
 
     bool Ink::allowsReentrancy() const {
         return true;
@@ -35,7 +35,7 @@ namespace blockchain {
         if(InkToLLVM::isMemoryStore(ins)) {
             llvm::MemoryLocation storeLoc = InkToLLVM::getStoreLocation(ins);
             llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn);
-            llvm::AAResults *aa = alias.request(*fnNoConst);
+            llvm::AAResults *aa = alias.request(*fnV);
             if(aa->alias(storeLoc, selfLoc) > llvm::AliasResult::MayAlias) {
                 return true;
             }
@@ -75,8 +75,7 @@ namespace blockchain {
         if(InkToLLVM::isMemoryRead(ins)) {
             llvm::MemoryLocation readLoc = InkToLLVM::getReadLocation(ins);
 
-            llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn); // how I fixed it
-            llvm::AAResults *aa = alias.request(*fnNoConst); // otherwise  alias.request(*fn), which throws error
+            llvm::AAResults *aa = alias.request(*fnV); // otherwise  alias.request(*fn), which throws error
             if(aa->alias(readLoc, selfLoc) > llvm::AliasResult::MayAlias) {
                 return true;
             }

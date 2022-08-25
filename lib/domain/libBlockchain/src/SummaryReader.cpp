@@ -19,7 +19,7 @@ using namespace std;
 namespace blockchain {
 
 
-    SummaryReader::SummaryReader(std::string projectFile, AAWrapper *alias) : alias(alias) {
+    SummaryReader::SummaryReader(std::string projectFile, vanguard::AAWrapper *alias) : alias(alias) {
         ifstream inStream(projectFile);
         rapidjson::IStreamWrapper jsonStream(inStream);
         cout << "starting" << endl;

@@ -22,8 +22,7 @@ namespace vanguard {
         return fnAlias;
     }
 
-    void AARequirement::fetch(llvm::ModuleAnalysisManager &modAnalysis, llvm::Module &module) {
-        fnAnalysis =
-                &modAnalysis.getResult<llvm::FunctionAnalysisManagerModuleProxy>(module).getManager();
+    void AARequirement::fetch(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam) {
+        fnAnalysis = &fam;
     }
 };

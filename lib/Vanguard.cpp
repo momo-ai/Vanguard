@@ -32,8 +32,12 @@ static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
 
-void performDetection(vanguard::ProgramDetector *detector, vanguard::Program &prog) {
-    detector->registerAnalyses();
+void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::ProgramDetector *detector, vanguard::Program &prog) {
+    auto requirements = detector->registerAnalyses();
+    for(auto req : requirements) {
+        req->fetch(mam, fam);
+    }
+
     detector->startDetection();
     detector->detect(prog);
     detector->report();
@@ -173,7 +177,7 @@ int main(int argc, char **argv) {
 
     if(detectors.empty()) {
         for(auto detector : detectorRegistry.all()) {
-            performDetection(detector, prog);
+            performDetection(MAM, FAM, detector, prog);
         }
     }
     else {
@@ -187,7 +191,7 @@ int main(int argc, char **argv) {
         for(auto name : detectors) {
             auto detector = detectorRegistry.get(name);
             if(detector != nullptr) {
-                performDetection(detector, prog);
+                performDetection(MAM, FAM, detector, prog);
             }
         }
     }

@@ -60,23 +60,19 @@ namespace vanguard { // Reentrancy {
                     }
                 }
             }
-            if (chain->isAnyExternalCall(*calledFn)) { // && !chain->callHasKeccik(*called_func)) {
+            if (chain->isAnyExternalCall(*calledFn)) {
                 list<Value*> args = CallInstr->getArgs();
-//                auto arg = CallInstr->getArgOperand(1);
-                // TODO: Confirm cast, hide LLVM, is a vector better for indexing?
-                if (auto i1 = llvm::dyn_cast<Instruction>(*args.begin().operator++(1))) {
-                    // If call is external, record that current func has ext and set last ext call
-                    lastExternalCall = calledFn;
-                    if (!get<0>(fnInfo[curFn])) {
-                        // Indicate function has ext call if not already indicated
-                        fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
-                        modified = true;
-                    }
+                // If call is external, record that current func has ext and set last ext call
+                lastExternalCall = calledFn;
+                if (!get<0>(fnInfo[curFn])) {
+                    // Indicate function has ext call if not already indicated
+                    fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
+                    modified = true;
                 }
             }
         }
         // TODO: hmm
-        if (chain->writesStorage(*ins)) {
+        if (chain->writesStorage(ins)) {
             // Detect store to contract state
             if (!get<1>(fnInfo[curFn])) {
                 // Indicate function has store if not already indicated
@@ -144,16 +140,14 @@ namespace vanguard { // Reentrancy {
 
     // aa req here is a global var so initialize it above
     std::vector<Requirement *> ReentrancyDetector::registerAnalyses() {
-        vanguard::AARequirement* req = new AARequirement();
-        std::vector<Requirement *> res = {req};
+        aa = new AARequirement();
+        std::vector<Requirement *> res = {aa};
         return res;
     }
 
     void ReentrancyDetector::startDetection() {
-        // TODO: last fx to be implemented
-        for (auto req : reqs) {
-            const blockchain::SummaryReader& sum = blockchain::SummaryReader("fp", req);
-        }
+        blockchain::SummaryReader sum = blockchain::SummaryReader("fp", aa);
+        chain = sum.blockchain();
     }
 
     bool ReentrancyDetector::detect(Function &fn) {
