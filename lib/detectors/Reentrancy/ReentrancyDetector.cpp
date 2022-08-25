@@ -6,18 +6,15 @@
 #include "../../domain/libBlockchain/include/SummaryReader.h"
 #include "../AARequirement.h"
 #include "../../program/InstructionClasses.h"
-#include "../Requirement.h"
 #include <list>
 
-using namespace vanguard;
+namespace vanguard { // Reentrancy {
 
-namespace ReentrancyDetector { // Reentrancy {
-
-    bool shouldAnalyze(Function &fn) {
+    bool ReentrancyDetector::shouldAnalyze(vanguard::Function &fn) {
         return chain->isContractFunction(fn);
     }
 
-    bool beginFn(Function &fn) {
+    bool ReentrancyDetector::beginFn(Function &fn) {
 //        ReachAnalysis::beginFn(fn);
         //fname = fn.getName().str();
         curFn = &fn;
@@ -30,10 +27,12 @@ namespace ReentrancyDetector { // Reentrancy {
         return false;
     }
 
-    bool transfer(Instruction &ins) {
+    bool ReentrancyDetector::transfer(Instruction &ins) {
 //        ReachAnalysis::transfer(ins);
-
-        if (auto CallInstr = llvm::dyn_cast<CallInstruction>(&ins)) { // TODO: Need a way to cast instruction classes to LLVM
+        if (ins.getInstructionType() == "call") {
+            auto CallInstr = llvm::dyn_cast<Call>(&ins);
+//        }
+//        if (auto CallInstr = llvm::dyn_cast<CallInstruction>(&ins)) { // TODO: Need a way to cast instruction classes to LLVM
             // Detect function call
             Function *calledFn = CallInstr->getTarget();
             //string cfname = called_func->getName().str();
@@ -62,8 +61,10 @@ namespace ReentrancyDetector { // Reentrancy {
                 }
             }
             if (chain->isAnyExternalCall(*calledFn)) { // && !chain->callHasKeccik(*called_func)) {
-                auto arg = CallInstr->getArgOperand(1);
-                if (auto i1 = dyn_cast<Instruction>(arg)) {
+                list<Value*> args = CallInstr->getArgs();
+//                auto arg = CallInstr->getArgOperand(1);
+                // TODO: Confirm cast, hide LLVM, is a vector better for indexing?
+                if (auto i1 = llvm::dyn_cast<Instruction>(*args.begin().operator++(1))) {
                     // If call is external, record that current func has ext and set last ext call
                     lastExternalCall = calledFn;
                     if (!get<0>(fnInfo[curFn])) {
@@ -74,8 +75,8 @@ namespace ReentrancyDetector { // Reentrancy {
                 }
             }
         }
-
-        if (chain->writesStorage(ins)) {
+        // TODO: hmm
+        if (chain->writesStorage(*ins)) {
             // Detect store to contract state
             if (!get<1>(fnInfo[curFn])) {
                 // Indicate function has store if not already indicated
@@ -90,11 +91,11 @@ namespace ReentrancyDetector { // Reentrancy {
         return false;
     }
 
-    bool endFn(Function &fn) {
+    bool ReentrancyDetector::endFn(Function &fn) {
         return modified;
     }
 
-    string vulnerabilityReport()  {
+    string ReentrancyDetector::vulnerabilityReport()  {
         string report = "Reentrancy Report:\n";
         for(pair<Function *, Function *> tup : potentialReentrancies) {
             report += "Function '" + chain->findFunction(*tup.first)->name() + "' has potential reentrancy \n";
@@ -116,8 +117,8 @@ namespace ReentrancyDetector { // Reentrancy {
     }
 
 
-    vector<Block *> findReachable(Block &blk, unordered_set<Block *> *exclude) {
-        auto reachable = new vector<Block *>();
+    vector<Block *> ReentrancyDetector::findReachable(Block &blk, unordered_set<Block *> *exclude) {
+        vector<Block*> reachable = {};
         list<Block *> wl;
         unordered_set<Block *> seen;
 
@@ -131,7 +132,7 @@ namespace ReentrancyDetector { // Reentrancy {
                     seen.insert(succBlk);
                     wl.push_back(succBlk);
                     if(exclude == nullptr || exclude->find(succBlk) == exclude->end()) {
-                        reachable->push_back(succBlk);
+                        reachable.push_back(succBlk);
                     }
                 }
             }
@@ -142,19 +143,20 @@ namespace ReentrancyDetector { // Reentrancy {
 
 
     // aa req here is a global var so initialize it above
-    std::vector<Requirement *> registerAnalyses() {
+    std::vector<Requirement *> ReentrancyDetector::registerAnalyses() {
         vanguard::AARequirement* req = new AARequirement();
         std::vector<Requirement *> res = {req};
         return res;
     }
 
-    void startDetection() {
+    void ReentrancyDetector::startDetection() {
+        // TODO: last fx to be implemented
         for (auto req : reqs) {
             const blockchain::SummaryReader& sum = blockchain::SummaryReader("fp", req);
         }
     }
 
-    bool detect(Function &fn) {
+    bool ReentrancyDetector::detect(Function &fn) {
         if (!shouldAnalyze(fn)) {
             return false;
         }
@@ -166,24 +168,24 @@ namespace ReentrancyDetector { // Reentrancy {
         // TODO: There is no way to iterate thru blocks in a fn
         // getbody and travel down the links
         for (Block* blk : fn.getAllBlocks()) {
-            wlContents.add(&blk);
+            wlContents.insert(blk);
             instWorklist.insert(instWorklist.end(), blk);
         }
 
         while (!instWorklist.empty()) {
             Block* blk = instWorklist.front();
             instWorklist.pop_front();
-            wlContents.erase(*inst);
+            wlContents.erase(blk);
 
             // was in for loop when it was blocks
             for (Instruction* inst : blk->getInstructionsList()) {
                 if (transfer(*inst)) {
                     modified = true;
                     // TODO: Implement re-analyzing affected  functions of true positives
-                    vector<Block *> reachable = findReachable(blk, &wlContents);
+                    vector<Block *> reachable = findReachable(*blk, &wlContents);
                     instWorklist.insert(instWorklist.begin(), reachable.begin(), reachable.end());
                     wlContents.insert(reachable.begin(), reachable.end());
-                    delete reachable;
+//                    delete reachable;
                 }
             }
         }
@@ -194,9 +196,13 @@ namespace ReentrancyDetector { // Reentrancy {
 
     }
 
-    void report() {
+    void ReentrancyDetector::report() {
         string theRep = vulnerabilityReport();
 
+    }
+
+    string ReentrancyDetector::name() {
+        return "reentrancyBasic";
     }
 
 }

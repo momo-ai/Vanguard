@@ -4,10 +4,13 @@
 
 #ifndef VANGUARD_DETECTOR_H
 #define VANGUARD_DETECTOR_H
+
+#include "Requirement.h"
+
 namespace vanguard {
     class Detector {
     public:
-        virtual void registerAnalyses() = 0;
+        virtual std::vector<Requirement *> registerAnalyses() = 0;
         virtual void startDetection() = 0;
         virtual void report() = 0;
     };

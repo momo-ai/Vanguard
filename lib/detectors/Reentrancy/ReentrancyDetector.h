@@ -8,11 +8,8 @@
 #include "../FunctionDetector.h"
 //#import "../../Vanguard.cpp"
 #include "../../domain/libBlockchain/include/Blockchain.h"
-#include "../Requirement.h"
 
-using namespace vanguard;
-
-namespace { // Reentrancy {
+namespace vanguard {
     class ReentrancyDetector : public FunctionDetector {
     public:
         bool shouldAnalyze(Function &fn);
@@ -20,18 +17,21 @@ namespace { // Reentrancy {
         bool transfer(Instruction &ins);
         bool endFn(Function &fn);
         std::string vulnerabilityReport();
+        vector<Block *> findReachable(Block &blk, unordered_set<Block *> *exclude);
 
         // OG
-        std::vector<Requirement *> registerAnalyses();
+        std::vector<Requirement *> registerAnalyses() override;
         void startDetection() override;
         bool detect(vanguard::Function &fn) override;
         void report() override;
 
+        static std::string name();
+
         static char ID;
-        ReentrancyDetector();
+
     private:
         std::vector<Requirement *> reqs;
-        const blockchain::Blockchain *chain;
+        const blockchain::Blockchain *chain = nullptr;
         // taken from ReentrancyAnalysis
         Function *lastExternalCall = nullptr; // Tracks last external call
         Function *curFn; // Current function name
