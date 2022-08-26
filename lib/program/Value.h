@@ -14,6 +14,9 @@
 namespace vanguard{
 
     enum ValueClassEnum{
+        BLKVARIABLE_BEGIN,
+        BLKVARIABLE,
+        BLKVARIABLE_END = BLKVARIABLE,
         VARIABLE_BEGIN,
         GLOBAL_VARIABLE = VARIABLE_BEGIN,
         ARGUMENT,
@@ -24,12 +27,15 @@ namespace vanguard{
         STRING_LITERAL,
         BOOLEAN_LITERAL,
         LITERAL_END = BOOLEAN_LITERAL,
-        MEMORY_ADDRESS_BEGIN,
-        MEMORY_ADDRESS = MEMORY_ADDRESS_BEGIN,
-        MEMORY_ADDRESS_END = MEMORY_ADDRESS,
+//        MEMORY_ADDRESS_BEGIN,
+//        MEMORY_ADDRESS = MEMORY_ADDRESS_BEGIN,
+//        MEMORY_ADDRESS_END = MEMORY_ADDRESS,
         CONSTANT_BEGIN,
         CONSTANT = CONSTANT_BEGIN,
-        CONSTANT_END = CONSTANT
+        CONSTANT_END = CONSTANT,
+        BLOCK_BEGIN,
+        BLOCK = BLOCK_BEGIN,
+        BLOCK_END = BLOCK
     };
 
     class ValueClassVisitor;
@@ -40,7 +46,7 @@ namespace vanguard{
         static inline bool classof(const Value &) { return true; }
         static inline bool classof(const Value *) { return true; }
 
-        virtual Type* getType() = 0;
+        virtual Type* getType() const= 0;
 
         ValueClassEnum getClass() const;
 
@@ -52,9 +58,8 @@ namespace vanguard{
 
     class Variable{
     public:
-        virtual Type* getType() = 0;
-        virtual bool hasName() = 0;
-        virtual std::string getName() = 0;
+        virtual bool hasName() const = 0;
+        virtual std::string getName() const = 0;
     };
 
     class GlobalVariable: public Value, public Variable{
@@ -71,13 +76,13 @@ namespace vanguard{
 
         GlobalVariable(const GlobalVariable&) = delete;
 
-        Type* getType() override;
+        Type* getType() const override;
 
-        bool hasName() override;
+        bool hasName() const override;
 
-        std::string getName() override;
+        std::string getName() const override;
 
-        const llvm::GlobalVariable &unwrap();
+        const llvm::GlobalVariable &unwrap() const;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -99,13 +104,13 @@ namespace vanguard{
 
         Argument(const Argument&) = delete;
 
-        Type* getType() override;
+        Type* getType() const override;
 
-        bool hasName() override;
+        bool hasName() const override;
 
-        std::string getName() override;
+        std::string getName() const override;
 
-        const llvm::Argument &unwrap();
+        const llvm::Argument &unwrap() const;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -127,13 +132,13 @@ namespace vanguard{
 
         InstructionVariable(const InstructionVariable&) = delete;
 
-        Type* getType() override;
+        Type* getType() const override;
 
-        bool hasName() override;
+        bool hasName() const override;
 
-        std::string getName() override;
+        std::string getName() const override;
 
-        const llvm::Instruction &unwrap();
+        const llvm::Instruction &unwrap() const;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -144,7 +149,7 @@ namespace vanguard{
     template <class T>
     class Literal{
     public:
-        virtual T getValue() = 0;
+        virtual T getValue() const = 0;
     };
 
     class IntegerLiteral: public Value, public Literal<int>{
@@ -161,11 +166,11 @@ namespace vanguard{
 
         IntegerLiteral(const IntegerLiteral&) = delete;
 
-        int getValue() override;
+        int getValue() const override;
 
-        Type* getType() override;
+        Type* getType() const override;
 
-        const llvm::ConstantInt &unwrap();
+        const llvm::ConstantInt &unwrap() const;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -187,11 +192,11 @@ namespace vanguard{
 
         StringLiteral(const StringLiteral&) = delete;
 
-        std::string getValue() override;
+        std::string getValue() const override;
 
-        Type* getType() override;
+        Type* getType() const override;
 
-        const llvm::ConstantDataSequential &unwrap();
+        const llvm::ConstantDataSequential &unwrap() const;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -213,43 +218,43 @@ namespace vanguard{
 
         BooleanLiteral(const BooleanLiteral&) = delete;
 
-        bool getValue() override;
+        bool getValue() const override;
 
     private:
         bool constBool;
     };
 
-    class MemoryAddress: public Value{
-    public:
-        MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
-
-        MemoryAddress(const llvm::Value* ptr, unsigned long sz);
-
-        static inline bool classof(const MemoryAddress &) { return true; }
-        static inline bool classof(const MemoryAddress *) { return true; }
-        static inline bool classof(const Value *value) { return classof(*value); }
-        static inline bool classof(const Value &value) {
-            if (value.getClass() == MEMORY_ADDRESS){ return true; }
-            return false;
-        }
-
-        MemoryAddress(const MemoryAddress&) = delete;
-
-        const llvm::Value* getPointer();
-
-        const llvm::Value* getIndex();
-
-        unsigned long getSize();
-
-        Type* getType() override;
-
-        void accept(ValueClassVisitor &v) const override;
-
-    private:
-        const llvm::Value* pointer;
-        const llvm::Value* index{};
-        unsigned long size = 0;
-    };
+//    class MemoryAddress: public Value{
+//    public:
+//        MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
+//
+//        MemoryAddress(const llvm::Value* ptr, unsigned long sz);
+//
+//        static inline bool classof(const MemoryAddress &) { return true; }
+//        static inline bool classof(const MemoryAddress *) { return true; }
+//        static inline bool classof(const Value *value) { return classof(*value); }
+//        static inline bool classof(const Value &value) {
+//            if (value.getClass() == MEMORY_ADDRESS){ return true; }
+//            return false;
+//        }
+//
+//        MemoryAddress(const MemoryAddress&) = delete;
+//
+//        const llvm::Value* getPointer() const;
+//
+//        const llvm::Value* getIndex() const;
+//
+//        unsigned long getSize() const;
+//
+//        Type* getType() const override;
+//
+//        void accept(ValueClassVisitor &v) const override;
+//
+//    private:
+//        const llvm::Value* pointer;
+//        const llvm::Value* index{};
+//        unsigned long size = 0;
+//    };
 
     class Constant: public Value{
     private:
@@ -267,10 +272,35 @@ namespace vanguard{
             return false;
         }
 
-        Type* getType() override;
+        Type* getType() const override;
+
+        unsigned getLLVMValueID() const;
 
         void accept(ValueClassVisitor &v) const override;
     };
+
+    class BlockValue: public Value{
+    private:
+        const llvm::BasicBlock &block;
+
+    public:
+        explicit BlockValue(const llvm::BasicBlock &);
+
+        static inline bool classof(const BlockValue &) { return true; }
+        static inline bool classof(const BlockValue *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == BLOCK){ return true; }
+            return false;
+        }
+
+        Type* getType() const override;
+
+        unsigned getLLVMValueID() const;
+
+        void accept(ValueClassVisitor &v) const override;
+    };
+
 
     class ValueClassVisitor{
     public:
@@ -279,8 +309,9 @@ namespace vanguard{
         virtual void visit(const InstructionVariable &v) = 0;
         virtual void visit(const StringLiteral &v) = 0;
         virtual void visit(const IntegerLiteral &v) = 0;
-        virtual void visit(const MemoryAddress &v) = 0;
+//        virtual void visit(const MemoryAddress &v) = 0;
         virtual void visit(const Constant &v) = 0;
+        virtual void visit(const BlockValue &v) = 0;
     };
 }
 

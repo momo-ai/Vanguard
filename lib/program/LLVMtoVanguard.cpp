@@ -115,6 +115,9 @@ namespace vanguard{
             else if (t->isVoidTy()){
                 typeMap[t] = new VoidType(*t);
             }
+            else if (t->isLabelTy()){
+                typeMap[t] = new LabelType(*t);
+            }
             else {
                 throw std::runtime_error("Given type cannot be translated since it does not exist in vanguard yet.");
             }
@@ -145,6 +148,9 @@ namespace vanguard{
             }
             else if(auto constant = llvm::dyn_cast<llvm::Constant>(val)){
                 valueMap[val] = new Constant(*constant);
+            }
+            else if(auto blk = llvm::dyn_cast<llvm::BasicBlock>(val)){
+                valueMap[val] = new BlockValue(*blk);
             }
             else{
                 throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");

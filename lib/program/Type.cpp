@@ -131,6 +131,7 @@ namespace vanguard{
         return vector;
     }
 
+    //Void Subclass
     VoidType::VoidType(const llvm::Type &vt): voidType(vt) {}
 
     std::string VoidType::getName() {
@@ -139,5 +140,16 @@ namespace vanguard{
 
     const llvm::Type &VoidType::unwrap() {
         return voidType;
+    }
+
+    //Label Subclass
+    LabelType::LabelType(const llvm::Type &lbt): labelType(lbt) {}
+
+    std::string LabelType::getName() {
+        return "LabelType";
+    }
+
+    const llvm::Type &LabelType::unwrap() {
+        return labelType;
     }
 }

@@ -135,6 +135,20 @@ namespace vanguard{
             const llvm::Type& voidType;
     };
 
+    class LabelType: public Type{
+    public:
+        explicit  LabelType(const llvm::Type&);
+
+        LabelType(const LabelType&) = delete;
+
+        std::string getName() override;
+
+        const llvm::Type &unwrap();
+
+    private:
+        const llvm::Type& labelType;
+    };
+
 }
 
 #endif

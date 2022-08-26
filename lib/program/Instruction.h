@@ -48,6 +48,7 @@ namespace vanguard{
         FREEZE_INST
     };
 
+    class InstructionClassVisitor;
     class Instruction{
     private:
         InstructionClassEnum instructionClassEnum;
@@ -62,25 +63,27 @@ namespace vanguard{
             return instructionClassEnum;
         }
 
-        virtual std::string getName() = 0;
+        virtual std::string getName() const = 0;
 
-        virtual Block* getBlock() = 0;
+        virtual Block* getBlock() const = 0;
 
-        virtual std::string getInstructionType() = 0;
+        virtual std::string getInstructionType() const = 0;
 
-        virtual bool mayReadOrWriteToMemory() = 0;
+        virtual bool mayReadOrWriteToMemory() const = 0;
 
-        virtual bool willReturn() = 0;
+        virtual bool willReturn() const = 0;
 
-        virtual Instruction * getSuccessor() = 0;
+        virtual Instruction * getSuccessor() const = 0;
 
-        virtual std::list<Instruction*> getAllSuccessors() = 0;
+        virtual std::list<Instruction*> getAllSuccessors() const = 0;
 
-        virtual Value* getOperand(unsigned i) = 0;
+        virtual Value* getOperand(unsigned i) const = 0;
 
-        virtual unsigned getNumOperands() = 0;
+        virtual unsigned getNumOperands() const = 0;
 
-        virtual const llvm::Instruction &unwrap() = 0;
+        virtual const llvm::Instruction &unwrap() const = 0;
+
+        virtual void accept(InstructionClassVisitor &v) const = 0;
 
     };
 

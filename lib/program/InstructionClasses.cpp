@@ -6,7 +6,7 @@ namespace vanguard{
     // Binary Operator
     BinaryOperator::BinaryOperator(const llvm::BinaryOperator &bop) : InstructionClass<llvm::BinaryOperator>(BINARY_OPERATOR, bop), binOp(bop) {}
 
-    unsigned BinaryOperator::getOpClass() {
+    unsigned BinaryOperator::getOpClass() const {
         unsigned opcode = binOp.getOpcode();
         BinaryOpClass binaryOpClass;
         if (opcode == 13 || opcode == 14) binaryOpClass = Add;
@@ -25,12 +25,12 @@ namespace vanguard{
         return binaryOpClass;
     }
 
-    InstructionVariable* BinaryOperator::getLHS(){
+    InstructionVariable* BinaryOperator::getLHS() const{
         auto* instvar = new InstructionVariable(binOp);
         return instvar;
     }
 
-    const llvm::BinaryOperator &BinaryOperator::unwrap(){
+    const llvm::BinaryOperator &BinaryOperator::unwrap() const{
         return binOp;
     }
 
@@ -42,7 +42,7 @@ namespace vanguard{
     //Compare Instruction
     CmpInst::CmpInst(const llvm::CmpInst &cmpinst) : InstructionClass<llvm::CmpInst>(CMP_INST, cmpinst), cmpInst(cmpinst) {}
 
-    unsigned CmpInst::getOpClass(){
+    unsigned CmpInst::getOpClass() const{
         unsigned opcode = cmpInst.getOpcode();
         BinaryOpClass binaryOpClass;
         if (opcode == 53 || opcode == 54) binaryOpClass = IFCmpInst;
@@ -52,12 +52,12 @@ namespace vanguard{
         return  binaryOpClass;
     }
 
-    InstructionVariable* CmpInst::getLHS(){
+    InstructionVariable* CmpInst::getLHS() const{
         auto* instvar = new InstructionVariable(cmpInst);
         return instvar;
     }
 
-    const llvm::CmpInst &CmpInst::unwrap(){
+    const llvm::CmpInst &CmpInst::unwrap() const{
         return cmpInst;
     }
 
@@ -69,16 +69,16 @@ namespace vanguard{
     //Branch Inst
     BranchInst::BranchInst(const llvm::BranchInst &brInst) : InstructionClass<llvm::BranchInst>(BRANCH_INST,brInst), branchInst(brInst) {}
 
-    bool BranchInst::isConditional(){
+    bool BranchInst::isConditional() const{
         return branchInst.isConditional();
     }
 
-    Value* BranchInst::getCondition(){
+    Value* BranchInst::getCondition() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateValue(branchInst.getCondition());
     }
 
-    std::list<Block*> BranchInst::getSuccessors(){
+    std::list<Block*> BranchInst::getSuccessors() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Block*> successors = {};
         unsigned int n = branchInst.getNumSuccessors();
@@ -88,7 +88,7 @@ namespace vanguard{
         return successors;
     }
 
-    const llvm::BranchInst &BranchInst::unwrap(){
+    const llvm::BranchInst &BranchInst::unwrap() const{
         return branchInst;
     }
 
@@ -99,11 +99,11 @@ namespace vanguard{
     //Indirect Branch Instruction
     IndirectBrInst::IndirectBrInst(const llvm::IndirectBrInst &ibrInst) : InstructionClass<llvm::IndirectBrInst>(INDIRECT_BR_INST,ibrInst), indirectBrInst(ibrInst) {}
 
-    Value* IndirectBrInst::getCondition(){
+    Value* IndirectBrInst::getCondition() const{
         throw std::runtime_error("Indirect Branch Instruction does not have a condition.");
     }
 
-    std::list<Block*> IndirectBrInst::getSuccessors(){
+    std::list<Block*> IndirectBrInst::getSuccessors() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Block*> successors = {};
         unsigned int n = indirectBrInst.getNumSuccessors();
@@ -113,7 +113,7 @@ namespace vanguard{
         return successors;
     }
 
-    const llvm::IndirectBrInst &IndirectBrInst::unwrap(){
+    const llvm::IndirectBrInst &IndirectBrInst::unwrap() const{
         return indirectBrInst;
     }
 
@@ -124,12 +124,12 @@ namespace vanguard{
     //Switch Instruction
     SwitchInst::SwitchInst(const llvm::SwitchInst &swInst) : InstructionClass<llvm::SwitchInst>(SWITCH_INST, swInst), switchInst(swInst) {}
 
-    Value* SwitchInst::getCondition(){
+    Value* SwitchInst::getCondition() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateValue(switchInst.getCondition());
     }
 
-    std::list<Block*> SwitchInst::getSuccessors(){
+    std::list<Block*> SwitchInst::getSuccessors() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Block*> successors = {};
         unsigned int n = switchInst.getNumSuccessors();
@@ -139,7 +139,7 @@ namespace vanguard{
         return successors;
     }
 
-    const llvm::SwitchInst &SwitchInst::unwrap(){
+    const llvm::SwitchInst &SwitchInst::unwrap() const{
         return switchInst;
     }
 
@@ -150,7 +150,7 @@ namespace vanguard{
     //Unary Operator
     UnaryOperator::UnaryOperator(const llvm::UnaryOperator &uop) : InstructionClass<llvm::UnaryOperator>(UNARY_OPERATOR,uop), unaryOperator(uop) {}
 
-    unsigned UnaryOperator::getOpClass(){
+    unsigned UnaryOperator::getOpClass() const{
         unsigned opcode = unaryOperator.getOpcode();
         UnaryOpClass unaryOpClass;
         if (opcode == 12) unaryOpClass = Neg;
@@ -160,12 +160,12 @@ namespace vanguard{
         return unaryOpClass;
     }
 
-    Value* UnaryOperator::getUnaryOperand() {
+    Value* UnaryOperator::getUnaryOperand() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateValue(unaryOperator.getOperand(0));
     }
 
-    const llvm::UnaryOperator &UnaryOperator::unwrap(){
+    const llvm::UnaryOperator &UnaryOperator::unwrap() const{
         return unaryOperator;
     }
 
@@ -176,7 +176,7 @@ namespace vanguard{
     //Cast Instruction
     CastInst::CastInst(const llvm::CastInst &ci): InstructionClass<llvm::CastInst>(CAST_INST,ci), castInst(ci){}
 
-    unsigned CastInst::getOpClass() {
+    unsigned CastInst::getOpClass() const{
         unsigned opcode = castInst.getOpcode();
         CastInstClass castInstClass;
         if (opcode == 38) castInstClass = Trunc;
@@ -193,12 +193,22 @@ namespace vanguard{
         return castInstClass;
     }
 
-    Value* CastInst::getUnaryOperand() {
+    Value* CastInst::getUnaryOperand() const{
         LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
         return llvMtoVanguard.translateValue(castInst.getOperand(0));
     }
 
-    const llvm::CastInst &CastInst::unwrap() {
+    Type* CastInst::getSrcType() const {
+        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
+        return llvMtoVanguard.translateType(castInst.getSrcTy());
+    }
+
+    Type* CastInst::getDestType() const {
+        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
+        return llvMtoVanguard.translateType(castInst.getDestTy());
+    }
+
+    const llvm::CastInst &CastInst::unwrap() const {
         return castInst;
     }
 
@@ -209,12 +219,12 @@ namespace vanguard{
     //Call
     Call::Call(const llvm::CallBase &cb) : InstructionClass<llvm::CallBase>(CALL, cb), call(cb) {}
 
-    Function* Call::getTarget(){
+    Function* Call::getTarget() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateFunction(call.getFunction());
     }
 
-    std::list<Value*> Call::getArgs(){
+    std::list<Value*> Call::getArgs() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Value*> args = {};
         for(auto itr = call.arg_begin(); itr != call.arg_end(); itr++){
@@ -223,7 +233,7 @@ namespace vanguard{
         return args;
     }
 
-    const llvm::CallBase &Call::unwrap(){
+    const llvm::CallBase &Call::unwrap() const{
         return call;
     }
 
@@ -235,11 +245,11 @@ namespace vanguard{
     UnreachableInstruction::UnreachableInstruction(const llvm::UnreachableInst &ui)
             : InstructionClass<llvm::UnreachableInst>(UNREACHABLE_INSTRUCTION, ui), unreachableInstruction(ui) {}
 
-    std::string UnreachableInstruction::error(){
+    std::string UnreachableInstruction::error() const{
         return "This instruction is unreachable.";
     }
 
-    const llvm::UnreachableInst &UnreachableInstruction::unwrap(){
+    const llvm::UnreachableInst &UnreachableInstruction::unwrap() const{
         return unreachableInstruction;
     }
 
@@ -251,17 +261,17 @@ namespace vanguard{
     ReturnInst::ReturnInst(const llvm::ReturnInst &retInst) : InstructionClass<llvm::ReturnInst>(RETURN_INST, retInst),
                                                                                              returnInst(retInst) {}
 
-    bool ReturnInst::returnsValue(){
+    bool ReturnInst::returnsValue() const{
         if (returnInst.getNumOperands() == 0) return false;
         else return true;
     }
 
-    Value* ReturnInst::returnValue(){
+    Value* ReturnInst::returnValue() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateValue(returnInst.getReturnValue());
     }
 
-    const llvm::ReturnInst &ReturnInst::unwrap(){
+    const llvm::ReturnInst &ReturnInst::unwrap() const{
         return returnInst;
     }
 
@@ -273,12 +283,27 @@ namespace vanguard{
     SelectInst::SelectInst(const llvm::SelectInst &si) : InstructionClass<llvm::SelectInst>(SELECT_INST, si),
                                                                                         selectInst(si) {}
 
-    InstructionVariable* SelectInst::getLHS(){
+    InstructionVariable* SelectInst::getLHS() const{
         auto* instvar = new InstructionVariable(selectInst);
         return instvar;
     }
 
-    const llvm::SelectInst &SelectInst::unwrap(){
+    Value *SelectInst::getCondition() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(selectInst.getCondition());
+    }
+
+    Value *SelectInst::getTrueValue() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(selectInst.getTrueValue());
+    }
+
+    Value *SelectInst::getFalseValue() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(selectInst.getFalseValue());
+    }
+
+    const llvm::SelectInst &SelectInst::unwrap() const{
         return selectInst;
     }
 
@@ -290,12 +315,22 @@ namespace vanguard{
     ExtractElementInst::ExtractElementInst(const llvm::ExtractElementInst &eei)
             : InstructionClass<llvm::ExtractElementInst>(EXTRACT_ELEMENT_INST, eei), extractElementInst(eei) {}
 
-    InstructionVariable* ExtractElementInst::getLHS(){
+    InstructionVariable* ExtractElementInst::getLHS() const{
         auto* instvar = new InstructionVariable(extractElementInst);
         return instvar;
     }
 
-    const llvm::ExtractElementInst &ExtractElementInst::unwrap(){
+    Value *ExtractElementInst::getVectorOperand() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(extractElementInst.getVectorOperand());
+    }
+
+    Value *ExtractElementInst::getIndexOperand() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(extractElementInst.getIndexOperand());
+    }
+
+    const llvm::ExtractElementInst &ExtractElementInst::unwrap() const{
         return extractElementInst;
     }
 
@@ -307,12 +342,26 @@ namespace vanguard{
     ExtractValueInst::ExtractValueInst(const llvm::ExtractValueInst &evi)
             : InstructionClass<llvm::ExtractValueInst>(EXTRACT_VALUE_INST, evi), extractValueInst(evi) {}
 
-    InstructionVariable* ExtractValueInst::getLHS(){
+    InstructionVariable* ExtractValueInst::getLHS() const{
         auto* instvar = new InstructionVariable(extractValueInst);
         return instvar;
     }
 
-    const llvm::ExtractValueInst &ExtractValueInst::unwrap(){
+    Value *ExtractValueInst::getAggregateOperand() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(extractValueInst.getAggregateOperand());
+    }
+
+    std::list<unsigned> ExtractValueInst::getIndices() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        std::list<unsigned> idxs = {};
+        for (unsigned i: extractValueInst.indices()){
+            idxs.push_back(i);
+        }
+        return idxs;
+    }
+
+    const llvm::ExtractValueInst &ExtractValueInst::unwrap() const{
         return extractValueInst;
     }
 
@@ -323,17 +372,26 @@ namespace vanguard{
     //Load Instruction
     LoadInst::LoadInst(const llvm::LoadInst &li): InstructionClass<llvm::LoadInst>(LOAD_INST, li), loadInst(li) {}
 
-    Value *LoadInst::getUnaryOperand() {
-        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
-        return llvMtoVanguard.translateValue(loadInst.getOperand(0));
-    }
-
-    InstructionVariable* LoadInst::getLHS(){
+    InstructionVariable* LoadInst::getLHS() const{
         auto* instvar = new InstructionVariable(loadInst);
         return instvar;
     }
 
-    const llvm::LoadInst &LoadInst::unwrap() {
+    Value *LoadInst::getPointerOperand() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(loadInst.getPointerOperand());
+    }
+
+    Type *LoadInst::getPointerOperandType() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(loadInst.getPointerOperandType());
+    }
+
+    unsigned LoadInst::getSize() const{
+        return loadInst.getPointerAddressSpace();
+    }
+
+    const llvm::LoadInst &LoadInst::unwrap() const {
         return loadInst;
     }
 
@@ -345,12 +403,30 @@ namespace vanguard{
     InsertValueInst::InsertValueInst(const llvm::InsertValueInst &ivi)
             : InstructionClass<llvm::InsertValueInst>(INSERT_VALUE_INST, ivi), insertValueInst(ivi) {}
 
-    MemoryAddress* InsertValueInst::getMemoryAddress(){
-        auto* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
-        return memAd;
+    Value *InsertValueInst::getAggregateOperand() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(insertValueInst.getAggregateOperand());
     }
 
-    const llvm::InsertValueInst &InsertValueInst::unwrap(){
+    Value *InsertValueInst::getInsertedValueOperand() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(insertValueInst.getInsertedValueOperand());
+    }
+
+    std::list<unsigned> InsertValueInst::getIndices() const {
+        std::list<unsigned> idxs = {};
+        for(unsigned i: insertValueInst.indices()){
+            idxs.push_back(i);
+        }
+        return idxs;
+    }
+
+//    MemoryAddress* InsertValueInst::getMemoryAddress() const{
+//        auto* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
+//        return memAd;
+//    }
+
+    const llvm::InsertValueInst &InsertValueInst::unwrap() const{
         return insertValueInst;
     }
 
@@ -362,12 +438,27 @@ namespace vanguard{
     InsertElementInst::InsertElementInst(const llvm::InsertElementInst &iei)
             : InstructionClass<llvm::InsertElementInst>(INSERT_ELEMENT_INST, iei), insertElementInst(iei) {}
 
-    MemoryAddress* InsertElementInst::getMemoryAddress(){
-        auto* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
-        return memAd;
+    Value *InsertElementInst::getVector() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(insertElementInst.getOperand(0));
     }
 
-    const llvm::InsertElementInst &InsertElementInst::unwrap(){
+    Value *InsertElementInst::getInsertedElement() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(insertElementInst.getOperand(1));
+    }
+
+    Value *InsertElementInst::getIndex() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(insertElementInst.getOperand(2));
+    }
+
+//    MemoryAddress* InsertElementInst::getMemoryAddress() const{
+//        auto* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
+//        return memAd;
+//    }
+
+    const llvm::InsertElementInst &InsertElementInst::unwrap() const{
         return insertElementInst;
     }
 
@@ -379,12 +470,31 @@ namespace vanguard{
     StoreInst::StoreInst(const llvm::StoreInst &si) : InstructionClass<llvm::StoreInst>(STORE_INST, si),
                                                                                      storeInst(si) {}
 
-    MemoryAddress* StoreInst::getMemoryAddress(){
-        auto* memAd = new MemoryAddress(storeInst.getPointerOperand(), sizeof(storeInst.getValueOperand()->getType()));
-        return memAd;
+    Value *StoreInst::getPointerOperand() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(storeInst.getPointerOperand());
     }
 
-    const llvm::StoreInst &StoreInst::unwrap(){
+    Value *StoreInst::getValueOperand() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(storeInst.getValueOperand());
+    }
+
+    Type *StoreInst::getPointerOperandType() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(storeInst.getPointerOperandType());
+    }
+
+    unsigned StoreInst::getSize() const {
+        return storeInst.getPointerAddressSpace();
+    }
+
+//    MemoryAddress* StoreInst::getMemoryAddress() const{
+//        auto* memAd = new MemoryAddress(storeInst.getPointerOperand(), sizeof(storeInst.getValueOperand()->getType()));
+//        return memAd;
+//    }
+
+    const llvm::StoreInst &StoreInst::unwrap() const{
         return storeInst;
     }
 
@@ -396,12 +506,12 @@ namespace vanguard{
     ShuffleVectorInst::ShuffleVectorInst(const llvm::ShuffleVectorInst &svi)
             : InstructionClass<llvm::ShuffleVectorInst>(SHUFFLE_VECTOR_INST, svi), shuffleVectorInst(svi) {}
 
-    MemoryAddress* ShuffleVectorInst::getMemoryAddress(){
-        auto* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), sizeof(shuffleVectorInst.getOperand(2)));
-        return memAd;
-    }
+//    MemoryAddress* ShuffleVectorInst::getMemoryAddress() const{
+//        auto* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), sizeof(shuffleVectorInst.getOperand(2)));
+//        return memAd;
+//    }
 
-    const llvm::ShuffleVectorInst &ShuffleVectorInst::unwrap(){
+    const llvm::ShuffleVectorInst &ShuffleVectorInst::unwrap() const{
         return shuffleVectorInst;
     }
 
@@ -412,17 +522,17 @@ namespace vanguard{
     //Alloca Instruction
     AllocaInst::AllocaInst(const llvm::AllocaInst &ai): InstructionClass<llvm::AllocaInst>(ALLOCA_INST, ai), allocaInst(ai) {}
 
-    Value *AllocaInst::getUnaryOperand() {
-        LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
-        return llvMtoVanguard.translateValue(allocaInst.getOperand(0));
+    Type *AllocaInst::getAllocatedType() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(allocaInst.getAllocatedType());
     }
 
-    MemoryAddress* AllocaInst::getMemoryAddress() {
-        auto* memAd = new MemoryAddress(allocaInst.getOperand(0), sizeof(allocaInst.getOperand(0)));
-        return memAd;
-    }
+//    MemoryAddress* AllocaInst::getMemoryAddress() const{
+//        auto* memAd = new MemoryAddress(allocaInst.getOperand(0), sizeof(allocaInst.getOperand(0)));
+//        return memAd;
+//    }
 
-    const llvm::AllocaInst &AllocaInst::unwrap() {
+    const llvm::AllocaInst &AllocaInst::unwrap() const{
         return allocaInst;
     }
 
@@ -433,12 +543,36 @@ namespace vanguard{
     //PHI Node
     PHINode::PHINode(const llvm::PHINode &phin) : InstructionClass<llvm::PHINode>(PHI_NODE, phin), phiNode(phin) {}
 
-    InstructionVariable* PHINode::getLHS(){
+    InstructionVariable* PHINode::getLHS() const{
         auto* instvar = new InstructionVariable(phiNode);
         return instvar;
     }
 
-    const llvm::PHINode &PHINode::unwrap(){
+    unsigned PHINode::getNumIncomingValues() const{
+        return phiNode.getNumIncomingValues();
+    }
+
+    std::vector<Value *> PHINode::getIncomingValues() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        std::vector<Value *> incValues = {};
+        int n = phiNode.getNumIncomingValues();
+        for(int i = 0; i < n ; i++){
+            incValues.push_back(llvmToVanguard.translateValue(phiNode.getIncomingValue(i)));
+        }
+        return incValues;
+    }
+
+    std::vector<Block *> PHINode::getIncomingBlocks() const {
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        std::vector<Block *> incBlocks = {};
+        int n = phiNode.getNumIncomingValues();
+        for(int i = 0; i < n ; i++){
+            incBlocks.push_back(llvmToVanguard.translateBlock(phiNode.getIncomingBlock(i)));
+        }
+        return incBlocks;
+    }
+
+    const llvm::PHINode &PHINode::unwrap() const{
         return phiNode;
     }
 
@@ -450,12 +584,22 @@ namespace vanguard{
     GetElementPtrInst::GetElementPtrInst(const llvm::GetElementPtrInst &gepi)
             : InstructionClass<llvm::GetElementPtrInst>(GET_ELEMENT_PTR_INST, gepi), getElementPtrInst(gepi) {}
 
-    InstructionVariable* GetElementPtrInst::getLHS(){
+    InstructionVariable* GetElementPtrInst::getLHS() const{
         auto* instvar = new InstructionVariable(getElementPtrInst);
         return instvar;
     }
 
-    const llvm::GetElementPtrInst &GetElementPtrInst::unwrap(){
+    Value *GetElementPtrInst::getPointerOperand() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(getElementPtrInst.getPointerOperand());
+    }
+
+    Type *GetElementPtrInst::getPointerOperandType() const{
+        LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(getElementPtrInst.getPointerOperandType());
+    }
+
+    const llvm::GetElementPtrInst &GetElementPtrInst::unwrap() const{
         return getElementPtrInst;
     }
 
@@ -466,16 +610,16 @@ namespace vanguard{
     //Freeze Instruction
     FreezeInst::FreezeInst(const llvm::FreezeInst &fi): InstructionClass<llvm::FreezeInst>(FREEZE_INST, fi), freezeInst(fi) {}
 
-    Value *FreezeInst::getUnaryOperand() {
+    Value *FreezeInst::getUnaryOperand() const{
         LLVMtoVanguard &llvMtoVanguard = LLVMtoVanguard::getInstance();
         return llvMtoVanguard.translateValue(freezeInst.getOperand(0));
     }
 
-    const llvm::FreezeInst &FreezeInst::unwrap() {
+    const llvm::FreezeInst &FreezeInst::unwrap() const{
         return freezeInst;
     }
 
-    InstructionVariable* FreezeInst::getLHS(){
+    InstructionVariable* FreezeInst::getLHS() const{
         auto* instvar = new InstructionVariable(freezeInst);
         return instvar;
     }

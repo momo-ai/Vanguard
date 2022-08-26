@@ -10,20 +10,20 @@ namespace vanguard{
 
     GlobalVariable::GlobalVariable(const llvm::GlobalVariable &gv): Value(GLOBAL_VARIABLE), globalVariable(gv) {}
 
-    Type* GlobalVariable::getType(){
+    Type* GlobalVariable::getType() const{
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(globalVariable.getType());
     }
 
-    bool GlobalVariable::hasName(){
+    bool GlobalVariable::hasName() const{
         return globalVariable.hasName();
     }
 
-    std::string GlobalVariable::getName(){
+    std::string GlobalVariable::getName() const{
         return std::string(globalVariable.getName());
     }
 
-    const llvm::GlobalVariable &GlobalVariable::unwrap(){
+    const llvm::GlobalVariable &GlobalVariable::unwrap() const{
         return globalVariable;
     }
 
@@ -34,20 +34,20 @@ namespace vanguard{
     //Argument
     Argument::Argument(const llvm::Argument& arg): Value(ARGUMENT), argument(arg){}
 
-    Type* Argument::getType(){
+    Type* Argument::getType() const{
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(argument.getType());
     }
 
-    bool Argument::hasName(){
+    bool Argument::hasName() const{
         return argument.hasName();
     }
 
-    std::string Argument::getName(){
+    std::string Argument::getName() const{
         return std::string(argument.getName());
     }
 
-    const llvm::Argument &Argument::unwrap(){
+    const llvm::Argument &Argument::unwrap() const{
         return argument;
     }
 
@@ -58,20 +58,20 @@ namespace vanguard{
     //InstructionVariable
     InstructionVariable::InstructionVariable(const llvm::Instruction& instv): Value(INSTRUCTION_VARIABLE), instructionVariable(instv){}
 
-    Type* InstructionVariable::getType(){
+    Type* InstructionVariable::getType() const{
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(instructionVariable.getType());
     }
 
-    bool InstructionVariable::hasName(){
+    bool InstructionVariable::hasName() const{
         return instructionVariable.hasName();
     }
 
-    std::string InstructionVariable::getName(){
+    std::string InstructionVariable::getName() const{
         return std::string(instructionVariable.getName());
     }
 
-    const llvm::Instruction &InstructionVariable::unwrap(){
+    const llvm::Instruction &InstructionVariable::unwrap() const{
         return instructionVariable;
     }
 
@@ -82,16 +82,16 @@ namespace vanguard{
     //Integer
     IntegerLiteral::IntegerLiteral(const llvm::ConstantInt& ci): Value(INTEGER_LITERAL), constInt(ci){}
 
-    Type* IntegerLiteral::getType(){
+    Type* IntegerLiteral::getType() const{
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(constInt.getType());
     }
 
-    int IntegerLiteral::getValue(){
+    int IntegerLiteral::getValue() const{
         return (int)constInt.getValue().getLimitedValue();
     }
 
-    const llvm::ConstantInt &IntegerLiteral::unwrap(){
+    const llvm::ConstantInt &IntegerLiteral::unwrap() const{
         return constInt;
     }
 
@@ -102,16 +102,16 @@ namespace vanguard{
     //String
     StringLiteral::StringLiteral(const llvm::ConstantDataSequential & cs): Value(STRING_LITERAL), constSeq(cs){}
 
-    Type* StringLiteral::getType(){
+    Type* StringLiteral::getType() const{
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(constSeq.getType());
     }
 
-    std::string StringLiteral::getValue(){
+    std::string StringLiteral::getValue() const{
         return constSeq.getAsString().str();
     }
 
-    const llvm::ConstantDataSequential &StringLiteral::unwrap(){
+    const llvm::ConstantDataSequential &StringLiteral::unwrap() const{
         return constSeq;
     }
 
@@ -122,45 +122,64 @@ namespace vanguard{
     //Boolean
     BooleanLiteral::BooleanLiteral(bool b): constBool(b){}
 
-    bool BooleanLiteral::getValue(){
+    bool BooleanLiteral::getValue() const{
         return constBool;
     }
 
-    //Memory Address
-    MemoryAddress::MemoryAddress(const llvm::Value* ptr, const llvm::Value* idx, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr) , index(idx), size(sz){}
-
-    MemoryAddress::MemoryAddress(const llvm::Value* ptr, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr), size(sz){}
-
-    Type* MemoryAddress::getType(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(pointer->getType());
-    }
-
-    const llvm::Value* MemoryAddress::getPointer(){
-        return pointer;
-    }
-
-    const llvm::Value* MemoryAddress::getIndex(){
-        return index;
-    }
-
-    unsigned long MemoryAddress::getSize(){
-        return size;
-    }
-
-    void MemoryAddress::accept(ValueClassVisitor &v) const {
-        return v.visit(*this);
-    }
+//    //Memory Address
+//    MemoryAddress::MemoryAddress(const llvm::Value* ptr, const llvm::Value* idx, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr) , index(idx), size(sz){}
+//
+//    MemoryAddress::MemoryAddress(const llvm::Value* ptr, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr), size(sz){}
+//
+//    Type* MemoryAddress::getType() const{
+//        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+//        return llvmToVanguard.translateType(pointer->getType());
+//    }
+//
+//    const llvm::Value* MemoryAddress::getPointer() const{
+//        return pointer;
+//    }
+//
+//    const llvm::Value* MemoryAddress::getIndex() const{
+//        return index;
+//    }
+//
+//    unsigned long MemoryAddress::getSize() const{
+//        return size;
+//    }
+//
+//    void MemoryAddress::accept(ValueClassVisitor &v) const {
+//        return v.visit(*this);
+//    }
 
     //Constant
     Constant::Constant(const llvm::Constant &cst): Value(CONSTANT), constant(cst) {}
 
-    Type* Constant::getType(){
+    Type* Constant::getType() const{
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(constant.getType());
     }
 
+    unsigned Constant::getLLVMValueID() const {
+        return constant.getValueID();
+    }
+
     void Constant::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    BlockValue::BlockValue(const llvm::BasicBlock &blk): Value(BLOCK), block(blk) {}
+
+    Type *BlockValue::getType() const {
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(block.getType());
+    }
+
+    unsigned BlockValue::getLLVMValueID() const {
+        return block.getValueID();
+    }
+
+    void BlockValue::accept(ValueClassVisitor &v) const {
         return v.visit(*this);
     }
 
