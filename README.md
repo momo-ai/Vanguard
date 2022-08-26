@@ -125,6 +125,8 @@ To add a detector, do the following:
 3. Add add_subdirectory(DETECTOR_DIR) to lib/detectors/CMakeLists.txt
 4. Add a CMakeLists.txt in /lib/detectors/DETECTOR_DIR that adds target_sources to Vanguard
 5. In DetectorRegistry.cpp, add the detector to the registry in the constructor.
+6. Add the detector name to list DETECTORS in run.py.
+
 
 
 
