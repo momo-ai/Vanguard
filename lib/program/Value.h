@@ -27,9 +27,9 @@ namespace vanguard{
         STRING_LITERAL,
         BOOLEAN_LITERAL,
         LITERAL_END = BOOLEAN_LITERAL,
-//        MEMORY_ADDRESS_BEGIN,
-//        MEMORY_ADDRESS = MEMORY_ADDRESS_BEGIN,
-//        MEMORY_ADDRESS_END = MEMORY_ADDRESS,
+        MEMORY_ADDRESS_BEGIN,
+        MEMORY_ADDRESS = MEMORY_ADDRESS_BEGIN,
+        MEMORY_ADDRESS_END = MEMORY_ADDRESS,
         CONSTANT_BEGIN,
         CONSTANT = CONSTANT_BEGIN,
         CONSTANT_END = CONSTANT,
@@ -224,37 +224,41 @@ namespace vanguard{
         bool constBool;
     };
 
-//    class MemoryAddress: public Value{
-//    public:
-//        MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
-//
-//        MemoryAddress(const llvm::Value* ptr, unsigned long sz);
-//
-//        static inline bool classof(const MemoryAddress &) { return true; }
-//        static inline bool classof(const MemoryAddress *) { return true; }
-//        static inline bool classof(const Value *value) { return classof(*value); }
-//        static inline bool classof(const Value &value) {
-//            if (value.getClass() == MEMORY_ADDRESS){ return true; }
-//            return false;
-//        }
-//
-//        MemoryAddress(const MemoryAddress&) = delete;
-//
-//        const llvm::Value* getPointer() const;
-//
-//        const llvm::Value* getIndex() const;
-//
-//        unsigned long getSize() const;
-//
-//        Type* getType() const override;
-//
-//        void accept(ValueClassVisitor &v) const override;
-//
-//    private:
-//        const llvm::Value* pointer;
-//        const llvm::Value* index{};
-//        unsigned long size = 0;
-//    };
+    class MemoryAddress: public Value{
+    public:
+        MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
+
+        MemoryAddress(const llvm::Value* ptr, unsigned long sz);
+
+        static inline bool classof(const MemoryAddress &) { return true; }
+        static inline bool classof(const MemoryAddress *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.getClass() == MEMORY_ADDRESS){ return true; }
+            return false;
+        }
+
+        MemoryAddress(const MemoryAddress&) = delete;
+
+        Value *getPointer() const;
+
+        Value *getIndex() const;
+
+        unsigned long getSize() const;
+
+        Type* getType() const override;
+
+        const llvm::Value* getLLVMPointer() const;
+
+        const llvm::Value* getLLVMIndex() const;
+
+        void accept(ValueClassVisitor &v) const override;
+
+    private:
+        const llvm::Value* pointer;
+        const llvm::Value* index{};
+        unsigned long size = 0;
+    };
 
     class Constant: public Value{
     private:
@@ -309,7 +313,7 @@ namespace vanguard{
         virtual void visit(const InstructionVariable &v) = 0;
         virtual void visit(const StringLiteral &v) = 0;
         virtual void visit(const IntegerLiteral &v) = 0;
-//        virtual void visit(const MemoryAddress &v) = 0;
+        virtual void visit(const MemoryAddress &v) = 0;
         virtual void visit(const Constant &v) = 0;
         virtual void visit(const BlockValue &v) = 0;
     };

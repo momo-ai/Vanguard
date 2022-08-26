@@ -126,31 +126,41 @@ namespace vanguard{
         return constBool;
     }
 
-//    //Memory Address
-//    MemoryAddress::MemoryAddress(const llvm::Value* ptr, const llvm::Value* idx, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr) , index(idx), size(sz){}
-//
-//    MemoryAddress::MemoryAddress(const llvm::Value* ptr, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr), size(sz){}
-//
-//    Type* MemoryAddress::getType() const{
-//        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-//        return llvmToVanguard.translateType(pointer->getType());
-//    }
-//
-//    const llvm::Value* MemoryAddress::getPointer() const{
-//        return pointer;
-//    }
-//
-//    const llvm::Value* MemoryAddress::getIndex() const{
-//        return index;
-//    }
-//
-//    unsigned long MemoryAddress::getSize() const{
-//        return size;
-//    }
-//
-//    void MemoryAddress::accept(ValueClassVisitor &v) const {
-//        return v.visit(*this);
-//    }
+    //Memory Address
+    MemoryAddress::MemoryAddress(const llvm::Value* ptr, const llvm::Value* idx, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr) , index(idx), size(sz){}
+
+    MemoryAddress::MemoryAddress(const llvm::Value* ptr, unsigned long sz): Value(MEMORY_ADDRESS), pointer(ptr), size(sz){}
+
+    Type* MemoryAddress::getType() const{
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateType(pointer->getType());
+    }
+
+    Value *MemoryAddress::getPointer() const{
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(pointer);
+    }
+
+    Value *MemoryAddress::getIndex() const{
+        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+        return llvmToVanguard.translateValue(index);
+    }
+
+    const llvm::Value* MemoryAddress::getLLVMPointer() const{
+        return pointer;
+    }
+
+    const llvm::Value* MemoryAddress::getLLVMIndex() const{
+        return index;
+    }
+
+    unsigned long MemoryAddress::getSize() const{
+        return size;
+    }
+
+    void MemoryAddress::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
 
     //Constant
     Constant::Constant(const llvm::Constant &cst): Value(CONSTANT), constant(cst) {}

@@ -6,6 +6,8 @@
 #include "../../program/InstructionClasses.h"
 
 namespace vanguard {
+    static bool debug_ir_validator = false;
+
     class ValueTrans : public ValueClassVisitor{
     public:
         std::string result;
@@ -48,9 +50,9 @@ namespace vanguard {
             result  = "StringLiteral of type " + v.getType()->getName() + " and value: " + v.getValue() + ". ";
         }
 
-//        void visit(const MemoryAddress &v) override{
-//            result = "MemoryAddress of type " + v.getType()->getName() + " and size " + std::to_string(v.getSize()) + ", ";
-//        }
+        void visit(const MemoryAddress &v) override{
+            result = "MemoryAddress of type " + v.getType()->getName() + " and size " + std::to_string(v.getSize()) + ", ";
+        }
 
         void visit(const Constant &v) override{
             result = "Constant of LLVM ValueID " + std::to_string(v.getLLVMValueID()) + " and type " + v.getType()->getName();
@@ -178,7 +180,7 @@ namespace vanguard {
         }
 
         void visit(const ExtractValueInst &inst) override{
-            result = "ExtractValueInst with aggregrate operand: " + getValueString(*inst.getAggregateOperand()) + " and indices: ";
+            result = "ExtractValueInst with aggregate operand: " + getValueString(*inst.getAggregateOperand()) + " and indices: ";
             for (unsigned i: inst.getIndices()){
                 result += std::to_string(i) + ", ";
             }
@@ -296,18 +298,26 @@ namespace vanguard {
             }
         }
 
-        std::cout << "\n ---- Listing global variables with their types ---- \n";
+        if(debug_ir_validator){
+            std::cout << "\n ---- Listing global variables with their types ---- \n";
+        }
         for (auto globalVariableValue: unit.getAllGlobalVariables()){
             auto globalVariable = llvm::dyn_cast<GlobalVariable>(globalVariableValue);
             if (globalVariable->hasName()) {
                 auto globalVariableFromName = (GlobalVariable *)unit.getGlobalVariable(globalVariable->getName());
                 assert(globalVariableFromName == globalVariable && "globalVariable and globalVariableFromName ");
                 assert(globalVariableFromName != nullptr && "Global variable from Name is null.");
-                std::cout << globalVariableFromName->getName() << " : " << (globalVariableFromName->getType())->getName() << "\n";
+                auto globalVariableName = globalVariableFromName->getName();
+                auto globalVariableType = (globalVariableFromName->getType())->getName();
+                if (debug_ir_validator) {
+                    std::cout << globalVariableName << " : " << globalVariableType << "\n";
+                }
             }
         }
 
-        std::cout << "\n ---- Listing functions with their signature ---- \n";
+        if (debug_ir_validator) {
+            std::cout << "\n ---- Listing functions with their signature ---- \n";
+        }
         std::vector< std::string > functionsNames = {};
         std::vector< std::list< Argument* > > functionsArguments = {};
         std::vector< std::list< Type* > > functionsArgumentTypes = {};
@@ -324,39 +334,58 @@ namespace vanguard {
             numFunctions++;
         }
         for(int i = 0; i < numFunctions; i++){
-            std::cout << functionsNames[i] << " : (";
+            auto funcName = functionsNames[i];
+            if (debug_ir_validator) {
+                std::cout << functionsNames[i] << " : (";
+            }
             auto itr1 = functionsArguments[i].begin();
             auto itr2 = functionsArgumentTypes[i].begin();
             for( ; itr1 != functionsArguments[i].end() && itr2 != functionsArgumentTypes[i].end(); ++itr1, ++itr2){
                 if ((*itr1)->hasName()){
-                    std::cout << (*itr1)->getName() << " : ";
+                    auto argName = (*itr1)->getName();
+                    if (debug_ir_validator){
+                        std::cout << argName << " : ";
+                    }
                 }
-                std::cout << (*itr2)->getName() << ", ";
+                auto arg_type_name = (*itr2)->getName();
+                if (debug_ir_validator) {
+                    std::cout << arg_type_name << ", ";
+                }
             }
-            std::cout << ") -> " << functionReturnTypes[i]->getName() << "\n";
+            auto ret_type = functionReturnTypes[i]->getName();
+            if (debug_ir_validator) {
+                std::cout << ") -> " << ret_type << "\n";
+            }
         }
 
-
-        std::cout << "---- Listing all Instructions with their types ---- \n";
+        if(debug_ir_validator) {
+            std::cout << "---- Listing all Instructions with their types ---- \n";
+        }
         for(auto fn : unit.getAllFunctions()) {
-            std::cout << fn->getName() << ":\n";
+            if (debug_ir_validator) {
+                std::cout << fn->getName() << ":\n";
+            }
             std::list<Instruction*> instructionsList = fn->getInstructionsList();
             if(!instructionsList.empty()) {
                 for (auto instruction: instructionsList) {
-//                    std::cout << instruction->getName() << " : " << instruction->getInstructionType() << "\n";
-                    std::cout << getInstructionString(*instruction) << "\n";
-
+                    std::string instString = getInstructionString(*instruction);
+                    if (debug_ir_validator) {
+                        std::cout << instString << "\n";
+                    }
                 }
             }
         }
     }
 
     void IRValidator::report() {
-        std::cout << "Module Name: " << moduleName << "\n";
-        std::cout << "Source File Name: " << sourceFileName << "\n";
-        std::cout << "Statistics:\n";
-        std::cout << "# Functions: " << totFns << "\n";
-        std::cout << "# Basic Blocks: " << totBlks << "\n";
-        std::cout << "# Instructions: " << totIns << "\n";
+        if (debug_ir_validator) {
+            std::cout << "Module Name: " << moduleName << "\n";
+            std::cout << "Source File Name: " << sourceFileName << "\n";
+            std::cout << "Statistics:\n";
+            std::cout << "# Functions: " << totFns << "\n";
+            std::cout << "# Basic Blocks: " << totBlks << "\n";
+            std::cout << "# Instructions: " << totIns << "\n";
+        }
+        std::cout << "IR validated successfully! \n";
     }
 }

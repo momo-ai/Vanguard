@@ -530,8 +530,8 @@ namespace vanguard{
     };
 
     class MemoryWriteInstruction: public AssignInstruction{
-//        public:
-//            virtual MemoryAddress* getMemoryAddress() const = 0;
+        public:
+            virtual MemoryAddress* getMemoryAddress() const = 0;
     };
 
     class InsertValueInst: public InstructionClass<llvm::InsertValueInst>, public MemoryWriteInstruction{
@@ -554,7 +554,7 @@ namespace vanguard{
 
             std::list<unsigned> getIndices() const;
 
-//            MemoryAddress* getMemoryAddress() const override;
+            MemoryAddress* getMemoryAddress() const override;
 
             const llvm::InsertValueInst &unwrap() const override;
 
@@ -584,7 +584,7 @@ namespace vanguard{
 
             Value *getIndex() const;
 
-//            MemoryAddress* getMemoryAddress() const override;
+            MemoryAddress* getMemoryAddress() const override;
 
             const llvm::InsertElementInst &unwrap() const override;
 
@@ -616,7 +616,7 @@ namespace vanguard{
 
             unsigned getSize() const;
 
-//            MemoryAddress* getMemoryAddress() const override;
+            MemoryAddress* getMemoryAddress() const override;
 
             const llvm::StoreInst &unwrap() const override;
 
@@ -640,7 +640,7 @@ namespace vanguard{
 
             ShuffleVectorInst(const ShuffleVectorInst&) = delete;
 
-//            MemoryAddress* getMemoryAddress() const override;
+            MemoryAddress* getMemoryAddress() const override;
 
             const llvm::ShuffleVectorInst &unwrap() const override;
 
@@ -666,7 +666,7 @@ namespace vanguard{
 
         Type *getAllocatedType() const;
 
-//        MemoryAddress* getMemoryAddress() const override;
+        MemoryAddress* getMemoryAddress() const override;
 
         const llvm::AllocaInst &unwrap() const override;
 

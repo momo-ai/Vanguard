@@ -421,10 +421,10 @@ namespace vanguard{
         return idxs;
     }
 
-//    MemoryAddress* InsertValueInst::getMemoryAddress() const{
-//        auto* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
-//        return memAd;
-//    }
+    MemoryAddress* InsertValueInst::getMemoryAddress() const{
+        auto* memAd = new MemoryAddress(insertValueInst.getOperand(0), insertValueInst.getOperand(2), sizeof(insertValueInst.getOperand(1)->getType()));
+        return memAd;
+    }
 
     const llvm::InsertValueInst &InsertValueInst::unwrap() const{
         return insertValueInst;
@@ -453,10 +453,10 @@ namespace vanguard{
         return llvmToVanguard.translateValue(insertElementInst.getOperand(2));
     }
 
-//    MemoryAddress* InsertElementInst::getMemoryAddress() const{
-//        auto* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
-//        return memAd;
-//    }
+    MemoryAddress* InsertElementInst::getMemoryAddress() const{
+        auto* memAd = new MemoryAddress(insertElementInst.getOperand(0), insertElementInst.getOperand(2), sizeof(insertElementInst.getOperand(1)->getType()));
+        return memAd;
+    }
 
     const llvm::InsertElementInst &InsertElementInst::unwrap() const{
         return insertElementInst;
@@ -489,10 +489,10 @@ namespace vanguard{
         return storeInst.getPointerAddressSpace();
     }
 
-//    MemoryAddress* StoreInst::getMemoryAddress() const{
-//        auto* memAd = new MemoryAddress(storeInst.getPointerOperand(), sizeof(storeInst.getValueOperand()->getType()));
-//        return memAd;
-//    }
+    MemoryAddress* StoreInst::getMemoryAddress() const{
+        auto* memAd = new MemoryAddress(storeInst.getPointerOperand(), sizeof(storeInst.getValueOperand()->getType()));
+        return memAd;
+    }
 
     const llvm::StoreInst &StoreInst::unwrap() const{
         return storeInst;
@@ -506,10 +506,10 @@ namespace vanguard{
     ShuffleVectorInst::ShuffleVectorInst(const llvm::ShuffleVectorInst &svi)
             : InstructionClass<llvm::ShuffleVectorInst>(SHUFFLE_VECTOR_INST, svi), shuffleVectorInst(svi) {}
 
-//    MemoryAddress* ShuffleVectorInst::getMemoryAddress() const{
-//        auto* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), sizeof(shuffleVectorInst.getOperand(2)));
-//        return memAd;
-//    }
+    MemoryAddress* ShuffleVectorInst::getMemoryAddress() const{
+        auto* memAd = new MemoryAddress(shuffleVectorInst.getOperand(2), sizeof(shuffleVectorInst.getOperand(2)));
+        return memAd;
+    }
 
     const llvm::ShuffleVectorInst &ShuffleVectorInst::unwrap() const{
         return shuffleVectorInst;
@@ -527,10 +527,10 @@ namespace vanguard{
         return llvmToVanguard.translateType(allocaInst.getAllocatedType());
     }
 
-//    MemoryAddress* AllocaInst::getMemoryAddress() const{
-//        auto* memAd = new MemoryAddress(allocaInst.getOperand(0), sizeof(allocaInst.getOperand(0)));
-//        return memAd;
-//    }
+    MemoryAddress* AllocaInst::getMemoryAddress() const{
+        auto* memAd = new MemoryAddress(allocaInst.getOperand(0), sizeof(allocaInst.getOperand(0)));
+        return memAd;
+    }
 
     const llvm::AllocaInst &AllocaInst::unwrap() const{
         return allocaInst;
