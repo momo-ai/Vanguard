@@ -10,7 +10,8 @@ jobs:
     timeout-minutes: 5
     steps:
       - uses: actions/checkout@v2.4.0
-        submodules: recursive
+        with: 
+          submodules: recursive
       - uses: cachix/install-nix-action@v17
         with:
           install_url: https://releases.nixos.org/nix/nix-2.9.2/install
