@@ -7,8 +7,16 @@
 #include "../AARequirement.h"
 #include "../../program/InstructionClasses.h"
 #include <list>
+#include <iostream>
 
 namespace vanguard { // Reentrancy {
+    ReentrancyDetector::ReentrancyDetector(const std::string& summaryFile) {
+        if(summaryFile.empty()) {
+            throw runtime_error("Must provide a summary to the reentrancy detector");
+        }
+
+        summary = summaryFile;
+    }
 
     bool ReentrancyDetector::shouldAnalyze(vanguard::Function &fn) {
         return chain->isContractFunction(fn);
@@ -61,7 +69,6 @@ namespace vanguard { // Reentrancy {
                 }
             }
             if (chain->isAnyExternalCall(*calledFn)) {
-                list<Value*> args = CallInstr->getArgs();
                 // If call is external, record that current func has ext and set last ext call
                 lastExternalCall = calledFn;
                 if (!get<0>(fnInfo[curFn])) {
@@ -146,7 +153,7 @@ namespace vanguard { // Reentrancy {
     }
 
     void ReentrancyDetector::startDetection() {
-        blockchain::SummaryReader sum = blockchain::SummaryReader("fp", aa);
+        blockchain::SummaryReader sum = blockchain::SummaryReader(summary, aa);
         chain = sum.blockchain();
     }
 
@@ -155,6 +162,7 @@ namespace vanguard { // Reentrancy {
             return false;
         }
 
+        string name = fn.getName();
         modified = beginFn(fn) || modified;
 
         unordered_set<Block* > wlContents;
@@ -192,7 +200,7 @@ namespace vanguard { // Reentrancy {
 
     void ReentrancyDetector::report() {
         string theRep = vulnerabilityReport();
-
+        std::cout << theRep << endl;
     }
 
     string ReentrancyDetector::name() {

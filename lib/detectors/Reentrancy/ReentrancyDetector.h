@@ -13,6 +13,7 @@
 namespace vanguard {
     class ReentrancyDetector : public FunctionDetector {
     public:
+        ReentrancyDetector(const std::string& summaryFile);
         bool shouldAnalyze(Function &fn);
         bool beginFn(Function &fn);
         bool transfer(Instruction &ins);
@@ -31,18 +32,19 @@ namespace vanguard {
         static char ID;
 
     private:
-        AARequirement *aa;
+        AARequirement *aa = nullptr;
         blockchain::Blockchain *chain = nullptr;
         // taken from ReentrancyAnalysis
         Function *lastExternalCall = nullptr; // Tracks last external call
-        Function *curFn; // Current function name
+        Function *curFn = nullptr; // Current function name
         std::map<Function *,Function *> potentialReentrancies; // Tracks potential reentrant funcs and external call
         std::map<Function *,std::tuple<bool,bool>> fnInfo; // Tracks for each func if it (1) has extern call or (2) has store
-        bool modified; // Tracks if current function being analyzed has been updated in fnInfo on this pass
+        bool modified = false; // Tracks if current function being analyzed has been updated in fnInfo on this pass
+        string summary;
         // OG
 //        ReentrancyAnalysis *analyzer;
     };
 }
 
 
-#endif //VANGUARD_Reentrancy_H
+#endif //VANGUARD_ReentrancyEXAMPLE_H

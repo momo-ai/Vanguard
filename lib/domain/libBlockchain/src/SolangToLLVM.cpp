@@ -98,7 +98,8 @@ namespace blockchain {
             return false;
         }
 
-        return llvmFn.getName().str() == "call";
+        string name = llvmFn.getName().str();
+        return name == "call";
     }
 
     bool SolangToLLVM::isStaticCall(vanguard::Function &fn) const {
@@ -107,7 +108,8 @@ namespace blockchain {
             return false;
         }
 
-        return llvmFn.getName().str() == "callStatic";
+        string name = llvmFn.getName().str();
+        return name == "callStatic";
     }
 
     bool SolangToLLVM::isDelegateCall(vanguard::Function &fn) const {
@@ -116,7 +118,8 @@ namespace blockchain {
             return false;
         }
 
-        return llvmFn.getName().str() == "callDelegate";
+        string name = llvmFn.getName().str();
+        return name == "callDelegate";
     }
 
     bool SolangToLLVM::writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const {

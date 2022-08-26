@@ -8,7 +8,7 @@
 
 namespace blockchain {
     // TODO: Confirm with Jon that this is all that is needed to set
-    BlkVariable::BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type) : BlkNode(VARIABLE, blk2llvm, name), vanguard::Value(vanguard::BLKVARIABLE) {
+    BlkVariable::BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type) : BlkNode(VARIABLE, blk2llvm, name), vanguard::Value(vanguard::BLKVARIABLE), varTy(type) {
         type->parent(this);
         // or do we do type->getType()
     }

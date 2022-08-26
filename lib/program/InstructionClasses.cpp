@@ -182,7 +182,7 @@ namespace vanguard{
 
     Function* Call::getTarget(){
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateFunction(call.getFunction());
+        return llvmToVanguard.translateFunction(call.getCalledFunction());
     }
 
     std::list<Value*> Call::getArgs(){
