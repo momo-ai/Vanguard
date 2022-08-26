@@ -1,12 +1,11 @@
 {
   inputs = {
-    libBlockchain.url = "github:Veridise/libBlockchain/nix";
-    libBlockchain.inputs.nixpkgs.follows = "nixpkgs";
+
 
     flake-utils.url = "github:numtide/flake-utils/v1.0.0";
   };
 
-  outputs = { self, nixpkgs, libBlockchain, flake-utils }:
+  outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
         pkgs = import nixpkgs {
@@ -49,9 +48,7 @@
     };
   }) // {
     overlays.default = final: prev: {
-      libVanguard = with final; callPackage ./libVanguard.nix {
-        inherit (libBlockchain.packages.${system}) libBlockchain;
-      };
+      libVanguard = with final; callPackage ./libVanguard.nix {};
 
       solang = with final; callPackage ./solang.nix { system = "aarch64-darwin"; };
     };

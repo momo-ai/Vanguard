@@ -1,0 +1,22 @@
+name: CI
+on:
+  push:
+    branches: [ v1 ]
+  pull_request:
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    timeout-minutes: 5
+    steps:
+      - uses: actions/checkout@v2.4.0
+        with: 
+          submodules: recursive
+      - uses: cachix/install-nix-action@v17
+        with:
+          install_url: https://releases.nixos.org/nix/nix-2.9.2/install
+      - name: Build libVanguard component
+        run: |
+          nix build --print-build-logs .#libVanguard
+          echo "Done."
+      # does not yet build preprocessors, python, other compoennts
