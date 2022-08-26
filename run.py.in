@@ -32,12 +32,12 @@ VANGUARD_EXEC = os.path.join(VANGUARD_BUILD_PATH, "Vanguard")
 ############################
 # Detectors
 ############################
-DETECTORS = ["statGen", "fnPrinter"]
+DETECTORS = ["statGen", "fnPrinter", "reentrancyBasic"]
 
 ############################
 # Subprocess Commands
 ############################
-VANGUARD_CMD = "{} --detectors {{}} {{}}".format(VANGUARD_EXEC)
+VANGUARD_CMD = "{} --detectors {{}} --summary {{}} {{}}".format(VANGUARD_EXEC)
 # Solidity commands
 IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG_PATH)
 BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG_PATH)
@@ -158,7 +158,7 @@ def run_detector(detector, summary_path):
             # Only process bc files
             class_name = bc_file.replace("_deploy.bc", "")
             bc_path = os.path.join(OUT_DIR, bc_file)
-            vanguard_cmd = VANGUARD_CMD.format(detector, bc_path)
+            vanguard_cmd = VANGUARD_CMD.format(detector, summary_path, bc_path)
             #print(vanguard_cmd)
             print("Running Vanguard on class {}...".format(class_name), end="")
             tout = bytes.decode(subprocess.check_output(vanguard_cmd.split(), stderr=subprocess.DEVNULL))
