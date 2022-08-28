@@ -10,7 +10,9 @@ namespace vanguard {
         return "fnPrinter";
     }
 
-    void FunctionPrinter::registerAnalyses() {}
+    std::vector<Requirement *> FunctionPrinter::registerAnalyses() {
+        return {};
+    }
 
     void FunctionPrinter::startDetection() {}
 

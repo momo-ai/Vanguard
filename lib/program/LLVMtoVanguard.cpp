@@ -100,9 +100,9 @@ namespace vanguard{
             else if (auto array = llvm::dyn_cast<llvm::ArrayType>(t)){
                 typeMap[t] = new ArrayType(*array);
             }
-//             else if (auto function = llvm::dyn_cast<llvm::FunctionType>(t)){
-//                 typeMap[t] = new FunctionT(*function);
-//             }
+            // else if (auto function = llvm::dyn_cast<llvm::FunctionType>(&t)){
+            //     typeMap[&t] = new FunctionT(*function);
+            // }
             else if (auto pointer = llvm::dyn_cast<llvm::PointerType>(t)){
                 typeMap[t] = new PointerType(*pointer);
             }

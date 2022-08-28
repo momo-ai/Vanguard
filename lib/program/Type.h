@@ -26,6 +26,8 @@ namespace vanguard{
 
             const llvm::IntegerType &unwrap();
 
+            const llvm::IntegerType &unwrap();
+
         private:
             const llvm::IntegerType& integer;
     };
@@ -41,6 +43,8 @@ namespace vanguard{
             uint64_t length();
 
             std::string name() override;
+
+            const llvm::ArrayType &unwrap();
 
             const llvm::ArrayType &unwrap();
 
@@ -78,6 +82,8 @@ namespace vanguard{
 
             const llvm::PointerType &unwrap();
 
+            const llvm::PointerType &unwrap();
+
         private:
             const llvm::PointerType& pointer;
     };
@@ -100,6 +106,8 @@ namespace vanguard{
 
             const llvm::StructType &unwrap();
 
+            const llvm::StructType &unwrap();
+
         private:
             const llvm::StructType& structT;
     };
@@ -113,6 +121,8 @@ namespace vanguard{
             Type* baseType();
 
             std::string name() override;
+
+            const llvm::VectorType &unwrap();
 
             const llvm::VectorType &unwrap();
 
@@ -148,7 +158,6 @@ namespace vanguard{
     private:
         const llvm::Type& labelType;
     };
-
 }
 
 #endif

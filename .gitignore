@@ -8,3 +8,4 @@ target
 Cargo.lock
 Cargo.toml
 .idea/*
+cmake-build-vanguard/*

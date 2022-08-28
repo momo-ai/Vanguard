@@ -14,6 +14,7 @@ namespace vanguard{
         else return "unnamed_block";
     }
 
+
     Function* Block::parent(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateFunction(block.getParent());

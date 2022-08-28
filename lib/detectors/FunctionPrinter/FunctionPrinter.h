@@ -10,7 +10,7 @@
 namespace vanguard {
     class FunctionPrinter : public FunctionDetector {
     public:
-        void registerAnalyses() override;
+        std::vector<Requirement *> registerAnalyses() override;
         void startDetection() override;
         bool detect(Function &fn) override;
         void report() override;

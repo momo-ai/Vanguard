@@ -48,7 +48,6 @@ namespace vanguard{
         virtual const llvm::Instruction &unwrap() const = 0;
 
         virtual void accept(InstructionClassVisitor &v) const = 0;
-
     };
 
 }

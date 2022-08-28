@@ -8,8 +8,12 @@
 #include <cassert>
 #include <iostream>
 
+#include "../../domain/libBlockchain/include/Blockchain.h"
+
 namespace vanguard {
-    void StatGen::registerAnalyses() { }
+    std::vector<Requirement *> StatGen::registerAnalyses() {
+        return {};
+    }
     void StatGen::startDetection() {
         totBlks = 0;
         totFns = 0;
@@ -64,5 +68,6 @@ namespace vanguard {
         std::cout << "# Functions: " << totFns << std::endl;
         std::cout << "# Basic Blocks: " << totBlks << std::endl;
         std::cout << "# Instructions: " << totIns << std::endl;
+        std::cout << blockchain::Blockchain::getThing() << std::endl;
     }
 }
