@@ -12,6 +12,7 @@
 //#include "LLVMtoVanguard.h"
 
 namespace vanguard{
+    class Block;
 
     enum ValueClassEnum{
         BLKVARIABLE_BEGIN,
@@ -27,15 +28,14 @@ namespace vanguard{
         STRING_LITERAL,
         BOOLEAN_LITERAL,
         LITERAL_END = BOOLEAN_LITERAL,
-        MEMORY_ADDRESS_BEGIN,
-        MEMORY_ADDRESS = MEMORY_ADDRESS_BEGIN,
-        MEMORY_ADDRESS_END = MEMORY_ADDRESS,
+        POINTER,
+        MEMORY_REGION,
         CONSTANT_BEGIN,
         CONSTANT = CONSTANT_BEGIN,
         CONSTANT_END = CONSTANT,
-        BLOCK_BEGIN,
-        BLOCK = BLOCK_BEGIN,
-        BLOCK_END = BLOCK
+        LOCATION_BEGIN,
+        LOCATION = LOCATION_BEGIN,
+        BLOCK_END = LOCATION
     };
 
     class ValueClassVisitor;
@@ -46,23 +46,24 @@ namespace vanguard{
         static inline bool classof(const Value &) { return true; }
         static inline bool classof(const Value *) { return true; }
 
-        virtual Type* getType() const= 0;
+        virtual Type* type() const= 0;
 
-        ValueClassEnum getClass() const;
+        ValueClassEnum valueClass() const;
 
         virtual void accept(ValueClassVisitor &v) const = 0;
 
     private:
-        ValueClassEnum valueClass;
+        ValueClassEnum valClass;
     };
 
-    class Variable{
+    class Variable : public Value{
     public:
+        explicit Variable(ValueClassEnum vc) : Value(vc) {};
         virtual bool hasName() const = 0;
-        virtual std::string getName() const = 0;
+        virtual std::string name() const = 0;
     };
 
-    class GlobalVariable: public Value, public Variable{
+    class GlobalVariable: public Variable{
     public:
         explicit GlobalVariable(const llvm::GlobalVariable &);
 
@@ -70,17 +71,17 @@ namespace vanguard{
         static inline bool classof(const GlobalVariable *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == GLOBAL_VARIABLE){ return true; }
+            if (value.valueClass() == GLOBAL_VARIABLE){ return true; }
             return false;
         }
 
         GlobalVariable(const GlobalVariable&) = delete;
 
-        Type* getType() const override;
+        Type* type() const override;
 
         bool hasName() const override;
 
-        std::string getName() const override;
+        std::string name() const override;
 
         const llvm::GlobalVariable &unwrap() const;
 
@@ -90,7 +91,7 @@ namespace vanguard{
         const llvm::GlobalVariable& globalVariable;
     };
 
-    class Argument: public Value, public Variable{
+    class Argument: public Variable{
     public:
         explicit Argument(const llvm::Argument&);
 
@@ -98,17 +99,17 @@ namespace vanguard{
         static inline bool classof(const Argument *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == ARGUMENT){ return true; }
+            if (value.valueClass() == ARGUMENT){ return true; }
             return false;
         }
 
         Argument(const Argument&) = delete;
 
-        Type* getType() const override;
+        Type* type() const override;
 
         bool hasName() const override;
 
-        std::string getName() const override;
+        std::string name() const override;
 
         const llvm::Argument &unwrap() const;
 
@@ -118,7 +119,7 @@ namespace vanguard{
         const llvm::Argument& argument;
     };
 
-    class InstructionVariable: public Value, public Variable{
+    class InstructionVariable: public Variable{
     public:
         explicit InstructionVariable(const llvm::Instruction &);
 
@@ -126,17 +127,17 @@ namespace vanguard{
         static inline bool classof(const InstructionVariable *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == INSTRUCTION_VARIABLE){ return true; }
+            if (value.valueClass() == INSTRUCTION_VARIABLE){ return true; }
             return false;
         }
 
         InstructionVariable(const InstructionVariable&) = delete;
 
-        Type* getType() const override;
+        Type* type() const override;
 
         bool hasName() const override;
 
-        std::string getName() const override;
+        std::string name() const override;
 
         const llvm::Instruction &unwrap() const;
 
@@ -147,12 +148,13 @@ namespace vanguard{
     };
 
     template <class T>
-    class Literal{
+    class Literal : public Value {
     public:
-        virtual T getValue() const = 0;
+        Literal(ValueClassEnum vc) : Value(vc) {};
+        virtual T value() const = 0;
     };
 
-    class IntegerLiteral: public Value, public Literal<int>{
+    class IntegerLiteral: public Literal<int>{
     public:
         explicit IntegerLiteral(const llvm::ConstantInt &);
 
@@ -160,15 +162,15 @@ namespace vanguard{
         static inline bool classof(const IntegerLiteral *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == INTEGER_LITERAL){ return true; }
+            if (value.valueClass() == INTEGER_LITERAL){ return true; }
             return false;
         }
 
         IntegerLiteral(const IntegerLiteral&) = delete;
 
-        int getValue() const override;
+        int value() const override;
 
-        Type* getType() const override;
+        Type* type() const override;
 
         const llvm::ConstantInt &unwrap() const;
 
@@ -178,7 +180,7 @@ namespace vanguard{
         const llvm::ConstantInt& constInt;
     };
 
-    class StringLiteral: public Value, public Literal<std::string>{
+    class StringLiteral: public Literal<std::string>{
     public:
         explicit StringLiteral(const llvm::ConstantDataSequential &);
 
@@ -186,15 +188,15 @@ namespace vanguard{
         static inline bool classof(const StringLiteral *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == STRING_LITERAL){ return true; }
+            if (value.valueClass() == STRING_LITERAL){ return true; }
             return false;
         }
 
         StringLiteral(const StringLiteral&) = delete;
 
-        std::string getValue() const override;
+        std::string value() const override;
 
-        Type* getType() const override;
+        Type* type() const override;
 
         const llvm::ConstantDataSequential &unwrap() const;
 
@@ -212,52 +214,73 @@ namespace vanguard{
         static inline bool classof(const BooleanLiteral *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == BOOLEAN_LITERAL){ return true; }
+            if (value.valueClass() == BOOLEAN_LITERAL){ return true; }
             return false;
         }
 
         BooleanLiteral(const BooleanLiteral&) = delete;
 
-        bool getValue() const override;
+        bool value() const override;
 
     private:
         bool constBool;
     };
 
-    class MemoryAddress: public Value{
+    class Pointer : public Value {
     public:
-        MemoryAddress(const llvm::Value* ptr,const llvm::Value* idx, unsigned long sz);
+        Pointer(const llvm::Value *base, const llvm::Value *offset, const llvm::Type *type);
 
-        MemoryAddress(const llvm::Value* ptr, unsigned long sz);
-
-        static inline bool classof(const MemoryAddress &) { return true; }
-        static inline bool classof(const MemoryAddress *) { return true; }
+        static inline bool classof(const Pointer &) { return true; }
+        static inline bool classof(const Pointer *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == MEMORY_ADDRESS){ return true; }
+            if (value.valueClass() == POINTER){ return true; }
             return false;
         }
 
-        MemoryAddress(const MemoryAddress&) = delete;
+        Pointer(const Pointer&) = delete;
+        Value *base() const;
+        Value *offset() const;
+        Type *refType() const;
+        Type* type() const override;
+        void accept(ValueClassVisitor &v) const override;
+    private:
+        const llvm::Value *ptrBase;
+        const llvm::Value *ptrOffset;
+        const llvm::Type *ptrType;
+    };
 
-        Value *getPointer() const;
+    class MemoryRegion: public Value{
+    public:
+        MemoryRegion(const Pointer *ptr, unsigned long size);
 
-        Value *getIndex() const;
+        static inline bool classof(const MemoryRegion &) { return true; }
+        static inline bool classof(const MemoryRegion *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == MEMORY_REGION){ return true; }
+            return false;
+        }
 
-        unsigned long getSize() const;
+        MemoryRegion(const MemoryRegion&) = delete;
 
-        Type* getType() const override;
+        const Pointer *pointer() const;
 
-        const llvm::Value* getLLVMPointer() const;
+        unsigned long size() const;
 
-        const llvm::Value* getLLVMIndex() const;
+        Type* type() const override;
+
+        //Type* type() const override;
+
+        //const llvm::Value* getLLVMPointer() const;
+
+        //const llvm::Value* getLLVMIndex() const;
 
         void accept(ValueClassVisitor &v) const override;
 
     private:
-        const llvm::Value* pointer;
-        const llvm::Value* index{};
-        unsigned long size = 0;
+        const Pointer *ptr;
+        unsigned long memSize = 0;
     };
 
     class Constant: public Value{
@@ -271,40 +294,36 @@ namespace vanguard{
         static inline bool classof(const Constant *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == CONSTANT){ return true; }
-            if (value.getClass() == STRING_LITERAL || value.getClass() == INTEGER_LITERAL){ return true; }
+            if (value.valueClass() == CONSTANT){ return true; }
             return false;
         }
 
-        Type* getType() const override;
+        Type* type() const override;
 
         unsigned getLLVMValueID() const;
 
         void accept(ValueClassVisitor &v) const override;
     };
 
-    class BlockValue: public Value{
+    class Location: public Value{
     private:
-        const llvm::BasicBlock &block;
+        const llvm::BasicBlock &location;
 
     public:
-        explicit BlockValue(const llvm::BasicBlock &);
+        explicit Location(const llvm::BasicBlock &);
 
-        static inline bool classof(const BlockValue &) { return true; }
-        static inline bool classof(const BlockValue *) { return true; }
+        static inline bool classof(const Location &) { return true; }
+        static inline bool classof(const Location *) { return true; }
         static inline bool classof(const Value *value) { return classof(*value); }
         static inline bool classof(const Value &value) {
-            if (value.getClass() == BLOCK){ return true; }
+            if (value.valueClass() == LOCATION){ return true; }
             return false;
         }
 
-        Type* getType() const override;
-
-        unsigned getLLVMValueID() const;
-
+        Type* type() const override;
         void accept(ValueClassVisitor &v) const override;
+        vanguard::Block &loc() const;
     };
-
 
     class ValueClassVisitor{
     public:
@@ -313,9 +332,10 @@ namespace vanguard{
         virtual void visit(const InstructionVariable &v) = 0;
         virtual void visit(const StringLiteral &v) = 0;
         virtual void visit(const IntegerLiteral &v) = 0;
-        virtual void visit(const MemoryAddress &v) = 0;
+        virtual void visit(const Pointer &v) = 0;
+        virtual void visit(const MemoryRegion &v) = 0;
         virtual void visit(const Constant &v) = 0;
-        virtual void visit(const BlockValue &v) = 0;
+        virtual void visit(const Location &v) = 0;
     };
 }
 

@@ -14,17 +14,17 @@ namespace vanguard{
 
         CompilationUnit(const CompilationUnit&) = delete;
 
-        std::string getModuleName();
+        std::string name();
 
-        std::string getSourceFileName();
+        std::string sourceFile();
 
-        Function* getFunction(std::string name);
+        Function* findFunction(std::string name);
 
-        Value* getGlobalVariable(std::string name);
+        Value* findGlobalVariable(std::string name);
 
-        std::list<Function *> getAllFunctions();
+        std::list<Function *> functions();
 
-        std::list<Value*> getAllGlobalVariables();
+        std::list<Value*> globalVariables();
 
         const llvm::Module& unwrap();
     };

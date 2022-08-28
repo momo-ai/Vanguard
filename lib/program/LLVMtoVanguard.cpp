@@ -2,7 +2,7 @@
 #include "Function.h"
 #include "Block.h"
 #include "Instruction.h"
-#include "InstructionClasses.h"
+#include "WrappedInstructions.h"
 #include "CompilationUnit.h"
 #include "Type.h"
 #include "Value.h"
@@ -50,28 +50,28 @@ namespace vanguard{
 
         if (instructionMap.find(ins) == instructionMap.end()) {
             unsigned opcode = ins->getOpcode();
-            if (opcode == 1) instructionMap[ins] = new ReturnInst(*llvm::dyn_cast<llvm::ReturnInst>(ins));
-            else if (opcode == 2) instructionMap[ins] = new BranchInst(*llvm::dyn_cast<llvm::BranchInst>(ins));
-            else if (opcode == 3)  instructionMap[ins] = new SwitchInst(*llvm::dyn_cast<llvm::SwitchInst>(ins));
-            else if (opcode == 4) instructionMap[ins] = new IndirectBrInst(*llvm::dyn_cast<llvm::IndirectBrInst>(ins));
-            else if (opcode == 7) instructionMap[ins] = new UnreachableInstruction(*llvm::dyn_cast<llvm::UnreachableInst>(ins));
-            else if (opcode == 12) instructionMap[ins] = new UnaryOperator(*llvm::dyn_cast<llvm::UnaryOperator>(ins));
-            else if (opcode >= 13 && opcode <= 30) instructionMap[ins] = new BinaryOperator(*llvm::dyn_cast<llvm::BinaryOperator>(ins));
-            else if (opcode == 31) instructionMap[ins] = new AllocaInst(*llvm::dyn_cast<llvm::AllocaInst>(ins));
-            else if (opcode == 32) instructionMap[ins] = new LoadInst(*llvm::dyn_cast<llvm::LoadInst>(ins));
-            else if (opcode == 33)  instructionMap[ins] = new StoreInst(*llvm::dyn_cast<llvm::StoreInst>(ins));
-            else if (opcode == 34) instructionMap[ins] = new GetElementPtrInst(*llvm::dyn_cast<llvm::GetElementPtrInst>(ins));
-            else if (opcode >= 38 && opcode <= 50) instructionMap[ins] = new CastInst(*llvm::dyn_cast<llvm::CastInst>(ins));
-            else if (opcode == 53 || opcode == 54) instructionMap[ins] = new CmpInst(*llvm::dyn_cast<llvm::CmpInst>(ins));
-            else if (opcode == 55) instructionMap[ins] = new PHINode(*llvm::dyn_cast<llvm::PHINode>(ins));
-            else if (opcode == 56) instructionMap[ins] = new Call(*llvm::dyn_cast<llvm::CallBase>(ins));
-            else if (opcode == 57) instructionMap[ins] = new SelectInst(*llvm::dyn_cast<llvm::SelectInst>(ins));
-            else if (opcode == 61) instructionMap[ins] = new ExtractElementInst(*llvm::dyn_cast<llvm::ExtractElementInst>(ins));
-            else if (opcode == 62) instructionMap[ins] = new InsertElementInst(*llvm::dyn_cast<llvm::InsertElementInst>(ins));
-            else if (opcode == 63) instructionMap[ins] = new ShuffleVectorInst(*llvm::dyn_cast<llvm::ShuffleVectorInst>(ins));
-            else if (opcode == 64) instructionMap[ins] = new ExtractValueInst(*llvm::dyn_cast<llvm::ExtractValueInst>(ins));
-            else if (opcode == 65) instructionMap[ins] = new InsertValueInst(*llvm::dyn_cast<llvm::InsertValueInst>(ins));
-            else if (opcode == 67) instructionMap[ins] = new FreezeInst(*llvm::dyn_cast<llvm::FreezeInst>(ins));
+            if (opcode == 1) instructionMap[ins] = new ReturnIns(*llvm::dyn_cast<llvm::ReturnInst>(ins));
+            else if (opcode == 2) instructionMap[ins] = new BranchIns(*llvm::dyn_cast<llvm::BranchInst>(ins));
+            else if (opcode == 3)  instructionMap[ins] = new SwitchIns(*llvm::dyn_cast<llvm::SwitchInst>(ins));
+            else if (opcode == 4) instructionMap[ins] = new IndirectBrIns(*llvm::dyn_cast<llvm::IndirectBrInst>(ins));
+            else if (opcode == 7) instructionMap[ins] = new UnreachableIns(*llvm::dyn_cast<llvm::UnreachableInst>(ins));
+            else if (opcode == 12) instructionMap[ins] = new UnaryIns(*llvm::dyn_cast<llvm::UnaryOperator>(ins));
+            else if (opcode >= 13 && opcode <= 30) instructionMap[ins] = new BinaryIns(*llvm::dyn_cast<llvm::BinaryOperator>(ins));
+            else if (opcode == 31) instructionMap[ins] = new AllocaIns(*llvm::dyn_cast<llvm::AllocaInst>(ins));
+            else if (opcode == 32) instructionMap[ins] = new LoadIns(*llvm::dyn_cast<llvm::LoadInst>(ins));
+            else if (opcode == 33)  instructionMap[ins] = new StoreIns(*llvm::dyn_cast<llvm::StoreInst>(ins));
+            else if (opcode == 34) instructionMap[ins] = new GetElementPtrIns(*llvm::dyn_cast<llvm::GetElementPtrInst>(ins));
+            else if (opcode >= 38 && opcode <= 50) instructionMap[ins] = new CastIns(*llvm::dyn_cast<llvm::CastInst>(ins));
+            else if (opcode == 53 || opcode == 54) instructionMap[ins] = new CmpIns(*llvm::dyn_cast<llvm::CmpInst>(ins));
+            else if (opcode == 55) instructionMap[ins] = new PHIIns(*llvm::dyn_cast<llvm::PHINode>(ins));
+            else if (opcode == 56) instructionMap[ins] = new CallIns(*llvm::dyn_cast<llvm::CallBase>(ins));
+            else if (opcode == 57) instructionMap[ins] = new SelectIns(*llvm::dyn_cast<llvm::SelectInst>(ins));
+            else if (opcode == 61) instructionMap[ins] = new ExtractElementIns(*llvm::dyn_cast<llvm::ExtractElementInst>(ins));
+            else if (opcode == 62) instructionMap[ins] = new InsertElementIns(*llvm::dyn_cast<llvm::InsertElementInst>(ins));
+            else if (opcode == 63) instructionMap[ins] = new ShuffleVectorIns(*llvm::dyn_cast<llvm::ShuffleVectorInst>(ins));
+            else if (opcode == 64) instructionMap[ins] = new ExtractValueIns(*llvm::dyn_cast<llvm::ExtractValueInst>(ins));
+            else if (opcode == 65) instructionMap[ins] = new InsertValueIns(*llvm::dyn_cast<llvm::InsertValueInst>(ins));
+            else if (opcode == 67) instructionMap[ins] = new FreezeIns(*llvm::dyn_cast<llvm::FreezeInst>(ins));
             else throw std::runtime_error("The instruction class " + (std::string)ins->getOpcodeName() + " with opcode " + std::to_string(opcode) + " does not exist in Vanguard yet.");
         }
         return instructionMap[ins];
@@ -138,7 +138,7 @@ namespace vanguard{
                 valueMap[val] = new Argument(*argument);
             }
             else if (auto instVar = llvm::dyn_cast<llvm::Instruction>(val)){
-                valueMap[val] =new InstructionVariable(*instVar);
+                valueMap[val] = new InstructionVariable(*instVar);
             }
             else if (auto integer = llvm::dyn_cast<llvm::ConstantInt>(val)){
                 valueMap[val] = new IntegerLiteral(*integer);
@@ -149,8 +149,8 @@ namespace vanguard{
             else if(auto constant = llvm::dyn_cast<llvm::Constant>(val)){
                 valueMap[val] = new Constant(*constant);
             }
-            else if(auto blk = llvm::dyn_cast<llvm::BasicBlock>(val)){
-                valueMap[val] = new BlockValue(*blk);
+            else if(auto loc = llvm::dyn_cast<llvm::BasicBlock>(val)) {
+                valueMap[val] = new Location(*loc);
             }
             else{
                 throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");
@@ -159,4 +159,15 @@ namespace vanguard{
         return valueMap[val];
     }
 
+    InstructionVariable *LLVMtoVanguard::translateInsVar(const llvm::Instruction *ins) {
+        if(ins == nullptr) {
+            return nullptr;
+        }
+
+        if (valueMap.find(ins) == valueMap.end()) {
+            valueMap[ins] = new InstructionVariable(*ins);
+        }
+
+        return llvm::dyn_cast<InstructionVariable>(valueMap[ins]);
+    }
 }

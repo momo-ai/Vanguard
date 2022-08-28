@@ -19,21 +19,19 @@ namespace vanguard {
 
         Function(const Function&) = delete;
 
-        std::string getName();
+        std::string name();
 
-        std::list<Argument*> getParams();
+        std::list<Argument*> params();
 
-        std::list<Type *> getParamTypes();
-
-        Type* getReturnType();
+        Type* returnType();
 
         bool hasBody();
 
-        Block* getBody();
+        Block* body();
 
-        std::list<Instruction*> getInstructionsList();
+        std::list<Instruction*> instructions();
 
-        std::list<Block *> getAllBlocks();
+        std::list<Block *> blocks();
 
         const llvm::Function &unwrap();
 

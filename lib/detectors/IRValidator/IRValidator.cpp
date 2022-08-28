@@ -3,7 +3,7 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
-#include "../../program/InstructionClasses.h"
+#include "../../program/WrappedInstructions.h"
 
 namespace vanguard {
     static bool debug_ir_validator = false;
@@ -14,52 +14,57 @@ namespace vanguard {
 
         void visit(const GlobalVariable &v) override{
             if (v.hasName()){
-                result = "GlobalVariable " + v.getName() + " of type " + v.getType()->getName();
+                result = "GlobalVariable " + v.name() + " of type " + v.type()->name();
             }
             else {
-                result = "GlobalVariable of type " + v.getType()->getName();
+                result = "GlobalVariable of type " + v.type()->name();
             }
             result += ", ";
         }
 
         void visit(const Argument &v) override{
             if (v.hasName()){
-                result = "Argument " + v.getName() + " of type " + v.getType()->getName();
+                result = "Argument " + v.name() + " of type " + v.type()->name();
             }
             else {
-                result = "Argument of type " + v.getType()->getName();
+                result = "Argument of type " + v.type()->name();
             }
             result+= ", ";
         }
 
         void visit(const InstructionVariable &v) override{
             if (v.hasName()){
-                result = "InstructionVariable " + v.getName() + " of type " + v.getType()->getName();
+                result = "InstructionVariable " + v.name() + " of type " + v.type()->name();
             }
             else {
-                result = "InstructionVariable of type " + v.getType()->getName();
+                result = "InstructionVariable of type " + v.type()->name();
             }
             result+= ", ";
         }
 
         void visit(const IntegerLiteral &v) override{
-            result  = "IntegerLiteral of type " + v.getType()->getName() + " and value: " + std::to_string(v.getValue()) +", ";
+            result  = "IntegerLiteral of type " + v.type()->name() + " and value: " + std::to_string(v.value()) + ", ";
         }
 
         void visit(const StringLiteral &v) override{
-            result  = "StringLiteral of type " + v.getType()->getName() + " and value: " + v.getValue() + ". ";
+            result  = "StringLiteral of type " + v.type()->name() + " and value: " + v.value() + ". ";
         }
 
-        void visit(const MemoryAddress &v) override{
-            result = "MemoryAddress of type " + v.getType()->getName() + " and size " + std::to_string(v.getSize()) + ", ";
+        void visit(const Pointer &v) override {
+            result = "found pointer";
+        }
+
+        void visit(const MemoryRegion &v) override{
+            result = "MemoryRegion of type " + v.type()->name() + " and size " + std::to_string(v.size()) + ", ";
         }
 
         void visit(const Constant &v) override{
-            result = "Constant of LLVM ValueID " + std::to_string(v.getLLVMValueID()) + " and type " + v.getType()->getName();
+            result = "Constant of LLVM ValueID " + std::to_string(v.getLLVMValueID()) + " and type " + v.type()->name();
         }
 
-        void visit(const BlockValue &v) override{
-            result = "BlockValue of LLVM ValueID " + std::to_string(v.getLLVMValueID()) + " and type " + v.getType()->getName();
+        void visit(const Location &v) override{
+            result = "BlockValue of type " +
+                    v.type()->name();
         }
 
     };
@@ -74,168 +79,76 @@ namespace vanguard {
     class InstructionTrans: public InstructionClassVisitor{
     public:
         std::string result;
-        void visit(const BinaryOperator &inst) override{
-            result = "BinaryOperator of BinaryOpClass " + std::to_string(inst.getOpClass()) + " has LHS: " + getValueString((Value&)(*inst.getLHS())) + " and operands: ";
-            auto n = inst.getNumOperands();
-            assert(n == 2 && "BinaryOperator does not have 2 operands");
-            result += getValueString(*inst.getOperand(0)) + " and ";
-            result += getValueString(*inst.getOperand(1));
+        void visit(const BinaryOpExpr &inst) override{
+            auto op = inst.op();
+            auto varResult = inst.result();
+            result = "BinaryIns of BinaryOpClass " + std::to_string(op) + " has LHS: " + getValueString(*varResult) + " and operands: ";
+            auto n = inst.numOperands();
+            assert(n == 2 && "BinaryIns does not have 2 operands");
+            result += getValueString(*inst.operand(0)) + " and ";
+            result += getValueString(*inst.operand(1));
         }
 
-        void visit(const CmpInst &inst) override{
-            result = "CmpInst of BinaryOpClass " + std::to_string(inst.getOpClass()) + " has LHS: " + getValueString((Value&)(*inst.getLHS())) + " and operands: ";
-            auto n = inst.getNumOperands();
-            assert(n == 2 && "CmpInst does not have 2 operands");
-            result += getValueString(*inst.getOperand(0)) + " and ";
-            result += getValueString(*inst.getOperand(1));
-        }
-
-        void visit(const BranchInst &inst) override{
-            result = "BranchInst ";
+        void visit(const Branch &inst) override{
+            result = "BranchIns ";
             if (inst.isConditional()){
-                result+= "with condition " + getValueString(*inst.getCondition()) + ", ";
+                result+= "with condition " + getValueString(*inst.condition()) + ", ";
             }
             result += " has successors: ";
-            for (auto blk : inst.getSuccessors()){
-                result += blk->getName() + ", ";
+            for (auto blk : inst.targets()){
+                result += blk->name() + ", ";
             }
-            auto n = inst.getNumOperands();
+            auto n = inst.numOperands();
             if (n != 0) {
                 result += "and operands ";
                 for (int i = 0; i < n; i++) {
-                    result += getValueString(*inst.getOperand(i)) + " ";
+                    result += getValueString(*inst.operand(i)) + " ";
                 }
             }
         }
 
-        void visit(const IndirectBrInst &inst) override{
-            result = "IndirectBrInst " ;
-            result += " has successors: ";
-            for (auto blk : inst.getSuccessors()){
-                result += blk->getName() + ", ";
-            }
-            auto n = inst.getNumOperands();
-            if (n != 0) {
-                result += "and operands ";
-                for (int i = 0; i < n; i++) {
-                    result += getValueString(*inst.getOperand(i)) + " ";
-                }
-            }
+        void visit(const UnaryOpExpr &inst) override{
+            result = "UnaryIns of UnaryOpClass " + std::to_string(inst.op()) + " has operand " +
+                    getValueString(*inst.operand());
         }
 
-        void visit(const SwitchInst &inst) override{
-            result = "SwitchInst with condition "+ getValueString(*inst.getCondition());
-            result += " has successors: ";
-            for (auto blk : inst.getSuccessors()){
-                result += blk->getName() + ", ";
-            }
-            auto n = inst.getNumOperands();
-            if (n != 0) {
-                result += "and operands ";
-                for (int i = 0; i < n; i++) {
-                    result += getValueString(*inst.getOperand(i)) + " ";
-                }
-            }
+        void visit(const CastExpr &inst) override{
+            result = "CastIns casts to " + inst.castTo()->name() ;
         }
 
-        void visit(const UnaryOperator &inst) override{
-            result = "UnaryOperator of UnaryOpClass " + std::to_string(inst.getOpClass()) + " has operand " +
-                    getValueString(*inst.getUnaryOperand());
-        }
-
-        void visit(const CastInst &inst) override{
-            result = "CastInst of CastInstClass " + std::to_string(inst.getOpClass()) + " casts from " + inst.getSrcType()->getName() + " to " + inst.getDestType()->getName();
-        }
-
-        void visit(const Call &inst) override{
-            result = "Call to function " + inst.getTarget()->getName() + " with arguments: ";
+        void visit(const CallExpr &inst) override{
+            result = "Call to function " + inst.getTarget()->name() + " with arguments: ";
             auto args = inst.getArgs();
             for (auto arg: args){
                 result += getValueString(*arg) + ", ";
             }
         }
 
-        void visit(const UnreachableInstruction &inst) override{
-            result = "UnreachableInstruction: " + inst.error() ;
+        void visit(const Error &inst) override {
+            result = "UnreachableIns: " + inst.msg() ;
         }
 
-        void visit(const ReturnInst &inst) override{
-            result = "ReturnInst ";
+        void visit(const Return &inst) override {
+            result = "ReturnIns ";
             if (inst.returnsValue()){
-                result += "returns value " + getValueString(*inst.returnValue());
+                result += "returns value " + getValueString(*inst.value());
             }
             else{
                 result += "not returning a value.";
             }
         }
 
-        void visit(const SelectInst &inst) override{
-            result = "SelectInst with condition " + getValueString(*inst.getCondition()) + " has true Value " +
-                    getValueString(*inst.getTrueValue()) + " and false value " + getValueString(*inst.getFalseValue());
+        void visit(const TernaryExpr &inst) override{
+            result = "SelectIns with condition " + getValueString(*inst.condition()) + " has true Value " +
+                    getValueString(*inst.trueValue()) + " and false value " + getValueString(*inst.falseValue());
         }
 
-        void visit(const ExtractElementInst &inst) override{
-            result = "ExtractElementInst with vector operand: " + getValueString(*inst.getVectorOperand())  + " and index operand " +
-                    getValueString(*inst.getIndexOperand());
+        void visit(const Assignment &inst) override {
+            result = "assigns " + getValueString(*inst.result());
         }
 
-        void visit(const ExtractValueInst &inst) override{
-            result = "ExtractValueInst with aggregate operand: " + getValueString(*inst.getAggregateOperand()) + " and indices: ";
-            for (unsigned i: inst.getIndices()){
-                result += std::to_string(i) + ", ";
-            }
-        }
-
-        void visit(const LoadInst &inst) override{
-            result = "LoadInst with pointer operand: " + getValueString(*inst.getPointerOperand());
-        }
-
-        void visit(const InsertValueInst &inst) override{
-            result = "InsertValueInst inserting " + getValueString(*inst.getInsertedValueOperand()) + " to " +
-                    getValueString(*inst.getAggregateOperand()) + " at indices: ";
-            for (unsigned i: inst.getIndices()){
-                result += std::to_string(i) + ", ";
-            }
-        }
-
-        void visit(const InsertElementInst &inst) override{
-            result = "InsertElementInst inserts value: " + getValueString(*inst.getInsertedElement())  + " to vector: " + getValueString(*inst.getVector()) + " at index " +
-                    getValueString(*inst.getIndex());
-        }
-
-        void visit(const StoreInst &inst) override{
-            result = "StoreInst storing value " + getValueString(*inst.getValueOperand()) + " at pointer " +
-                    getValueString(*inst.getPointerOperand());
-            assert(inst.getPointerOperandType() == inst.getPointerOperand()->getType() && "Pointer Operand Type not not consistent in StoreInst");
-        }
-
-        void visit(const ShuffleVectorInst &inst) override{
-            result = "ShuffleVectorInst ";
-        }
-
-        void visit(const AllocaInst &inst) override{
-            result = "AllocaInst allocating for type: " + inst.getAllocatedType()->getName();
-        }
-
-        void visit(const PHINode &inst) override{
-            result = "PHINode assigns to variable: " + getValueString(*inst.getLHS()) + " following values based on respective incoming blocks: " ;
-            int n = inst.getNumIncomingValues();
-            auto values = inst.getIncomingValues();
-            auto blocks = inst.getIncomingBlocks();
-            for (int i = 0; i < n; i++){
-                result += "(" + std::to_string(i+1) + ") block: ";
-                result += blocks[i]->getName();
-                result += ", value: " + getValueString(*values[i]);
-            }
-        }
-
-        void visit(const GetElementPtrInst &inst) override{
-            result = "GetElementPtrInst assigns to: " + getValueString(*inst.getLHS()) + " getting value at pointer " +
-                    getValueString(*inst.getPointerOperand());
-        }
-
-        void visit(const FreezeInst &inst) override{
-            result = "FreezeInst assigns to " + getValueString(*inst.getLHS());
+        void visit(const UnknownExpr &inst) override {
+            result = "Unknown expression";
         }
     };
 
@@ -259,7 +172,7 @@ namespace vanguard {
 
     void IRValidator::countBody(Block *blk) {
         assert(blk != nullptr && "Function does not have a body");
-        assert(blk->isEntryBlock() && "Fn body not marked as entry block");
+        assert(blk->isEntry() && "Fn body not marked as entry block");
 
         std::unordered_set<Block *> seen = { blk };
         std::vector<Block *> worklist = { blk };
@@ -270,12 +183,12 @@ namespace vanguard {
 
             totBlks++;
 
-            for(auto ins : curBlk->getInstructionsList()) {
-                assert(curBlk == ins->getBlock() && "Block does not match instruction block");
+            for(auto ins : curBlk->instructions()) {
+                assert(curBlk == ins->parent() && "Block does not match instruction block");
                 totIns++;
             }
 
-            for(auto next : curBlk->getAllSuccessors()) {
+            for(auto next : curBlk->successors()) {
                 if(next != nullptr && seen.find(next) == seen.end()) {
                     seen.insert(next);
                     worklist.push_back(next);
@@ -285,15 +198,15 @@ namespace vanguard {
     }
 
     void IRValidator::detect(CompilationUnit &unit) {
-        moduleName = unit.getModuleName();
-        sourceFileName = unit.getSourceFileName();
+        moduleName = unit.name();
+        sourceFileName = unit.sourceFile();
 
-        for(auto fn : unit.getAllFunctions()) {
+        for(auto fn : unit.functions()) {
             totFns++;
             if(fn->hasBody()) {
-                auto body = fn->getBody();
-                assert(body->getFunction() == fn && "Function does not match block function");
-                assert(body->isEntryBlock() == true && "Not an entry block.");
+                auto body = fn->body();
+                assert(body->parent() == fn && "Function does not match block function");
+                assert(body->isEntry() == true && "Not an entry block.");
                 countBody(body);
             }
         }
@@ -301,14 +214,14 @@ namespace vanguard {
         if(debug_ir_validator){
             std::cout << "\n ---- Listing global variables with their types ---- \n";
         }
-        for (auto globalVariableValue: unit.getAllGlobalVariables()){
+        for (auto globalVariableValue: unit.globalVariables()){
             auto globalVariable = llvm::dyn_cast<GlobalVariable>(globalVariableValue);
             if (globalVariable->hasName()) {
-                auto globalVariableFromName = (GlobalVariable *)unit.getGlobalVariable(globalVariable->getName());
+                auto globalVariableFromName = (GlobalVariable *) unit.findGlobalVariable(globalVariable->name());
                 assert(globalVariableFromName == globalVariable && "globalVariable and globalVariableFromName ");
                 assert(globalVariableFromName != nullptr && "Global variable from Name is null.");
-                auto globalVariableName = globalVariableFromName->getName();
-                auto globalVariableType = (globalVariableFromName->getType())->getName();
+                auto globalVariableName = globalVariableFromName->name();
+                auto globalVariableType = (globalVariableFromName->type())->name();
                 if (debug_ir_validator) {
                     std::cout << globalVariableName << " : " << globalVariableType << "\n";
                 }
@@ -320,17 +233,15 @@ namespace vanguard {
         }
         std::vector< std::string > functionsNames = {};
         std::vector< std::list< Argument* > > functionsArguments = {};
-        std::vector< std::list< Type* > > functionsArgumentTypes = {};
         std::vector< Type* > functionReturnTypes = {};
         int numFunctions = 0;
-        for (auto function: unit.getAllFunctions()){
-            auto functionFromName = unit.getFunction(function->getName());
+        for (auto function: unit.functions()){
+            auto functionFromName = unit.findFunction(function->name());
             assert(functionFromName != nullptr && "Function from name is null.");
             assert(function == functionFromName && "Function and function from name are not the same." );
-            functionsNames.push_back(function->getName());
-            functionsArguments.push_back(function->getParams());
-            functionsArgumentTypes.push_back(function->getParamTypes());
-            functionReturnTypes.push_back(function->getReturnType());
+            functionsNames.push_back(function->name());
+            functionsArguments.push_back(function->params());
+            functionReturnTypes.push_back(function->returnType());
             numFunctions++;
         }
         for(int i = 0; i < numFunctions; i++){
@@ -339,20 +250,19 @@ namespace vanguard {
                 std::cout << functionsNames[i] << " : (";
             }
             auto itr1 = functionsArguments[i].begin();
-            auto itr2 = functionsArgumentTypes[i].begin();
-            for( ; itr1 != functionsArguments[i].end() && itr2 != functionsArgumentTypes[i].end(); ++itr1, ++itr2){
+            for( ; itr1 != functionsArguments[i].end(); ++itr1){
                 if ((*itr1)->hasName()){
-                    auto argName = (*itr1)->getName();
+                    auto argName = (*itr1)->name();
                     if (debug_ir_validator){
                         std::cout << argName << " : ";
                     }
                 }
-                auto arg_type_name = (*itr2)->getName();
+                auto arg_type_name = (*itr1)->type()->name();
                 if (debug_ir_validator) {
                     std::cout << arg_type_name << ", ";
                 }
             }
-            auto ret_type = functionReturnTypes[i]->getName();
+            auto ret_type = functionReturnTypes[i]->name();
             if (debug_ir_validator) {
                 std::cout << ") -> " << ret_type << "\n";
             }
@@ -361,11 +271,11 @@ namespace vanguard {
         if(debug_ir_validator) {
             std::cout << "---- Listing all Instructions with their types ---- \n";
         }
-        for(auto fn : unit.getAllFunctions()) {
+        for(auto fn : unit.functions()) {
             if (debug_ir_validator) {
-                std::cout << fn->getName() << ":\n";
+                std::cout << fn->name() << ":\n";
             }
-            std::list<Instruction*> instructionsList = fn->getInstructionsList();
+            std::list<Instruction*> instructionsList = fn->instructions();
             if(!instructionsList.empty()) {
                 for (auto instruction: instructionsList) {
                     std::string instString = getInstructionString(*instruction);

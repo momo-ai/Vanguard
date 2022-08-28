@@ -13,15 +13,15 @@ namespace vanguard{
 
         Block(const Block&) = delete;
 
-        std::string getName();
+        std::string name();
 
-        Function* getFunction();
+        Function* parent();
 
-        std::list<Instruction *> getInstructionsList();
+        std::list<Instruction *> instructions();
 
-        bool isEntryBlock();
+        bool isEntry();
 
-        std::unordered_set<Block *> getAllSuccessors();
+        std::unordered_set<Block *> successors();
 
         const llvm::BasicBlock& unwrap();
 

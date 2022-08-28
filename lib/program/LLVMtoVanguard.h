@@ -34,6 +34,8 @@ namespace vanguard{
 
             Value *translateValue(const llvm::Value *val);
 
+            InstructionVariable *translateInsVar(const llvm::Instruction *ins);
+
         private:
             static LLVMtoVanguard* singletonLLVMtoVanguard;
             LLVMtoVanguard();

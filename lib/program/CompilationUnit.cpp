@@ -5,15 +5,15 @@ namespace vanguard{
 
     CompilationUnit::CompilationUnit(const llvm::Module& mod): module(mod){}
 
-    std::string CompilationUnit::getModuleName(){
+    std::string CompilationUnit::name(){
         return module.getModuleIdentifier();
     }
 
-    std::string CompilationUnit::getSourceFileName(){
+    std::string CompilationUnit::sourceFile(){
         return module.getSourceFileName();
     }
 
-    Function* CompilationUnit::getFunction(std::string name){
+    Function* CompilationUnit::findFunction(std::string name){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         auto function = module.getFunction(llvm::StringRef(name));
         if (function == nullptr) {
@@ -22,7 +22,7 @@ namespace vanguard{
         return llvmToVanguard.translateFunction(function);
     }
 
-    Value* CompilationUnit::getGlobalVariable(std::string name){
+    Value* CompilationUnit::findGlobalVariable(std::string name){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         auto globalVariable = module.getGlobalVariable(llvm::StringRef(name), true);
         if (globalVariable == nullptr){
@@ -31,7 +31,7 @@ namespace vanguard{
         return llvmToVanguard.translateValue(globalVariable);
     }
 
-    std::list<Function*> CompilationUnit::getAllFunctions(){
+    std::list<Function*> CompilationUnit::functions(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Function*> allFunctions = {};
         for(auto &F: module){
@@ -40,7 +40,7 @@ namespace vanguard{
         return allFunctions;
     }
 
-    std::list<Value*> CompilationUnit::getAllGlobalVariables(){
+    std::list<Value*> CompilationUnit::globalVariables(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Value*> allGlobalVariables = {};
         for (auto gv= module.global_begin(); gv != module.global_end(); gv++){
