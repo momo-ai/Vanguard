@@ -114,4 +114,4 @@ target_link_libraries(Vanguard PUBLIC
         ${LLVM_LINK_COMPONENTS}
         )
 
-add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)
+# add_custom_command(TARGET Vanguard POST_BUILD COMMAND tsc WORKING_DIRECTORY ${PROJECT_SOURCE_DIR}/deps/SolidityPreprocessor/src)

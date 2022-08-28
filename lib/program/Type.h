@@ -11,7 +11,7 @@ namespace vanguard{
         public:
             Type();
 
-            virtual std::string getName() = 0;
+            virtual std::string name() = 0;
     };
 
     class IntegerType: public Type{
@@ -20,9 +20,11 @@ namespace vanguard{
 
             IntegerType(const IntegerType&) = delete;
 
-            unsigned getWidth(); //returns width of integer in bytes
+            unsigned width(); //returns width of integer in bytes
 
-            std::string getName() override;
+            std::string name() override;
+
+            const llvm::IntegerType &unwrap();
 
             const llvm::IntegerType &unwrap();
 
@@ -36,11 +38,13 @@ namespace vanguard{
 
             ArrayType(const ArrayType&) = delete;
 
-            Type* getBaseType();
+            Type* baseType();
 
-            uint64_t getLength();
+            uint64_t length();
 
-            std::string getName() override;
+            std::string name() override;
+
+            const llvm::ArrayType &unwrap();
 
             const llvm::ArrayType &unwrap();
 
@@ -48,19 +52,21 @@ namespace vanguard{
             const llvm::ArrayType& array;
     };
 
-    // class FunctionT: public Type{
-    //     public:
-    //         FunctionT(llvm::FunctionType& function);
-
-    //         Type* getReturnType();
-
-    //         unsigned getNumParams();
-
-    //         std::list<Type*> getParamsType();
-
-    //     private:
-    //         llvm::FunctionType& function;
-    // };
+//     class FunctionT: public Type{
+//         public:
+//             explicit FunctionT(const llvm::FunctionType& function);
+//
+//             std::string name() override;
+//
+//             Type* returnType();
+//
+//             unsigned getNumParams();
+//
+//             std::list<Type*> getParamsType();
+//
+//         private:
+//             const llvm::FunctionType& function;
+//     };
 
     class PointerType: public Type{
         public:
@@ -70,9 +76,11 @@ namespace vanguard{
             
             bool isOpaque();
 
-            Type* getPointeeType();
+            Type* referencedType();
 
-            std::string getName() override;
+            std::string name() override;
+
+            const llvm::PointerType &unwrap();
 
             const llvm::PointerType &unwrap();
 
@@ -88,13 +96,15 @@ namespace vanguard{
 
             //struct name
 
-            unsigned getNumFields();
+            unsigned numFields();
 
-            std::list<Type*> getFieldTypes();
+            std::list<Type*> fieldTypes();
 
             Type* getTypeAtIndex(unsigned n);
 
-            std::string getName() override;
+            std::string name() override;
+
+            const llvm::StructType &unwrap();
 
             const llvm::StructType &unwrap();
 
@@ -108,9 +118,11 @@ namespace vanguard{
 
             VectorType(const VectorType&) = delete;
 
-            Type* getBaseType();
+            Type* baseType();
 
-            std::string getName() override;
+            std::string name() override;
+
+            const llvm::VectorType &unwrap();
 
             const llvm::VectorType &unwrap();
 
@@ -125,7 +137,7 @@ namespace vanguard{
 
             VoidType(const VoidType&) = delete;
 
-            std::string getName() override;
+            std::string name() override;
 
             const llvm::Type &unwrap();
 
@@ -133,6 +145,19 @@ namespace vanguard{
             const llvm::Type& voidType;
     };
 
+    class LabelType: public Type{
+    public:
+        explicit  LabelType(const llvm::Type&);
+
+        LabelType(const LabelType&) = delete;
+
+        std::string name() override;
+
+        const llvm::Type &unwrap();
+
+    private:
+        const llvm::Type& labelType;
+    };
 }
 
 #endif

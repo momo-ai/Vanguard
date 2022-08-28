@@ -8,11 +8,11 @@ namespace vanguard{
     Function::Function(const llvm::Function& func): function(func){
     }
 
-    std::string Function::getName(){
+    std::string Function::name(){
         return function.getName().str();
     }
 
-    std::list<Argument*> Function::getParams(){
+    std::list<Argument*> Function::params(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Argument*> params = {};
         for (auto itr = function.arg_begin(); itr != function.arg_end(); itr++){
@@ -21,16 +21,7 @@ namespace vanguard{
         return params;
     }
 
-    std::list<Type *> Function::getParamTypes(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        std::list<Type *> paramTypes = {};
-        for (auto itr = function.arg_begin(); itr != function.arg_end(); itr++){
-            paramTypes.push_back((Type *)llvmToVanguard.translateType(llvm::dyn_cast<llvm::Type>(itr->getType())));
-        }
-        return paramTypes;
-    }
-
-    Type* Function::getReturnType(){
+    Type* Function::returnType(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(function.getReturnType());
     }
@@ -39,12 +30,12 @@ namespace vanguard{
         return !function.isDeclaration();
     }
 
-    Block* Function::getBody(){
+    Block* Function::body(){
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateBlock(&function.getEntryBlock());
     }
 
-    std::list<Instruction*> Function::getInstructionsList(){
+    std::list<Instruction*> Function::instructions(){
         std::list<Instruction*> instructionsList = {};
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         for (auto &blk : function){
@@ -55,7 +46,7 @@ namespace vanguard{
         return instructionsList;
     }
 
-    std::list<Block *> Function::getAllBlocks(){
+    std::list<Block *> Function::blocks(){
         std::list<Block *> blocks = {};
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         for (auto &blk : function){

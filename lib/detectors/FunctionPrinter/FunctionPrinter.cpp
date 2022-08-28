@@ -17,7 +17,7 @@ namespace vanguard {
     void FunctionPrinter::startDetection() {}
 
     bool FunctionPrinter::detect(Function &fn) {
-        std::cout << "Found Function: " << fn.getName() << std::endl;
+        std::cout << "Found Function: " << fn.name() << std::endl;
         return false;
     }
 

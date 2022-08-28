@@ -26,7 +26,7 @@ namespace vanguard {
 
     void StatGen::countBody(Block *blk) {
         assert(blk != nullptr && "Function does not have a body");
-        assert(blk->isEntryBlock() && "Fn body not marked as entry block");
+        assert(blk->isEntry() && "Fn body not marked as entry block");
 
         std::unordered_set<Block *> seen = { blk };
         std::vector<Block *> worklist = { blk };
@@ -37,12 +37,12 @@ namespace vanguard {
 
             totBlks++;
 
-            for(auto ins : curBlk->getInstructionsList()) {
-                assert(curBlk == ins->getBlock() && "Block does not match instruction block");
+            for(auto ins : curBlk->instructions()) {
+                assert(curBlk == ins->parent() && "Block does not match instruction block");
                 totIns++;
             }
 
-            for(auto next : curBlk->getAllSuccessors()) {
+            for(auto next : curBlk->successors()) {
                 if(next != nullptr && seen.find(next) == seen.end()) {
                     seen.insert(next);
                     worklist.push_back(next);
@@ -52,11 +52,11 @@ namespace vanguard {
     }
 
     void StatGen::detect(CompilationUnit &unit) {
-        for(auto fn : unit.getAllFunctions()) {
+        for(auto fn : unit.functions()) {
             totFns++;
             if(fn->hasBody()) {
-                auto body = fn->getBody();
-                assert(body->getFunction() == fn && "Function does not match block function");
+                auto body = fn->body();
+                assert(body->parent() == fn && "Function does not match block function");
 
                 countBody(body);
             }

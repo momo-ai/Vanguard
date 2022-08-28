@@ -4,6 +4,7 @@
 
 #include "DetectorRegistry.h"
 #include "StatGen/StatGen.h"
+#include "IRValidator/IRValidator.h"
 #include "FunctionPrinter/FunctionPrinter.h"
 #include "Reentrancy/ReentrancyDetector.h"
 #include <llvm/Support/CommandLine.h>
@@ -37,6 +38,7 @@ namespace vanguard {
         add(StatGen::name(), new StatGen());
         add(FunctionPrinter::name(), new FunctionPrinter());
         add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
+        add(IRValidator::name(), new IRValidator());
     }
 
     DetectorRegistry::~DetectorRegistry() {

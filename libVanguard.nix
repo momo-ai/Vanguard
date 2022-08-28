@@ -1,5 +1,5 @@
 { stdenv, cmake, ninja,
-  llvmPackages_13, libBlockchain
+  llvmPackages_13, lib, nodePackages 
 }:
 
 let
@@ -9,18 +9,17 @@ stdenv.mkDerivation {
   name = "Vanguard";
   version = "0.0.1";
   nativeBuildInputs = [ cmake ninja ];
-  src = ./.;
+  src = ./.; #lib.cleanSource
   buildInputs = [
     libllvm
-    libBlockchain
+    nodePackages.typescript 
   ];
 
   postInstall = ''
     install -m755 -D ../run.py $out/bin/vanguard
   '';
 
-  outputs = [ "out" "dev" ];
+ # outputs = [ "out" "dev" ];
 
   LLVM_HOME="${libllvm}";
-  LIBBLOCKCHAIN_HOME="${libBlockchain}";
 }

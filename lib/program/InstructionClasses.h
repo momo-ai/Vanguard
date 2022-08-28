@@ -1,667 +1,223 @@
-#ifndef INSTRUCTIONCLASSES_H
-#define INSTRUCTIONCLASSES_H
+//
+// Created by Jon Stephens on 8/26/22.
+//
 
-#include "Instruction.h"
+#ifndef VANGUARD_INSTRUCTIONCLASSES_H
+#define VANGUARD_INSTRUCTIONCLASSES_H
+
 #include "Value.h"
-#include "llvm/IR/Instruction.h"
-#include "llvm/IR/InstrTypes.h"
-#include "llvm/IR/Instructions.h"
-#include "LLVMtoVanguard.h"
-#include <string>
-#include <list>
+#include "Instruction.h"
 
-namespace vanguard{
+namespace vanguard {
+    enum BinOp{Add, Sub, Mul, Div, Mod, Shl, Shr, And, Or, Xor, IFCmpInst};
 
-    template<typename T> class InstructionClass: public Instruction{
-        static_assert(std::is_base_of<llvm::Instruction, T>::value, "T must inherit from instruction.");
-    public:
-
-        explicit InstructionClass(InstructionClassEnum ice, const T &inst): Instruction(ice), instructionClassEnum(ice), instr(inst){
-            instruction = llvm::dyn_cast<llvm::Instruction>(&instr);
-        }
-
-        std::string getName() override {
-            return instruction->getName().str();
-        }
-
-        Block* getBlock() override{
-            auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-            return llvmToVanguard.translateBlock(instruction->getParent());
-        }
-
-        std::string getInstructionType() override{
-            return (std::string)instruction->getOpcodeName();
-        }
-
-        bool mayReadOrWriteToMemory() override{
-            return instruction->mayReadOrWriteMemory();
-        }
-
-        bool willReturn() override{
-            return instruction->willReturn();
-        }
-
-        Instruction* getSuccessor() override{
-            auto nextInst = instruction->getNextNonDebugInstruction();
-            if (nextInst == nullptr){
-                return nullptr;
-            }
-            else{
-                auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-                return llvmToVanguard.translateInstruction(nextInst);
-            }
-        }
-
-        std::unordered_set<Instruction*> getAllSuccessors() override{
-            std::unordered_set<Instruction *> allSuccessors = {};
-            if (instruction->isTerminator()) {
-                auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-                int numSuccessors = instruction->getNumSuccessors();
-                for (int i = 0; i < numSuccessors; i++) {
-                    allSuccessors.insert(llvmToVanguard.translateBlock(instruction->getSuccessor(i))->getInstructionsList().front());
-                }
-                return allSuccessors;
-            }
-            else{
-                return allSuccessors;
-            }
-        }
-
-        Value* getOperand(unsigned i) override{
-            auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-            return llvmToVanguard.translateValue(instruction->getOperand(i));
-        }
-
-        unsigned getNumOperands() override{
-            return instruction->getNumOperands();
-        }
-
-        const llvm::Instruction &unwrap() override{
-            return *instruction;
-        }
-
-    private:
-        InstructionClassEnum  instructionClassEnum;
-        const llvm::Instruction *instruction;
-        const T &instr;
-    };
-
-    enum BinaryOpClass{Add, Sub, Mul, Div, Mod, Shl, Shr, And, Or, Xor, IFCmpInst};
-
-    enum UnaryOpClass{Neg, Not};
-
-    enum CastInstClass{AddrSpaceCast, BitCast, FPCasts, IntToPtr, PtrToInt, SExt, Trunc, ZExt};
-
-    //BinaryOpInstruction
-    class BinaryOpInstruction{
-        public:
-            virtual unsigned getOpClass() = 0;
-
-            virtual InstructionVariable* getLHS() = 0;
-    };
-
-    class BinaryOperator: public InstructionClass<llvm::BinaryOperator>, public BinaryOpInstruction{
-        public:
-            explicit BinaryOperator(const llvm::BinaryOperator &bop);
-
-            static inline bool classof(const BinaryOperator &) { return true; }
-            static inline bool classof(const BinaryOperator *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == BINARY_OPERATOR){ return true; }
-                return false;
-            }
-
-
-        BinaryOperator(const BinaryOperator&) = delete;
-
-            unsigned getOpClass() override;
-
-            InstructionVariable* getLHS() override;
-
-            const llvm::BinaryOperator &unwrap() override;
-
-        private:
-            const llvm::BinaryOperator& binOp;
-    };
-
-    class CmpInst: public InstructionClass<llvm::CmpInst>, public BinaryOpInstruction{
-        public:
-            explicit CmpInst(const llvm::CmpInst &cmpinst);
-
-            static inline bool classof(const CmpInst &) { return true; }
-            static inline bool classof(const CmpInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == CMP_INST){ return true; }
-                return false;
-            }
-
-        CmpInst(const CmpInst&) = delete;
-
-            unsigned getOpClass() override;
-
-            InstructionVariable* getLHS() override;
-
-            const llvm::CmpInst &unwrap() override;
-
-        private:
-            const llvm::CmpInst& cmpInst;
-    };
+    enum UnOp{Neg, Not};
 
     // Branch Instruction
-    class BranchInstruction{
-        public:
-            virtual Value* getCondition() = 0;
-
-            virtual std::list<Block*> getSuccessors() = 0;
-    };
-
-    class BranchInst: public InstructionClass<llvm::BranchInst>, public BranchInstruction{
-        public:
-            explicit BranchInst( const llvm::BranchInst &brInst);
-
-            static inline bool classof(const BranchInst &) { return true; }
-            static inline bool classof(const BranchInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == BRANCH_INST){ return true; }
-                return false;
-            }
-
-            BranchInst(const BranchInst&) = delete;
-
-            bool isConditional();
-
-            Value* getCondition() override;
-
-            std::list<Block*> getSuccessors() override;
-
-            const llvm::BranchInst &unwrap() override;
-
-        private:
-            const llvm::BranchInst& branchInst;
-    };
-
-    class IndirectBrInst: public InstructionClass<llvm::IndirectBrInst>, public BranchInstruction{
-        public:
-            explicit IndirectBrInst(const llvm::IndirectBrInst &ibrInst);
-
-            static inline bool classof(const IndirectBrInst &) { return true; }
-            static inline bool classof(const IndirectBrInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == INDIRECT_BR_INST){ return true; }
-                return false;
-            }
-
-            IndirectBrInst(const IndirectBrInst&) = delete;
-
-            Value * getCondition() override;
-
-            std::list<Block*> getSuccessors() override;
-
-            const llvm::IndirectBrInst &unwrap() override;
-
-        private:
-            const llvm::IndirectBrInst& indirectBrInst;
-    };
-
-    class SwitchInst: public InstructionClass<llvm::SwitchInst>, public BranchInstruction{
-        public:
-            explicit SwitchInst(const llvm::SwitchInst &swInst);
-
-            static inline bool classof(const SwitchInst &) { return true; }
-            static inline bool classof(const SwitchInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == SWITCH_INST){ return true; }
-                return false;
-            }
-
-            SwitchInst(const SwitchInst&) = delete;
-
-            Value* getCondition() override;
-
-            std::list<Block*> getSuccessors() override;
-
-            const llvm::SwitchInst &unwrap() override;
-
-        private:
-            const llvm::SwitchInst& switchInst;
-    };
-
-    //Unary Operation Instruction
-    class  UnaryOpInstruction{
-        public:
-            virtual Value* getUnaryOperand() = 0;
-    };
-
-    class UnaryOperator: public InstructionClass<llvm::UnaryOperator>, public UnaryOpInstruction{
-        public:
-            explicit UnaryOperator(const llvm::UnaryOperator &uop);
-
-            static inline bool classof(const UnaryOperator &) { return true; }
-            static inline bool classof(const UnaryOperator *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == UNARY_OPERATOR){ return true; }
-                return false;
-            }
-
-            UnaryOperator(const UnaryOperator&) = delete;
-
-            Value* getUnaryOperand() override;
-
-            unsigned getOpClass();
-
-            const llvm::UnaryOperator &unwrap() override;
-
-        private:
-            const llvm::UnaryOperator& unaryOperator;
-    };
-
-    class CastInst: public InstructionClass<llvm::CastInst>, public UnaryOpInstruction{
+    class Branch : virtual public Instruction {
     public:
-        explicit CastInst(const llvm::CastInst &ci);
-
-        static inline bool classof(const CastInst &) { return true; }
-        static inline bool classof(const CastInst *) { return true; }
+        static inline bool classof(const Branch &) { return true; }
+        static inline bool classof(const Branch *) { return true; }
         static inline bool classof(const Instruction *inst) { return classof(*inst); }
         static inline bool classof(const Instruction &inst) {
-            if (inst.getInstructionClassEnum() == CAST_INST){ return true; }
+            if (inst.instructionClass() == BRANCH){ return true; }
             return false;
         }
 
-        CastInst(const CastInst&) = delete;
+        virtual bool isConditional() const = 0;
+        virtual Value* condition() const = 0;
+        virtual std::list<Block*> targets() const = 0;
 
-        unsigned getOpClass();
-
-        Value* getUnaryOperand() override;
-
-        const llvm::CastInst &unwrap() override;
-
-    private:
-        const llvm::CastInst& castInst;
-    };
-
-    //Call Instruction
-    class CallInstruction{
-        public:
-            virtual Function* getTarget() = 0;
-
-            virtual std::list<Value*> getArgs() = 0;
-    };
-
-    class Call: public InstructionClass<llvm::CallBase>, public CallInstruction{
-        public:
-            explicit Call(const llvm::CallBase &cb);
-
-            static inline bool classof(const Call &) { return true; }
-            static inline bool classof(const Call *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == CALL){ return true; }
-                return false;
-            }
-
-            Call(const Call&) = delete;
-
-            Function* getTarget() override;
-
-            std::list<Value*> getArgs() override;
-
-            const llvm::CallBase &unwrap() override;
-
-        private:
-            const llvm::CallBase& call;
-    };
-
-    //Error Instruction
-    class ErrorInstruction{
-        public:
-            virtual std::string error() = 0;
-    };
-
-    class UnreachableInstruction: public InstructionClass<llvm::UnreachableInst>, public ErrorInstruction{
-        public:
-            explicit UnreachableInstruction(const llvm::UnreachableInst &ui);
-
-            static inline bool classof(const UnreachableInstruction &) { return true; }
-            static inline bool classof(const UnreachableInstruction *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == UNREACHABLE_INSTRUCTION){ return true; }
-                return false;
-            }
-
-            UnreachableInstruction(const UnreachableInstruction&) = delete;
-
-            std::string error() override;
-
-            const llvm::UnreachableInst &unwrap() override;
-
-        private:
-            const llvm::UnreachableInst& unreachableInstruction;
+        InstructionClassEnum instructionClass() const override {
+            return BRANCH;
+        }
     };
 
     //Return Instruction
-    class ReturnInstruction{
-        public:
-            virtual bool returnsValue() = 0;
+    class Return : virtual public Instruction {
+    public:
+        static inline bool classof(const Return &) { return true; }
+        static inline bool classof(const Return *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == RETURN){ return true; }
+            return false;
+        }
 
-            virtual Value* returnValue() = 0;
+        virtual bool returnsValue() const = 0;
+        virtual Value* value() const = 0;
+
+        InstructionClassEnum instructionClass() const override {
+            return RETURN;
+        }
     };
 
-    class ReturnInst: public InstructionClass<llvm::ReturnInst>, public ReturnInstruction{
-        public:
-            explicit ReturnInst(const llvm::ReturnInst &retInst);
+    class Error : virtual public Instruction {
+    public:
+        static inline bool classof(const Error &) { return true; }
+        static inline bool classof(const Error *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == ERROR){ return true; }
+            return false;
+        }
 
-            static inline bool classof(const ReturnInst &) { return true; }
-            static inline bool classof(const ReturnInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == RETURN_INST){ return true; }
-                return false;
-            }
+        virtual std::string msg() const = 0;
 
-            ReturnInst(const ReturnInst&) = delete;
+        InstructionClassEnum instructionClass() const override {
+            return ERROR;
+        }
+    };
 
-            bool returnsValue() override;
+    class Expression : virtual public Instruction {
+    public:
+        static inline bool classof(const Expression &) { return true; }
+        static inline bool classof(const Expression *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() >= EXPRESSION_BEGIN && inst.instructionClass() <= EXPRESSION_END){ return true; }
+            return false;
+        }
 
-            Value* returnValue() override;
-
-            const llvm::ReturnInst &unwrap() override;
-
-        private:
-            const llvm::ReturnInst& returnInst;
+        virtual Variable* result() const = 0;
     };
 
     // Assign Instruction
-    class AssignInstruction{
-        public:
-    };
-
-    class MemoryReadInstruction: public AssignInstruction{
-        public:
-            virtual InstructionVariable* getLHS() = 0;
-    };
-
-    class SelectInst: public InstructionClass<llvm::SelectInst>, public MemoryReadInstruction{
-        public:
-            explicit SelectInst(const llvm::SelectInst &si);
-
-            static inline bool classof(const SelectInst &) { return true; }
-            static inline bool classof(const SelectInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == SELECT_INST){ return true; }
-                return false;
-            }
-
-            SelectInst(const SelectInst&) = delete;
-
-            InstructionVariable* getLHS() override;
-
-            const llvm::SelectInst &unwrap() override;
-
-        private:
-            const llvm::SelectInst& selectInst;
-    };
-
-    class ExtractElementInst: public InstructionClass<llvm::ExtractElementInst>, public MemoryReadInstruction{
-        public:
-            explicit ExtractElementInst(const llvm::ExtractElementInst &eei);
-
-            static inline bool classof(const ExtractElementInst &) { return true; }
-            static inline bool classof(const ExtractElementInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == EXTRACT_ELEMENT_INST){ return true; }
-                return false;
-            }
-
-            ExtractElementInst(const ExtractElementInst&) = delete;
-
-            InstructionVariable* getLHS() override;
-
-            const llvm::ExtractElementInst &unwrap() override;
-
-        private:
-            const llvm::ExtractElementInst& extractElementInst;
-    };
-
-    class ExtractValueInst: public InstructionClass<llvm::ExtractValueInst>, public MemoryReadInstruction{
+    class Assignment : public Expression {
     public:
-        explicit ExtractValueInst(const llvm::ExtractValueInst &evi);
-
-        static inline bool classof(const ExtractValueInst &) { return true; }
-        static inline bool classof(const ExtractValueInst *) { return true; }
+        static inline bool classof(const Assignment &) { return true; }
+        static inline bool classof(const Assignment *) { return true; }
         static inline bool classof(const Instruction *inst) { return classof(*inst); }
         static inline bool classof(const Instruction &inst) {
-            if (inst.getInstructionClassEnum() == EXTRACT_VALUE_INST){ return true; }
+            if (inst.instructionClass() == ASSIGNMENT){ return true; }
             return false;
         }
 
-        ExtractValueInst(const ExtractValueInst&) = delete;
-
-        InstructionVariable* getLHS() override;
-
-        const llvm::ExtractValueInst &unwrap() override;
-
-    private:
-        const llvm::ExtractValueInst& extractValueInst;
+        InstructionClassEnum instructionClass() const override {
+            return ASSIGNMENT;
+        }
     };
 
-    class LoadInst: public InstructionClass<llvm::LoadInst>, public MemoryReadInstruction{
+    //BinaryOpInstruction
+    class BinaryOpExpr : public Expression {
     public:
-        explicit LoadInst(const llvm::LoadInst&);
-
-        static inline bool classof(const LoadInst &) { return true; }
-        static inline bool classof(const LoadInst *) { return true; }
+        static inline bool classof(const BinaryOpExpr &) { return true; }
+        static inline bool classof(const BinaryOpExpr *) { return true; }
         static inline bool classof(const Instruction *inst) { return classof(*inst); }
         static inline bool classof(const Instruction &inst) {
-            if (inst.getInstructionClassEnum() == LOAD_INST){ return true; }
+            if (inst.instructionClass() == BIN_OP){ return true; }
             return false;
         }
 
-        LoadInst(const LoadInst&) = delete;
+        virtual BinOp op() const = 0;
+        InstructionClassEnum instructionClass() const override {
+            return BIN_OP;
+        }
+    };
 
-        Value* getUnaryOperand();
+    //Unary Operation Instruction
+    class  UnaryOpExpr : public Expression {
+    public:
+        static inline bool classof(const UnaryOpExpr &) { return true; }
+        static inline bool classof(const UnaryOpExpr *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == UN_OP){ return true; }
+            return false;
+        }
 
-        InstructionVariable* getLHS() override;
+        virtual UnOp op() const = 0;
+        virtual Value* operand() const = 0;
 
-        const llvm::LoadInst &unwrap() override;
-    private:
-        const llvm::LoadInst& loadInst;
+        InstructionClassEnum instructionClass() const override {
+            return UN_OP;
+        }
+    };
+
+    class CallExpr : public Expression {
+    public:
+        static inline bool classof(const CallExpr &) { return true; }
+        static inline bool classof(const CallExpr *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == CALL){ return true; }
+            return false;
+        }
+
+        virtual bool hasReturn() const = 0;
+        virtual Function* getTarget() const = 0;
+        virtual std::list<Value*> getArgs() const = 0;
+
+        InstructionClassEnum instructionClass() const override {
+            return CALL;
+        }
+    };
+
+    class CastExpr : public Expression {
+    public:
+        static inline bool classof(const CastExpr &) { return true; }
+        static inline bool classof(const CastExpr *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == CAST){ return true; }
+            return false;
+        }
+
+        virtual Type *castTo() const = 0;
+
+        InstructionClassEnum instructionClass() const override {
+            return CAST;
+        }
+    };
+
+    class TernaryExpr : public Expression {
+    public:
+        static inline bool classof(const TernaryExpr &) { return true; }
+        static inline bool classof(const TernaryExpr *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == TERNARY){ return true; }
+            return false;
+        }
+
+        virtual Value *condition() const = 0;
+        virtual Value *trueValue() const = 0;
+        virtual Value *falseValue() const = 0;
+
+        InstructionClassEnum instructionClass() const override {
+            return TERNARY;
+        }
+    };
+
+    class UnknownExpr : public Expression {
+    public:
+        static inline bool classof(const UnknownExpr &) { return true; }
+        static inline bool classof(const UnknownExpr *) { return true; }
+        static inline bool classof(const Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Instruction &inst) {
+            if (inst.instructionClass() == UNKNOWN){ return true; }
+            return false;
+        }
+
+        InstructionClassEnum instructionClass() const override {
+            return UNKNOWN;
+        }
+    };
+
+    /*class MemoryReadInstruction: public AssignInstruction{
+    public:
+        virtual InstructionVariable* getLHS() const = 0;
     };
 
     class MemoryWriteInstruction: public AssignInstruction{
-        public:
-            virtual MemoryAddress* getMemoryAddress() = 0;
-    };
-
-    class InsertValueInst: public InstructionClass<llvm::InsertValueInst>, public MemoryWriteInstruction{
-        public:
-            explicit InsertValueInst(const llvm::InsertValueInst &ivi);
-
-            static inline bool classof(const InsertValueInst &) { return true; }
-            static inline bool classof(const InsertValueInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == INSERT_VALUE_INST){ return true; }
-                return false;
-            }
-
-            InsertValueInst(const InsertValueInst&) = delete;
-
-            MemoryAddress* getMemoryAddress() override;
-
-            const llvm::InsertValueInst &unwrap() override;
-
-        private:
-            const llvm::InsertValueInst& insertValueInst;
-    };
-
-    class InsertElementInst: public InstructionClass<llvm::InsertElementInst>, public MemoryWriteInstruction{
-        public:
-            explicit InsertElementInst(const llvm::InsertElementInst &iei);
-
-            static inline bool classof(const InsertElementInst &) { return true; }
-            static inline bool classof(const InsertElementInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == INSERT_ELEMENT_INST){ return true; }
-                return false;
-            }
-
-            InsertElementInst(const InsertElementInst&) = delete;
-
-            MemoryAddress* getMemoryAddress() override;
-
-            const llvm::InsertElementInst &unwrap() override;
-
-        private:
-            const llvm::InsertElementInst& insertElementInst;
-    };
-
-    class StoreInst: public InstructionClass<llvm::StoreInst>, public MemoryWriteInstruction{
-        public:
-            explicit StoreInst(const llvm::StoreInst &si);
-
-            static inline bool classof(const StoreInst &) { return true; }
-            static inline bool classof(const StoreInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == STORE_INST){ return true; }
-                return false;
-            }
-
-            StoreInst(const StoreInst&) = delete;
-
-            MemoryAddress* getMemoryAddress() override;
-
-            const llvm::StoreInst &unwrap() override;
-
-        private:
-            const llvm::StoreInst& storeInst;
-    };
-
-    class ShuffleVectorInst: public InstructionClass<llvm::ShuffleVectorInst>, public MemoryWriteInstruction{
-        public:
-            explicit ShuffleVectorInst(const llvm::ShuffleVectorInst &svi);
-
-            static inline bool classof(const ShuffleVectorInst &) { return true; }
-            static inline bool classof(const ShuffleVectorInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == SHUFFLE_VECTOR_INST){ return true; }
-                return false;
-            }
-
-            ShuffleVectorInst(const ShuffleVectorInst&) = delete;
-
-            MemoryAddress* getMemoryAddress() override;
-
-            const llvm::ShuffleVectorInst &unwrap() override;
-
-        private:
-            const llvm::ShuffleVectorInst& shuffleVectorInst;
-    };
-
-    class AllocaInst: public InstructionClass<llvm::AllocaInst>, public MemoryWriteInstruction{
     public:
-        explicit AllocaInst(const llvm::AllocaInst&);
-
-        static inline bool classof(const AllocaInst &) { return true; }
-        static inline bool classof(const AllocaInst *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
-            if (inst.getInstructionClassEnum() == ALLOCA_INST){ return true; }
-            return false;
-        }
-
-        AllocaInst(const AllocaInst&) = delete;
-
-        MemoryAddress* getMemoryAddress() override;
-
-        Value* getUnaryOperand();
-
-        const llvm::AllocaInst &unwrap() override;
-    private:
-        const llvm::AllocaInst &allocaInst;
+        virtual MemoryRegion* getMemoryAddress() const = 0;
     };
 
     class AssignInst: public AssignInstruction{
-        public:
-            virtual InstructionVariable* getLHS() = 0;
-    };
-
-    class PHINode: public InstructionClass<llvm::PHINode>, public AssignInst{
-        public:
-            explicit PHINode(const llvm::PHINode &phin);
-
-            static inline bool classof(const PHINode &) { return true; }
-            static inline bool classof(const PHINode *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == PHI_NODE){ return true; }
-                return false;
-            }
-
-            PHINode(const PHINode&) = delete;
-
-            InstructionVariable* getLHS() override;
-
-            const llvm::PHINode &unwrap() override;
-
-        private:
-            const llvm::PHINode& phiNode;
-    };
-
-    class GetElementPtrInst: public InstructionClass<llvm::GetElementPtrInst>, public AssignInst{
-        public:
-            explicit GetElementPtrInst(const llvm::GetElementPtrInst &gepi);
-
-            static inline bool classof(const GetElementPtrInst &) { return true; }
-            static inline bool classof(const GetElementPtrInst *) { return true; }
-            static inline bool classof(const Instruction *inst) { return classof(*inst); }
-            static inline bool classof(const Instruction &inst) {
-                if (inst.getInstructionClassEnum() == GET_ELEMENT_PTR_INST){ return true; }
-                return false;
-            }
-
-            InstructionVariable* getLHS() override;
-
-            const llvm::GetElementPtrInst &unwrap() override;
-
-        private:
-            const llvm::GetElementPtrInst& getElementPtrInst;
-    };
-
-    class FreezeInst: public InstructionClass<llvm::FreezeInst>, public AssignInst{
     public:
-        explicit FreezeInst(const llvm::FreezeInst&);
-
-        static inline bool classof(const FreezeInst &) { return true; }
-        static inline bool classof(const FreezeInst *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
-            if (inst.getInstructionClassEnum() == FREEZE_INST){ return true; }
-            return false;
-        }
-
-        FreezeInst(const FreezeInst&) = delete;
-
-        Value* getUnaryOperand();
-
-        InstructionVariable* getLHS() override;
-
-        const llvm::FreezeInst &unwrap() override;
-    private:
-        const llvm::FreezeInst& freezeInst;
-    };
-
+        virtual InstructionVariable* getLHS() const = 0;
+    };*/
 }
 
-#endif
+#endif //VANGUARD_INSTRUCTIONCLASSES_H

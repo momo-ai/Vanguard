@@ -3,8 +3,7 @@
 
 #include "Value.h"
 #include "Function.h"
-#include <unordered_set>
-#include <llvm/IR/Module.h> 
+#include <llvm/IR/Module.h>
 
 namespace vanguard{
     class CompilationUnit{
@@ -15,17 +14,17 @@ namespace vanguard{
 
         CompilationUnit(const CompilationUnit&) = delete;
 
-        std::string getModuleName();
+        std::string name();
 
-        std::string getSourceFileName();
+        std::string sourceFile();
 
-        Function* getFunction(std::string name);
+        Function* findFunction(std::string name);
 
-        Value* getGlobalVariable(std::string name);
+        Value* findGlobalVariable(std::string name);
 
-        std::unordered_set<Function *> getAllFunctions();
+        std::list<Function *> functions();
 
-        std::unordered_set<Value*> getAllGlobalVariables();
+        std::list<Value*> globalVariables();
 
         const llvm::Module& unwrap();
     };

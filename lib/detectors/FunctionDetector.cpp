@@ -10,7 +10,7 @@ namespace vanguard {
     void FunctionDetector::detect(CompilationUnit &unit) {
         std::unordered_set<Function *> processed;
         std::deque<Function *> fnWorklist;
-        for(auto f : unit.getAllFunctions()) {
+        for(auto f : unit.functions()) {
             fnWorklist.push_back(f);
         }
 
