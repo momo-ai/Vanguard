@@ -32,7 +32,7 @@ VANGUARD_EXEC = os.path.join(VANGUARD_BUILD_PATH, "Vanguard")
 ############################
 # Detectors
 ############################
-DETECTORS = ["statGen", "fnPrinter", "reentrancyBasic"]
+DETECTORS = ["statGen", "fnPrinter", "reentrancyBasic", "irValidator"]
 
 ############################
 # Subprocess Commands

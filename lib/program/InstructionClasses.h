@@ -14,7 +14,7 @@ namespace vanguard {
     enum UnOp{Neg, Not};
 
     // Branch Instruction
-    class Branch : virtual public Instruction {
+    class Branch : public Instruction {
     public:
         static inline bool classof(const Branch &) { return true; }
         static inline bool classof(const Branch *) { return true; }
@@ -34,7 +34,7 @@ namespace vanguard {
     };
 
     //Return Instruction
-    class Return : virtual public Instruction {
+    class Return : public Instruction {
     public:
         static inline bool classof(const Return &) { return true; }
         static inline bool classof(const Return *) { return true; }
@@ -52,7 +52,7 @@ namespace vanguard {
         }
     };
 
-    class Error : virtual public Instruction {
+    class Error : public Instruction {
     public:
         static inline bool classof(const Error &) { return true; }
         static inline bool classof(const Error *) { return true; }
@@ -69,7 +69,7 @@ namespace vanguard {
         }
     };
 
-    class Expression : virtual public Instruction {
+    class Expression : public Instruction {
     public:
         static inline bool classof(const Expression &) { return true; }
         static inline bool classof(const Expression *) { return true; }
@@ -145,8 +145,8 @@ namespace vanguard {
         }
 
         virtual bool hasReturn() const = 0;
-        virtual Function* getTarget() const = 0;
-        virtual std::list<Value*> getArgs() const = 0;
+        virtual Function* target() const = 0;
+        virtual std::list<Value*> args() const = 0;
 
         InstructionClassEnum instructionClass() const override {
             return CALL;

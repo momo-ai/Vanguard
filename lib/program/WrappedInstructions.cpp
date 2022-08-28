@@ -177,12 +177,12 @@ namespace vanguard{
         return !ins.doesNotReturn();
     }
 
-    Function* CallIns::getTarget() const{
+    Function* CallIns::target() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateFunction(ins.getFunction());
+        return llvmToVanguard.translateFunction(ins.getCalledFunction());
     }
 
-    std::list<Value*> CallIns::getArgs() const{
+    std::list<Value*> CallIns::args() const{
         LLVMtoVanguard& llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Value*> args = {};
         for(auto itr = ins.arg_begin(); itr != ins.arg_end(); itr++){

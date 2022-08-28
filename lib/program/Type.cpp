@@ -12,7 +12,7 @@ namespace vanguard{
         return integer.getBitWidth()/8;
     }
 
-    std::string IntegerType::name(){
+    std::string IntegerType::name() const {
         return "IntegerType";
     }
 
@@ -23,16 +23,16 @@ namespace vanguard{
     //Array subclass
     ArrayType::ArrayType(const llvm::ArrayType& arr): array(arr){}
 
-    Type* ArrayType::baseType(){
+    Type* ArrayType::baseType() const {
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(array.getElementType());
     }
 
-    uint64_t ArrayType::length(){
+    uint64_t ArrayType::length() const {
         return array.getNumElements();
     }
 
-    std::string ArrayType::name(){
+    std::string ArrayType::name() const {
         return "ArrayType< " + (this->baseType())->name() + " >";
     }
 
@@ -72,12 +72,12 @@ namespace vanguard{
         return pointer.isOpaque();
     }
 
-    Type* PointerType::referencedType(){
+    Type* PointerType::referencedType() const {
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(pointer.getElementType());
     }
 
-    std::string PointerType::name(){
+    std::string PointerType::name() const {
         return "PointerType< " + (this->referencedType())->name() + " >";
     }
 
@@ -107,7 +107,7 @@ namespace vanguard{
         return fieldTypesList;
     }
 
-    std::string StructType::name(){
+    std::string StructType::name() const {
         return std::string(structT.getName());
     }
 
@@ -118,12 +118,12 @@ namespace vanguard{
     //Vector subclass
     VectorType::VectorType(const llvm::VectorType& vec): vector(vec){}
 
-    Type* VectorType::baseType(){
+    Type* VectorType::baseType() const {
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return llvmToVanguard.translateType(vector.getElementType());
     }
 
-    std::string VectorType::name(){
+    std::string VectorType::name() const {
         return "VectorType< " + (this->baseType())->name() + " >";
     }
 
@@ -134,7 +134,7 @@ namespace vanguard{
     //Void Subclass
     VoidType::VoidType(const llvm::Type &vt): voidType(vt) {}
 
-    std::string VoidType::name() {
+    std::string VoidType::name() const {
         return "VoidType";
     }
 
@@ -145,7 +145,7 @@ namespace vanguard{
     //Label Subclass
     LabelType::LabelType(const llvm::Type &lbt): labelType(lbt) {}
 
-    std::string LabelType::name() {
+    std::string LabelType::name() const {
         return "LabelType";
     }
 

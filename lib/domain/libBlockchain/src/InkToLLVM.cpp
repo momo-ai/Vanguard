@@ -307,7 +307,7 @@ namespace blockchain {
     bool InkToLLVM::isConstructorClosure(const BlkFunction &blockchainFn, vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         stringstream ss;
-        ss << ".*\\.\\." << blockchainFn.parent()->name() << ".*" << blockchainFn.name() << ".*closure.*";
+        ss << ".*\\.\\." << blockchainFn.parent()->blkName() << ".*" << blockchainFn.blkName() << ".*closure.*";
         std::regex reg(ss.str());
         string name = llvmFn.getName().str();
         return regex_match(llvmFn.getName().str(), reg);
@@ -326,7 +326,7 @@ namespace blockchain {
         }
 
         stringstream ss;
-        ss << ".*\\.\\." << blockchainFn.parent()->name() << ".*" << blockchainFn.name() << "[a-hA-F0-9]{20}$";
+        ss << ".*\\.\\." << blockchainFn.parent()->blkName() << ".*" << blockchainFn.blkName() << "[a-hA-F0-9]{20}$";
 
         std::regex reg(ss.str());
         string name = llvmFn.getName().str();

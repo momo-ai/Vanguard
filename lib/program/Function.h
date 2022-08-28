@@ -35,10 +35,6 @@ namespace vanguard {
 
         const llvm::Function &unwrap();
 
-        std::list<Block *> getAllBlocks();
-
-        const llvm::Function &unwrap();
-
     private:
         const llvm::Function &function;
     };

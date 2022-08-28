@@ -14,7 +14,7 @@
 using namespace std;
 
 namespace blockchain {
-class BlkVariable : public BlkNode, public vanguard::Value {
+class BlkVariable : public BlkNode, public vanguard::Variable {
     public:
         BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type);
         ~BlkVariable();
@@ -27,9 +27,14 @@ class BlkVariable : public BlkNode, public vanguard::Value {
             return false;
         }
 
+
+        bool hasName() const override;
+        std::string name() const override;
         const BlkType &varType() const;
+        vanguard::Type* type() const override;
         bool writtenBy(vanguard::Instruction &ins) const;
         bool readBy(vanguard::Instruction &ins) const;
+        void accept(vanguard::ValueClassVisitor &v) const override;
     private:
         BlkType *varTy;
     };

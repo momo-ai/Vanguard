@@ -8,12 +8,13 @@
 #include "../FunctionDetector.h"
 //#import "../../Vanguard.cpp"
 #include "../../domain/libBlockchain/include/Blockchain.h"
+#include "../../program/InstructionClassVisitor.h"
 #include "../AARequirement.h"
 
 namespace vanguard {
-    class ReentrancyDetector : public FunctionDetector {
+    class ReentrancyDetector : public FunctionDetector, public vanguard::InstructionClassVisitor {
     public:
-        ReentrancyDetector(const std::string& summaryFile);
+        explicit ReentrancyDetector(const std::string& summaryFile);
         bool shouldAnalyze(Function &fn);
         bool beginFn(Function &fn);
         bool transfer(Instruction &ins);
@@ -28,6 +29,7 @@ namespace vanguard {
         void report() override;
 
         static std::string name();
+        void visit(const CallExpr &v) override;
 
         static char ID;
 

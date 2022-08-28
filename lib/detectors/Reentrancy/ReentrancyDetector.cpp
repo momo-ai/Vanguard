@@ -35,49 +35,47 @@ namespace vanguard { // Reentrancy {
         return false;
     }
 
-    bool ReentrancyDetector::transfer(Instruction &ins) {
-//        ReachAnalysis::transfer(ins);
-        if (ins.getInstructionType() == "call") {
-            auto CallInstr = llvm::dyn_cast<Call>(&ins);
-//        }
-//        if (auto CallInstr = llvm::dyn_cast<CallInstruction>(&ins)) { // TODO: Need a way to cast instruction classes to LLVM
-            // Detect function call
-            Function *calledFn = CallInstr->getTarget();
-            //string cfname = called_func->getName().str();
-            if (fnInfo.find(calledFn) != fnInfo.end()) {
-                // Run checks if called function is already analyzed
-                tuple<bool,bool> calledFnInfo = fnInfo[calledFn];
-                if (get<1>(fnInfo[calledFn])) {
-                    // If call has store, record in curr func and check for prev external call
-                    if (!get<1>(fnInfo[curFn])) {
-                        // If call has store, record that current function has store
-                        fnInfo[curFn] = make_tuple(get<0>(fnInfo[curFn]), true);
-                        modified = true;
-                    }
-                    if (lastExternalCall && potentialReentrancies.find(curFn) == potentialReentrancies.end()) {
-                        // Record reentrancy if there is prev ext call in this func (and not already recorded)
-                        potentialReentrancies[curFn] = lastExternalCall;
-                    }
+    void ReentrancyDetector::visit(const CallExpr &CallInstr) {
+        Function *calledFn = CallInstr.target();
+        //string cfname = called_func->getName().str();
+        if (fnInfo.find(calledFn) != fnInfo.end()) {
+            // Run checks if called function is already analyzed
+            tuple<bool,bool> calledFnInfo = fnInfo[calledFn];
+            if (get<1>(fnInfo[calledFn])) {
+                // If call has store, record in curr func and check for prev external call
+                if (!get<1>(fnInfo[curFn])) {
+                    // If call has store, record that current function has store
+                    fnInfo[curFn] = make_tuple(get<0>(fnInfo[curFn]), true);
+                    modified = true;
                 }
-                if (get<0>(fnInfo[calledFn])) {
-                    // If call has external, record that current function has external call
-                    lastExternalCall = calledFn;
-                    if (!get<0>(fnInfo[curFn])) {
-                        fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
-                        modified = true;
-                    }
+                if (lastExternalCall && potentialReentrancies.find(curFn) == potentialReentrancies.end()) {
+                    // Record reentrancy if there is prev ext call in this func (and not already recorded)
+                    potentialReentrancies[curFn] = lastExternalCall;
                 }
             }
-            if (chain->isAnyExternalCall(*calledFn)) {
-                // If call is external, record that current func has ext and set last ext call
+            if (get<0>(fnInfo[calledFn])) {
+                // If call has external, record that current function has external call
                 lastExternalCall = calledFn;
                 if (!get<0>(fnInfo[curFn])) {
-                    // Indicate function has ext call if not already indicated
                     fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
                     modified = true;
                 }
             }
         }
+        if (chain->isAnyExternalCall(*calledFn)) {
+            // If call is external, record that current func has ext and set last ext call
+            lastExternalCall = calledFn;
+            if (!get<0>(fnInfo[curFn])) {
+                // Indicate function has ext call if not already indicated
+                fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
+                modified = true;
+            }
+        }
+    }
+
+    bool ReentrancyDetector::transfer(Instruction &ins) {
+//        ReachAnalysis::transfer(ins);
+        ins.accept(*this);
         // TODO: hmm
         if (chain->writesStorage(ins)) {
             // Detect store to contract state
@@ -101,7 +99,7 @@ namespace vanguard { // Reentrancy {
     string ReentrancyDetector::vulnerabilityReport()  {
         string report = "Reentrancy Report:\n";
         for(pair<Function *, Function *> tup : potentialReentrancies) {
-            report += "Function '" + chain->findFunction(*tup.first)->name() + "' has potential reentrancy \n";
+            report += "Function '" + chain->findFunction(*tup.first)->blkName() + "' has potential reentrancy \n";
 
 //            for(auto pubFn : reachingPublicFns(chain, tup.first)) {
 //                report += "Function '" + chain->findFunction(*tup.first)->name() + "' has potential reentrancy \n";
@@ -130,7 +128,7 @@ namespace vanguard { // Reentrancy {
             Block *curBlk = wl.front();
             wl.pop_front();
 
-            for(Block *succBlk : curBlk->getAllSuccessors()) {
+            for(Block *succBlk : curBlk->successors()) {
                 if(seen.find(succBlk) == seen.end()) {
                     seen.insert(succBlk);
                     wl.push_back(succBlk);
@@ -162,14 +160,14 @@ namespace vanguard { // Reentrancy {
             return false;
         }
 
-        string name = fn.getName();
+        string name = fn.name();
         modified = beginFn(fn) || modified;
 
         unordered_set<Block* > wlContents;
         list<Block* > instWorklist;
         // TODO: There is no way to iterate thru blocks in a fn
         // getbody and travel down the links
-        for (Block* blk : fn.getAllBlocks()) {
+        for (Block* blk : fn.blocks()) {
             wlContents.insert(blk);
             instWorklist.insert(instWorklist.end(), blk);
         }
@@ -180,7 +178,7 @@ namespace vanguard { // Reentrancy {
             wlContents.erase(blk);
 
             // was in for loop when it was blocks
-            for (Instruction* inst : blk->getInstructionsList()) {
+            for (Instruction* inst : blk->instructions()) {
                 if (transfer(*inst)) {
                     modified = true;
                     // TODO: Implement re-analyzing affected  functions of true positives

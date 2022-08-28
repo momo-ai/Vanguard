@@ -15,12 +15,10 @@ namespace vanguard{
     class Block;
 
     enum ValueClassEnum{
-        BLKVARIABLE_BEGIN,
-        BLKVARIABLE,
-        BLKVARIABLE_END = BLKVARIABLE,
         VARIABLE_BEGIN,
         GLOBAL_VARIABLE = VARIABLE_BEGIN,
         ARGUMENT,
+        BLKVARIABLE,
         INSTRUCTION_VARIABLE,
         VARIABLE_END = INSTRUCTION_VARIABLE,
         LITERAL_BEGIN,
@@ -327,6 +325,7 @@ namespace vanguard{
 
     class ValueClassVisitor{
     public:
+        virtual void visit(const Variable &v) = 0;
         virtual void visit(const GlobalVariable &v) = 0;
         virtual void visit(const Argument &v) = 0;
         virtual void visit(const InstructionVariable &v) = 0;

@@ -16,7 +16,7 @@ namespace vanguard {
             */
             virtual bool resolvesCalls() = 0; 
 
-            virtual std::list<CallEdge*> getCallees(Context context, CallInstruction ins) = 0;
+            virtual std::list<CallEdge*> getCallees(Context context, CallExpr& ins) = 0;
 
             // Eventually we might want to add this functionality, but if it is added getCallers will take in a Function rather than a callInstruction
             // virtual std::list<CallEdge*> getCallers(Context context, callInstruction instruction) = 0;

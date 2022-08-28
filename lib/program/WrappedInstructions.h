@@ -88,8 +88,8 @@ namespace vanguard{
 
             Variable* result() const override;
             bool hasReturn() const override;
-            Function* getTarget() const override;
-            std::list<Value*> getArgs() const override;
+            Function* target() const override;
+            std::list<Value*> args() const override;
 
             //void accept(InstructionClassVisitor &v) const override;
     };

@@ -65,7 +65,7 @@ namespace blockchain {
         return false;
     }
 
-    std::list<vanguard::CallEdge*> Blockchain::getCallees(vanguard::Context context, vanguard::CallInstruction ins) {
+    std::list<vanguard::CallEdge*> Blockchain::getCallees(vanguard::Context context, vanguard::CallExpr &ins) {
         std::list<vanguard::CallEdge*> res;
         return res;
     }
