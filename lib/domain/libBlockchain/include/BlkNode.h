@@ -42,7 +42,7 @@ namespace blockchain {
         static inline bool classof(const BlkNode *) { return true; }
 
         virtual ~BlkNode() = default;
-        std::string name() const;
+        std::string blkName() const;
         BlkNode *parent() const;
         void parent(BlkNode *parent);
         NodeType type() const;
@@ -70,7 +70,7 @@ namespace blockchain {
         }
     private:
         NodeType ty;
-        std::string blkName;
+        std::string name;
         BlkNode *blkParent;
     };
 }

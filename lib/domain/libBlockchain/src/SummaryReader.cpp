@@ -72,7 +72,8 @@ namespace blockchain {
         }
 
         for(auto &ref : storageRefs) {
-            require(storageDecls.find(ref.second) != storageDecls.end(), string("Could not find referenced declaration for ") + ref.first->name());
+            require(storageDecls.find(ref.second) != storageDecls.end(), string("Could not find referenced declaration for ") +
+                    ref.first->blkName());
             ref.first->setReferenced(storageDecls[ref.second]);
         }
 

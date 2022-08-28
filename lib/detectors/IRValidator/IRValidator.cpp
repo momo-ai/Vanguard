@@ -67,6 +67,10 @@ namespace vanguard {
                     v.type()->name();
         }
 
+        void visit(const Variable &v) override {
+            result = "Variable of type " +
+                     v.type()->name();
+        }
     };
 
     std::string getValueString(const Value &v){
@@ -117,8 +121,8 @@ namespace vanguard {
         }
 
         void visit(const CallExpr &inst) override{
-            result = "Call to function " + inst.getTarget()->name() + " with arguments: ";
-            auto args = inst.getArgs();
+            result = "Call to function " + inst.target()->name() + " with arguments: ";
+            auto args = inst.args();
             for (auto arg: args){
                 result += getValueString(*arg) + ", ";
             }
@@ -159,7 +163,9 @@ namespace vanguard {
     }
 
 
-    void IRValidator::registerAnalyses() { }
+    std::vector<Requirement *> IRValidator::registerAnalyses() {
+        return {};
+    }
     void IRValidator::startDetection() {
         totBlks = 0;
         totFns = 0;

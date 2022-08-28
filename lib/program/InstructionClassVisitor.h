@@ -10,16 +10,16 @@
 namespace vanguard {
     class InstructionClassVisitor{
     public:
-        virtual void visit(const Branch &v) = 0;
-        virtual void visit(const Return &v) = 0;
-        virtual void visit(const Error &v) = 0;
-        virtual void visit(const BinaryOpExpr &v) = 0;
-        virtual void visit(const UnaryOpExpr &v) = 0;
-        virtual void visit(const CallExpr &v) = 0;
-        virtual void visit(const CastExpr &v) = 0;
-        virtual void visit(const TernaryExpr &v) = 0;
-        virtual void visit(const Assignment &v) = 0;
-        virtual void visit(const UnknownExpr &v) = 0;
+        virtual void visit(const Branch &v) {};
+        virtual void visit(const Return &v) {};
+        virtual void visit(const Error &v) {};
+        virtual void visit(const BinaryOpExpr &v) {};
+        virtual void visit(const UnaryOpExpr &v) {};
+        virtual void visit(const CallExpr &v) {};
+        virtual void visit(const CastExpr &v) {};
+        virtual void visit(const TernaryExpr &v) {};
+        virtual void visit(const Assignment &v) {};
+        virtual void visit(const UnknownExpr &v) {};
     };
 }
 

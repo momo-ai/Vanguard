@@ -10,7 +10,7 @@
 namespace vanguard {
     class IRValidator : public UnitDetector {
     public:
-        void registerAnalyses() override;
+        std::vector<Requirement *> registerAnalyses() override;
         void startDetection() override;
         void detect(CompilationUnit &unit) override;
         void report() override;

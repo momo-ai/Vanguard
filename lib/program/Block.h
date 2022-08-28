@@ -25,8 +25,6 @@ namespace vanguard{
 
         const llvm::BasicBlock& unwrap();
 
-        const llvm::BasicBlock& unwrap();
-
     private:
         const llvm::BasicBlock& block;
 

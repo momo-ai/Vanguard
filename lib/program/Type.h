@@ -11,7 +11,7 @@ namespace vanguard{
         public:
             Type();
 
-            virtual std::string name() = 0;
+            virtual std::string name() const = 0;
     };
 
     class IntegerType: public Type{
@@ -22,9 +22,7 @@ namespace vanguard{
 
             unsigned width(); //returns width of integer in bytes
 
-            std::string name() override;
-
-            const llvm::IntegerType &unwrap();
+            std::string name() const override;
 
             const llvm::IntegerType &unwrap();
 
@@ -38,13 +36,11 @@ namespace vanguard{
 
             ArrayType(const ArrayType&) = delete;
 
-            Type* baseType();
+            Type* baseType() const;
 
-            uint64_t length();
+            uint64_t length() const;
 
-            std::string name() override;
-
-            const llvm::ArrayType &unwrap();
+            std::string name() const override;
 
             const llvm::ArrayType &unwrap();
 
@@ -76,11 +72,9 @@ namespace vanguard{
             
             bool isOpaque();
 
-            Type* referencedType();
+            Type* referencedType() const;
 
-            std::string name() override;
-
-            const llvm::PointerType &unwrap();
+            std::string name() const override;
 
             const llvm::PointerType &unwrap();
 
@@ -102,9 +96,7 @@ namespace vanguard{
 
             Type* getTypeAtIndex(unsigned n);
 
-            std::string name() override;
-
-            const llvm::StructType &unwrap();
+            std::string name() const override;
 
             const llvm::StructType &unwrap();
 
@@ -118,11 +110,9 @@ namespace vanguard{
 
             VectorType(const VectorType&) = delete;
 
-            Type* baseType();
+            Type* baseType() const;
 
-            std::string name() override;
-
-            const llvm::VectorType &unwrap();
+            std::string name() const override;
 
             const llvm::VectorType &unwrap();
 
@@ -137,7 +127,7 @@ namespace vanguard{
 
             VoidType(const VoidType&) = delete;
 
-            std::string name() override;
+            std::string name() const override;
 
             const llvm::Type &unwrap();
 
@@ -151,7 +141,7 @@ namespace vanguard{
 
         LabelType(const LabelType&) = delete;
 
-        std::string name() override;
+        std::string name() const override;
 
         const llvm::Type &unwrap();
 

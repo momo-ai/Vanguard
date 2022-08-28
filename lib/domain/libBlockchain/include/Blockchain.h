@@ -49,7 +49,7 @@ class Blockchain : public BlkNode, public vanguard::Domain {
 
         // overridden from Domain class, implementation begins L83 Blockchain.cpp
         virtual bool resolvesCalls() override;
-        virtual std::list<vanguard::CallEdge*> getCallees(vanguard::Context context, vanguard::CallInstruction ins) override;
+        virtual std::list<vanguard::CallEdge*> getCallees(vanguard::Context context, vanguard::CallExpr &ins) override;
         virtual bool hasAdditionalStorage() override;
         virtual std::list<vanguard::Value*> getAdditionalStorage() override;
         virtual std::list<vanguard::Value*> getStorageReads(vanguard::Instruction& ins) override;

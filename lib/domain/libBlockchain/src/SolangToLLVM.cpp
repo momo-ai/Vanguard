@@ -39,11 +39,11 @@ namespace blockchain {
         }
 
         void visit(const BlkUserType &t) override {
-            result = t.name().substr(t.name().find_last_of(' ') + 1,  t.name().length());
+            result = t.blkName().substr(t.blkName().find_last_of(' ') + 1, t.blkName().length());
         }
 
         void visit(const BlkElementaryType &t) override {
-            result = t.name();
+            result = t.blkName();
         }
     };
 
@@ -61,14 +61,14 @@ namespace blockchain {
         }
 
         stringstream ss;
-        ss << ".*" << blockchainFn.parent()->name() << "::";
+        ss << ".*" << blockchainFn.parent()->blkName() << "::";
 
         if(blockchainFn.isConstructor()) {
-            ss << blockchainFn.name() << ".*";
+            ss << blockchainFn.blkName() << ".*";
         }
         else {
             //ss << "function::" << blockchainFn.name() ;
-            ss << ".*" << blockchainFn.name() ;
+            ss << ".*" << blockchainFn.blkName() ;
             if(!blockchainFn.parameters().empty() || !blockchainFn.modifiers().empty()) {
                 ss << "__";
             }
@@ -127,7 +127,7 @@ namespace blockchain {
         if(auto call = llvm::dyn_cast<CallInst>(&llvmIns)) {
             auto fn = call->getCalledFunction();
             stringstream ss;
-            ss << ".*::function::v?__set_" << var.name() << ".*";
+            ss << ".*::function::v?__set_" << var.blkName() << ".*";
             std::regex reg(ss.str());
 
             if(fn->hasName() && regex_match(fn->getName().str(), reg)) {
@@ -143,7 +143,7 @@ namespace blockchain {
         if(auto call = llvm::dyn_cast<CallInst>(&llvmIns)) {
             auto fn = call->getCalledFunction();
             stringstream ss;
-            ss << ".*::function::v?__get_" << var.name() << ".*";
+            ss << ".*::function::v?__get_" << var.blkName() << ".*";
             std::regex reg(ss.str());
 
             if(fn->hasName() && regex_match(fn->getName().str(), reg)) {
