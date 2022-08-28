@@ -4,6 +4,7 @@
 
 #include "DetectorRegistry.h"
 #include "StatGen/StatGen.h"
+#include "IRValidator/IRValidator.h"
 #include "FunctionPrinter/FunctionPrinter.h"
 
 
@@ -32,6 +33,7 @@ namespace vanguard {
     DetectorRegistry::DetectorRegistry() {
         add(StatGen::name(), new StatGen());
         add(FunctionPrinter::name(), new FunctionPrinter());
+        add(IRValidator::name(), new IRValidator());
     }
 
     DetectorRegistry::~DetectorRegistry() {

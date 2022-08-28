@@ -1,6 +1,8 @@
 #ifndef VANGUARD_PROGRAM_FUNCTION_H
 #define VANGUARD_PROGRAM_FUNCTION_H
 
+#include "Type.h"
+#include "Value.h"
 #include "llvm/IR/Function.h"
 #include "Type.h"
 #include <list>
@@ -13,24 +15,28 @@ namespace vanguard {
 
     class Function{    
     public:
-        explicit Function(const llvm::Function& func);
+        explicit Function(const llvm::Function &func);
 
         Function(const Function&) = delete;
 
-        std::string getName();
+        std::string name();
 
-        bool getParams();
+        std::list<Argument*> params();
 
-        Type* getReturnType();
+        Type* returnType();
 
         bool hasBody();
 
-        Block* getBody();
+        Block* body();
 
-        std::list<Instruction*> getInstructionsList();
+        std::list<Instruction*> instructions();
+
+        std::list<Block *> blocks();
+
+        const llvm::Function &unwrap();
 
     private:
-        const llvm::Function& function;
+        const llvm::Function &function;
     };
 
 }

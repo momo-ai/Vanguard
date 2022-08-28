@@ -13,13 +13,17 @@ namespace vanguard{
 
         Block(const Block&) = delete;
 
-        Function* getFunction();
+        std::string name();
 
-        std::list<Instruction *> getInstructionsList();
+        Function* parent();
 
-        bool isEntryBlock();
+        std::list<Instruction *> instructions();
 
-        std::unordered_set<Block *> getAllSuccessors();
+        bool isEntry();
+
+        std::unordered_set<Block *> successors();
+
+        const llvm::BasicBlock& unwrap();
 
     private:
         const llvm::BasicBlock& block;

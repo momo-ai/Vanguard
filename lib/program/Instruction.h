@@ -2,37 +2,55 @@
 #define VANGUARD_PROGRAM_INSTRUCTION_H
 
 #include "Function.h"
-#include <unordered_set>
-#include "llvm/IR/Instruction.h"
 
 namespace vanguard{
 
+    enum InstructionClassEnum {
+        BRANCH,
+        RETURN,
+        ERROR,
+        EXPRESSION_BEGIN,
+        BIN_OP = EXPRESSION_BEGIN,
+        UN_OP,
+        CALL,
+        CAST,
+        TERNARY,
+        ASSIGNMENT,
+        UNKNOWN,
+        EXPRESSION_END = UNKNOWN
+    };
+
+    class InstructionClassVisitor;
     class Instruction{
-    private:
-        const llvm::Instruction& instruction;
 
     public:
-        explicit Instruction(const llvm::Instruction &inst);
+        static inline bool classof(const Instruction &) { return true; }
+        static inline bool classof(const Instruction *) { return true; }
 
-        Instruction(const Instruction&) = delete;
+        virtual InstructionClassEnum instructionClass() const = 0;
 
-        Block* getBlock();
+        virtual std::string name() const = 0;
 
-        //Function* getFunction();
+        virtual Block* parent() const = 0;
 
-        const char* getInstructionType();
+        virtual bool mayReadOrWriteToMemory() const = 0;
 
-        bool mayReadOrWriteToMemory();
+        virtual bool willReturn() const = 0;
 
-        bool willReturn();
+        virtual Instruction * getSuccessor() const = 0;
 
-        unsigned getNumSuccessors();
+        virtual std::list<Instruction*> getAllSuccessors() const = 0;
 
-        Block* getSuccessor(unsigned n);
+        virtual Value* operand(unsigned i) const = 0;
 
-        std::unordered_set<Block*> getAllSuccessors();
+        virtual unsigned numOperands() const = 0;
+
+        virtual const llvm::Instruction &unwrap() const = 0;
+
+        virtual void accept(InstructionClassVisitor &v) const = 0;
 
     };
+
 }
 
 #endif
