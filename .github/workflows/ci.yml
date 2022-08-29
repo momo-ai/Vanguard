@@ -22,4 +22,9 @@ jobs:
       - name: Build SolidityPreprocessor
         run: |
           nix build '.?submodules=1#solidity-preprocessor'
+      - name: Test IR Validator
+        run: |
+          python3 run.py --src_path test/PuppetPool.sol  --detector irValidator
+          echo "Done." 
+
       # does not yet build preprocessors, python, other compoennts
