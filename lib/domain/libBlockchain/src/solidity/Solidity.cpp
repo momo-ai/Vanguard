@@ -2,15 +2,18 @@
 // Created by Jon Stephens on 3/20/22.
 //
 
-#include "../include/Blockchain.h"
-#include "../include/Solidity.h"
-#include "../include/BlockchainToLLVM.h"
-#include "../include/SolangToLLVM.h"
+#include "domain/libBlockchain/include/Blockchain.h"
+#include "domain/libBlockchain/include/solidity/Solidity.h"
+#include "domain/libBlockchain/include/BlockchainModel.h"
+#include "domain/libBlockchain/include/solidity/SolangModel.h"
 #include <llvm/IR/Instructions.h>
+
+#include <utility>
 
 
 namespace blockchain {
-    Solidity::Solidity(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts) : Blockchain(SOLIDITY, blk2llvm, c, v, contracts) {}
+    Solidity::Solidity(BlockchainModel *blk2llvm, std::string &c, std::string &v, std::vector<BlkContract *> contracts)
+        : Blockchain(SOLIDITY, blk2llvm, c, v, std::move(contracts)) {}
 
 
     bool Solidity::allowsReentrancy() const {
@@ -24,7 +27,7 @@ namespace blockchain {
             auto& llvmToVanguard = vanguard::LLVMtoVanguard::getInstance();
             vanguard::Function* fnV = llvmToVanguard.translateFunction(fn);
 
-            return SolangToLLVM::writesStorage(*fnV);
+            return SolangModel::writesStorage(*fnV);
 
             //assume assigns goes through setter
             /*auto fn = call->getCalledFunction();
@@ -43,7 +46,7 @@ namespace blockchain {
             auto& llvmToVanguard = vanguard::LLVMtoVanguard::getInstance();
             vanguard::Function* fnV = llvmToVanguard.translateFunction(fn);
 
-            return SolangToLLVM::readsStorage(*fnV);
+            return SolangModel::readsStorage(*fnV);
 
             //assume assigns goes through setter
             /*auto fn = call->getCalledFunction();

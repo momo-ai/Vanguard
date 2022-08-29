@@ -11,12 +11,10 @@
 #include "../../../program/Value.h"
 #include "BlkType.h"
 
-using namespace std;
-
 namespace blockchain {
 class BlkVariable : public BlkNode, public vanguard::Variable {
     public:
-        BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type);
+        BlkVariable(BlockchainModel *blk2llvm, std::string &name, BlkType *type);
         ~BlkVariable();
 
         static inline bool classof(const BlkVariable &) { return true; }

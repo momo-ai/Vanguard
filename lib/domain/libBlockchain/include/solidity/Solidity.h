@@ -6,12 +6,12 @@
 #define LIBBLOCKCHAIN_SOLIDITY_H
 
 
-#include "Blockchain.h"
+#include "domain/libBlockchain/include/Blockchain.h"
 
 namespace blockchain {
     class Solidity : public Blockchain {
     public:
-        Solidity(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts);
+        Solidity(BlockchainModel *blk2llvm, std::string &c, std::string &v, std::vector<BlkContract *> contracts);
 
         static inline bool classof(const Solidity &) { return true; }
         static inline bool classof(const Solidity *) { return true; }

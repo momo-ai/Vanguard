@@ -3,13 +3,12 @@
 //
 
 #include "../include/BlkContract.h"
-#include "../include/BlockchainToLLVM.h"
+#include "../include/BlockchainModel.h"
 
 namespace blockchain {
-    BlkContract::BlkContract(BlockchainToLLVM *blk2llvm, string &name, vector<BlkFunction *> *fns, vector<BlkVariable *> *vars, vector<BlkUserType *> *inherits,
-            vector<BlkEnum *> *enums, vector<BlkStruct *> *structs, vector<BlkEvent *> *events) : BlkStorage(CONTRACT, blk2llvm, name) {
-        contractFns = fns;
-        registerParent(contractFns);
+    BlkContract::BlkContract(BlockchainModel *blk2llvm, std::string &name, std::vector<BlkFunction *> fns, std::vector<BlkVariable *> vars, std::vector<BlkUserType *> inherits,
+                             std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events) : Container<BlkFunction>(std::move(fns)), BlkStorage(CONTRACT, blk2llvm, name) {
+        registerParent(contained);
         contractVars = vars;
         registerParent(contractVars);
         contractInherits = inherits;
@@ -28,13 +27,13 @@ namespace blockchain {
         deleter(contractEnums);
         deleter(contractStructs);
         deleter(contractVars);
-        deleter(contractFns);
+        deleter(contained);
     }
 
-    vector<BlkContract *> BlkContract::inherits() const {
-        vector<BlkContract *> inherits;
+    std::vector<BlkContract *> BlkContract::inherits() const {
+        std::vector<BlkContract *> inherits;
 
-        for(auto inherit : *contractInherits) {
+        for(auto inherit : contractInherits) {
             if(auto inheritFrom = llvm::dyn_cast<BlkContract>(inherit)) {
                 inherits.push_back(inheritFrom);
             }
@@ -46,8 +45,8 @@ namespace blockchain {
         return inherits;
     }
 
-    const vector<BlkVariable *> &BlkContract::variables() const {
-        return *contractVars;
+    const std::vector<BlkVariable *> &BlkContract::variables() const {
+        return contractVars;
     }
 
     bool BlkContract::isContractFunction(vanguard::Function &fn) const {
@@ -55,7 +54,7 @@ namespace blockchain {
     }
 
     const BlkFunction *BlkContract::findFunction(vanguard::Function &fn) const {
-        for(auto blkFn : *contractFns) {
+        for(auto blkFn : contained) {
             if(blkFn->isTranslation(fn)) {
                 return blkFn;
             }
@@ -64,7 +63,7 @@ namespace blockchain {
         return nullptr;
     }
 
-    const vector<BlkFunction *> &BlkContract::functions() const {
-        return *contractFns;
+    const std::vector<BlkFunction *> &BlkContract::functions() const {
+        return contained;
     }
 }

@@ -6,7 +6,8 @@
 #define LIBBLOCKCHAIN_BLKCONTRACT_H
 
 //#include "llvm/IR/Function.h"
-#include "../../../program/Function.h"
+#include <program/Function.h>
+#include <domain/Container.h>
 #include "BlkEnum.h"
 #include "BlkStruct.h"
 #include "BlkVariable.h"
@@ -16,13 +17,11 @@
 #include "BlkNode.h"
 #include "BlkEvent.h"
 
-using namespace std;
-
 namespace blockchain {
-    class BlkContract : public BlkStorage {
+    class BlkContract : public BlkStorage, public vanguard::Container<BlkFunction> {
     public:
-        BlkContract(BlockchainToLLVM *blk2llvm, string &name, vector<BlkFunction *> *fns, vector<BlkVariable *> *vars, vector<BlkUserType *> *inherits,
-                    vector<BlkEnum *> *enums, vector<BlkStruct *> *structs, vector<BlkEvent *> *events);
+        BlkContract(BlockchainModel *blk2llvm, std::string &name, std::vector<BlkFunction *> fns, std::vector<BlkVariable *> vars, std::vector<BlkUserType *> inherits,
+                    std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events);
         ~BlkContract();
 
         static inline bool classof(const BlkContract &) { return true; }
@@ -34,16 +33,15 @@ namespace blockchain {
         }
         bool isContractFunction(vanguard::Function &fn) const;
         const BlkFunction *findFunction(vanguard::Function &fn) const;
-        const vector<BlkFunction *> &functions() const;
-        const vector<BlkVariable *> &variables() const;
-        vector<BlkContract *> inherits() const;
+        const std::vector<BlkFunction *> &functions() const;
+        const std::vector<BlkVariable *> &variables() const;
+        std::vector<BlkContract *> inherits() const;
     private:
-        vector<BlkUserType *> *contractInherits;
-        vector<BlkEvent *> *contractEvents;
-        vector<BlkEnum *> *contractEnums;
-        vector<BlkStruct *> *contractStructs;
-        vector<BlkVariable *> *contractVars;
-        vector<BlkFunction *> *contractFns;
+        std::vector<BlkUserType *> contractInherits;
+        std::vector<BlkEvent *> contractEvents;
+        std::vector<BlkEnum *> contractEnums;
+        std::vector<BlkStruct *> contractStructs;
+        std::vector<BlkVariable *> contractVars;
     };
 }
 

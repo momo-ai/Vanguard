@@ -4,9 +4,12 @@
 
 #include "../include/BlkStruct.h"
 
+#include <utility>
+
+using namespace std;
+
 namespace blockchain {
-    BlkStruct::BlkStruct(BlockchainToLLVM *blk2llvm, string &name, vector<BlkVariable *> *fields) : BlkStorage (STRUCT, blk2llvm, name) {
-        structFields = fields;
+    BlkStruct::BlkStruct(BlockchainModel *blk2llvm, string &name, vector<BlkVariable *> fields) : structFields(std::move(fields)), BlkStorage (STRUCT, blk2llvm, name) {
         registerParent(structFields);
     }
 

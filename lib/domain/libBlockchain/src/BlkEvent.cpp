@@ -4,9 +4,10 @@
 
 #include "../include/BlkEvent.h"
 
+using namespace std;
 
 namespace blockchain {
-    BlkEvent::BlkEvent(BlockchainToLLVM *blk2llvm, std::string &name, vector<BlkVariable *> *params) : eventParams(params), BlkNode(EVENT, blk2llvm, name) {
+    BlkEvent::BlkEvent(BlockchainModel *blk2llvm, std::string &name, vector<BlkVariable *> params) : eventParams(std::move(params)), BlkNode(EVENT, blk2llvm, name) {
         registerParent(eventParams);
     }
 
@@ -15,7 +16,7 @@ namespace blockchain {
     }
 
     const vector<BlkVariable *> &BlkEvent::parameters() const {
-        return *eventParams;
+        return eventParams;
     }
 
     bool BlkEvent::emits(vanguard::Instruction &ins) const {

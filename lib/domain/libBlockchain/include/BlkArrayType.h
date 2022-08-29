@@ -10,7 +10,7 @@
 namespace blockchain {
     class BlkArrayType : public BlkType {
     public:
-        explicit BlkArrayType(BlockchainToLLVM *blk2llvm, std::string &name, BlkType *base);
+        explicit BlkArrayType(BlockchainModel *blk2llvm, std::string &name, BlkType *base);
 
         static inline bool classof(const BlkArrayType &) { return true; }
         static inline bool classof(const BlkArrayType *) { return true; }

@@ -11,7 +11,7 @@
 namespace blockchain {
     class BlkStorage : public BlkNode {
     public:
-        explicit BlkStorage(NodeType t, BlockchainToLLVM *blk2llvm, std::string &name) : BlkNode(t, blk2llvm, name) {}
+        explicit BlkStorage(NodeType t, BlockchainModel *blk2llvm, std::string &name) : BlkNode(t, blk2llvm, name) {}
 
         static inline bool classof(const BlkStorage &) { return true; }
         static inline bool classof(const BlkStorage *) { return true; }

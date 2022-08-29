@@ -11,12 +11,10 @@
 #include "BlkVariable.h"
 #include "BlkStorage.h"
 
-using namespace std;
-
 namespace blockchain {
     class BlkStruct : public BlkStorage {
     public:
-        BlkStruct(BlockchainToLLVM *blk2llvm, string &name, vector<BlkVariable *> *fields);
+        BlkStruct(BlockchainModel *blk2llvm, std::string &name, std::vector<BlkVariable *> fields);
         ~BlkStruct();
 
         static inline bool classof(const BlkStruct &) { return true; }
@@ -27,7 +25,7 @@ namespace blockchain {
             return false;
         }
     private:
-        vector<BlkVariable *> *structFields;
+        std::vector<BlkVariable *> structFields;
     };
 }
 

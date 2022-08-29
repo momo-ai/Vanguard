@@ -9,12 +9,10 @@
 #include <string>
 #include "BlkStorage.h"
 
-using namespace std;
-
 namespace blockchain {
     class BlkEnum : public BlkStorage {
     public:
-        BlkEnum(BlockchainToLLVM *blk2llvm, string &name, map<std::string, int> *values);
+        BlkEnum(BlockchainModel *blk2llvm, std::string &name, std::map<std::string, int> values);
         ~BlkEnum();
 
         static inline bool classof(const BlkEnum &) { return true; }
@@ -25,7 +23,7 @@ namespace blockchain {
             return false;
         }
     private:
-        map<std::string, int> *values;
+        std::map<std::string, int> values;
     };
 }
 

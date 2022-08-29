@@ -11,7 +11,7 @@
 namespace blockchain {
     class BlkElementaryType : public BlkType {
     public:
-        BlkElementaryType(BlockchainToLLVM *blk2llvm, std::string &name);
+        BlkElementaryType(BlockchainModel *blk2llvm, std::string &name);
         ~BlkElementaryType();
 
         static inline bool classof(const BlkElementaryType &) { return true; }

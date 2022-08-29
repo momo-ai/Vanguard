@@ -2,14 +2,17 @@
 // Created by Jon Stephens on 4/10/22.
 //
 
-#include "../include/Ink.h"
+#include "domain/libBlockchain/include/Ink/Ink.h"
 #include <llvm/IR/Instructions.h>
 #include <llvm/IR/Instruction.h>
 #include <llvm/Analysis/MemoryLocation.h>
-#include "../include/InkToLLVM.h"
+
+#include <utility>
+#include "domain/libBlockchain/include/Ink/InkModel.h"
 
 namespace blockchain {
-    Ink::Ink(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts, vanguard::AAWrapper &alias) : Blockchain(INK, blk2llvm, c, v, contracts), alias(alias) {}
+    Ink::Ink(BlockchainModel *blk2llvm, std::string &c, std::string &v, std::vector<BlkContract *> contracts, vanguard::AAWrapper &alias)
+        : Blockchain(INK, blk2llvm, c, v, std::move(contracts)), alias(alias) {}
 
     bool Ink::allowsReentrancy() const {
         return true;
@@ -26,14 +29,14 @@ namespace blockchain {
         }
 
         if(fn->arg_size() < 1) {
-            throw runtime_error("Expected there to be at least one input to " + fn->getName().str());
+            throw std::runtime_error("Expected there to be at least one input to " + fn->getName().str());
         }
 
-        auto selfArg = InkToLLVM::getSelfRef(*blkFn, *fnV);
+        auto selfArg = InkModel::getSelfRef(*blkFn, *fnV);
         llvm::MemoryLocation selfLoc = llvm::MemoryLocation::getAfter(selfArg);
 
-        if(InkToLLVM::isMemoryStore(ins)) {
-            llvm::MemoryLocation storeLoc = InkToLLVM::getStoreLocation(ins);
+        if(InkModel::isMemoryStore(ins)) {
+            llvm::MemoryLocation storeLoc = InkModel::getStoreLocation(ins);
             llvm::Function* fnNoConst = const_cast<llvm::Function*>(fn);
             llvm::AAResults *aa = alias.request(*fnV);
             if(aa->alias(storeLoc, selfLoc) > llvm::AliasResult::MayAlias) {
@@ -46,7 +49,7 @@ namespace blockchain {
             auto& llvmToVanguard = vanguard::LLVMtoVanguard::getInstance();
             vanguard::Function* fncV = llvmToVanguard.translateFunction(fn);
             //Can only store contract variables
-            if(InkToLLVM::isLazyStore(*fncV)) {
+            if(InkModel::isLazyStore(*fncV)) {
                 return true;
             }
         }
@@ -66,14 +69,14 @@ namespace blockchain {
         }
 
         if(fn->arg_size() < 1) {
-            throw runtime_error("Expected there to be at least one input to " + fn->getName().str());
+            throw std::runtime_error("Expected there to be at least one input to " + fn->getName().str());
         }
 
-        auto selfArg = InkToLLVM::getSelfRef(*blkFn, *fnV);
+        auto selfArg = InkModel::getSelfRef(*blkFn, *fnV);
         llvm::MemoryLocation selfLoc = llvm::MemoryLocation::getAfter(selfArg);
 
-        if(InkToLLVM::isMemoryRead(ins)) {
-            llvm::MemoryLocation readLoc = InkToLLVM::getReadLocation(ins);
+        if(InkModel::isMemoryRead(ins)) {
+            llvm::MemoryLocation readLoc = InkModel::getReadLocation(ins);
 
             llvm::AAResults *aa = alias.request(*fnV); // otherwise  alias.request(*fn), which throws error
             if(aa->alias(readLoc, selfLoc) > llvm::AliasResult::MayAlias) {
@@ -87,7 +90,7 @@ namespace blockchain {
             vanguard::Function* fnV = llvmToVanguard.translateFunction(fn);
 
             //Can only store contract variables
-            if(InkToLLVM::isLazyGet(*fnV)) {
+            if(InkModel::isLazyGet(*fnV)) {
                 return true;
             }
         }
@@ -102,7 +105,7 @@ namespace blockchain {
             auto& llvmToVanguard = vanguard::LLVMtoVanguard::getInstance();
             vanguard::Function* fnV = llvmToVanguard.translateFunction(fn);
 
-            if(InkToLLVM::isMsgSender(*fnV)) {
+            if(InkModel::isMsgSender(*fnV)) {
                 return true;
             }
         }
@@ -117,7 +120,7 @@ namespace blockchain {
             auto& llvmToVanguard = vanguard::LLVMtoVanguard::getInstance();
             vanguard::Function* fnV = llvmToVanguard.translateFunction(fn);
 
-            if(InkToLLVM::isMsgValue(*fnV)) {
+            if(InkModel::isMsgValue(*fnV)) {
                 return true;
             }
         }
@@ -132,7 +135,7 @@ namespace blockchain {
             auto& llvmToVanguard = vanguard::LLVMtoVanguard::getInstance();
             vanguard::Function* fnV = llvmToVanguard.translateFunction(fn);
 
-            if(InkToLLVM::isSelfDestruct(*fnV)) {
+            if(InkModel::isSelfDestruct(*fnV)) {
                 return true;
             }
         }

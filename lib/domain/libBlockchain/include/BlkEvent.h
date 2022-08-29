@@ -12,7 +12,7 @@
 namespace blockchain {
     class BlkEvent : public BlkNode {
     public:
-        BlkEvent(BlockchainToLLVM *blk2llvm, std::string &name, vector<BlkVariable *> *params);
+        BlkEvent(BlockchainModel *blk2llvm, std::string &name, std::vector<BlkVariable *> params);
         ~BlkEvent();
 
         static inline bool classof(const BlkEvent &) { return true; }
@@ -23,11 +23,11 @@ namespace blockchain {
             return false;
         }
 
-        const vector<BlkVariable *> &parameters() const;
+        const std::vector<BlkVariable *> &parameters() const;
         bool emits(vanguard::Instruction &ins) const;
 
     private:
-        vector<BlkVariable *> *eventParams;
+        std::vector<BlkVariable *> eventParams;
     };
 }
 

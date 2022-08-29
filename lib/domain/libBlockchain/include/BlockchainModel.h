@@ -6,14 +6,13 @@
 #define LIBBLOCKCHAIN_BLOCKCHAINTOLLVM_H
 
 #include "BlkFunction.h"
-//#include "llvm/IR/Function.h"
-#include "../../../program/Function.h"
+#include <program/Function.h>
 
 
 namespace blockchain {
-    class BlockchainToLLVM {
+    class BlockchainModel {
         public:
-            virtual ~BlockchainToLLVM() = default;
+            virtual ~BlockchainModel() = default;
             virtual bool isTranslation(const BlkFunction &blockchainFn, vanguard::Function &llvmFn) const = 0;
             //virtual bool isExternalCall(const llvm::Function &llvmFn) = 0;
             //virtual bool isDelegateCall(const llvm::Function &llvmFn) = 0;

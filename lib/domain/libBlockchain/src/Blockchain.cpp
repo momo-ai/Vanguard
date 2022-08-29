@@ -3,16 +3,14 @@
 //
 
 #include "../include/Blockchain.h"
-#include "../include/BlockchainToLLVM.h"
+#include "../include/BlockchainModel.h"
+
+using namespace std;
 
 namespace blockchain {
     Blockchain::~Blockchain() {
-        deleter(allContracts);
+        deleter(contained);
         delete blkTollvm;
-    }
-
-    std::string Blockchain::getThing() {
-        return "found thing!";
     }
 
     bool Blockchain::isContractFunction(vanguard::Function &fn) const {
@@ -20,11 +18,11 @@ namespace blockchain {
     }
 
     const vector<BlkContract *> &Blockchain::contracts() const {
-        return *allContracts;
+        return contains();
     }
 
     const BlkFunction *Blockchain::findFunction(vanguard::Function &fn) const {
-        for(auto contract : *allContracts) {
+        for(auto contract : contained) {
             const BlkFunction *blkFn = contract->findFunction(fn);
             if(blkFn != nullptr) {
                 return blkFn;
@@ -35,7 +33,7 @@ namespace blockchain {
     }
 
     const BlkContract *Blockchain::findDeclaringContract(vanguard::Function &fn) const {
-        for(auto contract : *allContracts) {
+        for(auto contract : contained) {
             if(contract->isContractFunction(fn)) {
                 return contract;
             }
@@ -77,7 +75,7 @@ namespace blockchain {
 
     std::list<vanguard::Value*> Blockchain::getAdditionalStorage() {
         std::list<vanguard::Value*> res;
-        for(auto contract : *allContracts) {
+        for(auto contract : contained) {
             for(auto var : contract->variables()) {
                 res.push_back(var);
             }
@@ -87,7 +85,7 @@ namespace blockchain {
 
     std::list<vanguard::Value*> Blockchain::getStorageReads(vanguard::Instruction& ins) {
         std::list<vanguard::Value*> res;
-        for(auto contract: *allContracts) {
+        for(auto contract: contained) {
             for(auto var : contract->variables()) {
                 if(var->readBy(ins)) {
                     res.push_back(var);
@@ -99,7 +97,7 @@ namespace blockchain {
 
     std::list<vanguard::Value*> Blockchain::getStorageWrites(vanguard::Instruction& ins) {
         std::list<vanguard::Value*> res;
-        for(auto contract: *allContracts) {
+        for(auto contract: contained) {
             for(auto var : contract->variables()) {
                 if(var->writtenBy(ins)) {
                     res.push_back(var);

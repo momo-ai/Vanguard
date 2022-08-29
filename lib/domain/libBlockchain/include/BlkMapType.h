@@ -11,7 +11,7 @@
 namespace blockchain {
     class BlkMapType : public BlkType {
     public:
-        BlkMapType(BlockchainToLLVM *blk2llvm, std::string &name, BlkType *key, BlkType *val);
+        BlkMapType(BlockchainModel *blk2llvm, std::string &name, BlkType *key, BlkType *val);
         ~BlkMapType();
 
         static inline bool classof(const BlkMapType &) { return true; }

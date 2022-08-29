@@ -11,7 +11,6 @@
 #include <vector>
 #include "BlkVariable.h"
 
-using namespace std;
 namespace blockchain {
     enum Mutability {
         PURE,
@@ -30,7 +29,7 @@ namespace blockchain {
 
     class BlkFunction : public BlkNode {
     public:
-        BlkFunction(BlockchainToLLVM *blk2llvm, std::string &name, bool isCnstr, Visibility visibility, Mutability mutability, vector<BlkVariable *> *params, vector<BlkVariable *> *rets, vector<string> *mods);
+        BlkFunction(BlockchainModel *blk2llvm, std::string &name, bool isCnstr, Visibility visibility, Mutability mutability, std::vector<BlkVariable *> params, std::vector<BlkVariable *> rets, std::vector<std::string> mods);
         ~BlkFunction();
 
         static inline bool classof(const BlkFunction &) { return true; }
@@ -41,25 +40,25 @@ namespace blockchain {
             return false;
         }
 
-        void setSelector(string selector);
-        string selector();
-        const vector<std::string> &modifiers() const;
-        const vector<BlkVariable *> &parameters() const;
+        void setSelector(std::string selector);
+        std::string selector();
+        const std::vector<std::string> &modifiers() const;
+        const std::vector<BlkVariable *> &parameters() const;
         bool isTranslation(vanguard::Function &fn) const;
         bool isConstructor() const;
         Visibility visibility() const;
         Mutability mutability() const;
 
-        static Mutability toMutability(string mutStr);
-        static Visibility toVisibility(string visStr);
+        static Mutability toMutability(const std::string& mutStr);
+        static Visibility toVisibility(const std::string& visStr);
     private:
         bool fnIsConstructor;
-        vector<BlkVariable *> *fnParams;
-        vector<BlkVariable *> *fnReturns;
-        vector<std::string> *fnMods;
+        std::vector<BlkVariable *> fnParams;
+        std::vector<BlkVariable *> fnReturns;
+        std::vector<std::string> fnMods;
         Visibility visible;
         Mutability mut;
-        string fnSelector;
+        std::string fnSelector;
     };
 }
 

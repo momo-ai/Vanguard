@@ -2,29 +2,31 @@
 // Created by Jon Stephens on 4/10/22.
 //
 
-#include "../include/InkToLLVM.h"
-#include "../include/BlkElementaryType.h"
-#include "../include/BlkMapType.h"
-#include "../include/BlkUserType.h"
-#include "../include/BlkArrayType.h"
+#include "domain/libBlockchain/include/Ink/InkModel.h"
+#include "domain/libBlockchain/include/BlkElementaryType.h"
+#include "domain/libBlockchain/include/BlkMapType.h"
+#include "domain/libBlockchain/include/BlkUserType.h"
+#include "domain/libBlockchain/include/BlkArrayType.h"
 #include <regex>
 #include <sstream>
 #include <stdexcept>
 #include <iostream>
-#include "../include/BlkTypeVisitor.h"
-#include "../include/BlkContract.h"
+#include "domain/libBlockchain/include/BlkTypeVisitor.h"
+#include "domain/libBlockchain/include/BlkContract.h"
 #include "llvm/IR/Constants.h"
-#include "../../../program/Instruction.h"
+#include "program/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include <iostream>
 #include "llvm/IR/IntrinsicInst.h"
 
-namespace blockchain {
-    InkToLLVM::InkToLLVM(vanguard::AAWrapper &alias) : alias(alias) {}
+using namespace std;
 
-    llvm::Value *InkToLLVM::getSelfRef(const BlkFunction &blkFn, vanguard::Function &fn) {
+namespace blockchain {
+    InkModel::InkModel(vanguard::AAWrapper &alias) : alias(alias) {}
+
+    llvm::Value *InkModel::getSelfRef(const BlkFunction &blkFn, vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
-        if(InkToLLVM::isConstructorClosure(blkFn, fn)) {
+        if(InkModel::isConstructorClosure(blkFn, fn)) {
             return llvmFn.getArg(llvmFn.arg_size() - 1);
         }
 
@@ -42,7 +44,7 @@ namespace blockchain {
             throw runtime_error("Should be contract function");
         }
 
-        auto arg = InkToLLVM::getSelfRef(*blkFn, *fnV);
+        auto arg = InkModel::getSelfRef(*blkFn, *fnV);
         auto it = std::find(contract.variables().begin(), contract.variables().end(), &var);
         auto id = std::distance(contract.variables().begin(), it);
 
@@ -66,17 +68,17 @@ namespace blockchain {
         return loc;
     }
 
-    bool InkToLLVM::isMemoryStore(vanguard::Instruction &ins) {
+    bool InkModel::isMemoryStore(vanguard::Instruction &ins) {
         const llvm::Instruction& llvmIns = ins.unwrap();
         return llvm::isa<llvm::StoreInst>(llvmIns) || llvm::isa<llvm::MemIntrinsic>(llvmIns);
     }
 
-    bool InkToLLVM::isMemoryRead(vanguard::Instruction &ins) {
+    bool InkModel::isMemoryRead(vanguard::Instruction &ins) {
         const llvm::Instruction& llvmIns = ins.unwrap();
         return llvm::isa<llvm::LoadInst>(llvmIns) || llvm::isa<llvm::MemTransferInst>(llvmIns);
     }
 
-    llvm::MemoryLocation InkToLLVM::getStoreLocation(vanguard::Instruction &ins) {
+    llvm::MemoryLocation InkModel::getStoreLocation(vanguard::Instruction &ins) {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(auto store = llvm::dyn_cast<llvm::StoreInst>(&llvmIns)) {
             llvm::MemoryLocation storeLoc = llvm::MemoryLocation::get(store);
@@ -90,7 +92,7 @@ namespace blockchain {
         throw runtime_error("error");
     }
 
-    llvm::MemoryLocation InkToLLVM::getReadLocation(vanguard::Instruction &ins) {
+    llvm::MemoryLocation InkModel::getReadLocation(vanguard::Instruction &ins) {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(auto load = llvm::dyn_cast<llvm::LoadInst>(&llvmIns)) {
             llvm::MemoryLocation loadLoc = llvm::MemoryLocation::get(load);
@@ -104,7 +106,7 @@ namespace blockchain {
         throw runtime_error("error");
     }
 
-    bool InkToLLVM::writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
+    bool InkModel::writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(isMemoryStore(ins)){
             llvm::MemoryLocation storeLoc = getStoreLocation(ins);
@@ -166,7 +168,7 @@ namespace blockchain {
         return false;
     }
 
-    bool InkToLLVM::readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
+    bool InkModel::readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(isMemoryRead(ins)) {
             llvm::MemoryLocation readLoc = getReadLocation(ins);
@@ -227,7 +229,7 @@ namespace blockchain {
         return false;
     }
 
-    bool InkToLLVM::isSelfDestruct(vanguard::Function &fn) {
+    bool InkModel::isSelfDestruct(vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -242,7 +244,7 @@ namespace blockchain {
         return regex_match(fnName, reg);
     }
 
-    bool InkToLLVM::isMsgSender(vanguard::Function &fn) {
+    bool InkModel::isMsgSender(vanguard::Function &fn) {
         //_ZN8ink_lang10env_access18EnvAccess$LT$E$GT$6caller17h56520365e2893a15E
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
@@ -258,7 +260,7 @@ namespace blockchain {
         return regex_match(fnName, reg);
     }
 
-    bool InkToLLVM::isMsgValue(vanguard::Function &fn) {
+    bool InkModel::isMsgValue(vanguard::Function &fn) {
         //ink_lang10env_access18EnvAccess$LT$E$GT$17transferred_value
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
@@ -274,7 +276,7 @@ namespace blockchain {
         return regex_match(fnName, reg);
     }
 
-    bool InkToLLVM::isLazyGet(vanguard::Function &fn) {
+    bool InkModel::isLazyGet(vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -289,7 +291,7 @@ namespace blockchain {
         return regex_match(fnName, reg);
     }
 
-    bool InkToLLVM::isLazyStore(vanguard::Function &fn) {
+    bool InkModel::isLazyStore(vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -304,7 +306,7 @@ namespace blockchain {
         return regex_match(fnName, reg);
     }
 
-    bool InkToLLVM::isConstructorClosure(const BlkFunction &blockchainFn, vanguard::Function &fn) {
+    bool InkModel::isConstructorClosure(const BlkFunction &blockchainFn, vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         stringstream ss;
         ss << ".*\\.\\." << blockchainFn.parent()->blkName() << ".*" << blockchainFn.blkName() << ".*closure.*";
@@ -315,7 +317,7 @@ namespace blockchain {
 
     // these fellas were originally declared as const because llvm uses const everywhere, so we wanted our stuff to be
     // compatible w the llvm required types so, remove all instances of vanguard::
-    bool InkToLLVM::isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const {
+    bool InkModel::isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -333,11 +335,11 @@ namespace blockchain {
         return regex_match(llvmFn.getName().str(), reg);
     }
 
-    bool InkToLLVM::isAnyExternalCall(vanguard::Function &fn) const {
+    bool InkModel::isAnyExternalCall(vanguard::Function &fn) const {
         return isCall(fn) || isStaticCall(fn) || isDelegateCall(fn);
     }
 
-    bool InkToLLVM::isCall(vanguard::Function &fn) const {
+    bool InkModel::isCall(vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -351,7 +353,7 @@ namespace blockchain {
         return regex_match(llvmFn.getName().str(), reg);
     }
 
-    bool InkToLLVM::isStaticCall(vanguard::Function &fn) const {
+    bool InkModel::isStaticCall(vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -360,7 +362,7 @@ namespace blockchain {
         return false;
     }
 
-    bool InkToLLVM::isDelegateCall(vanguard::Function &fn) const {
+    bool InkModel::isDelegateCall(vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;

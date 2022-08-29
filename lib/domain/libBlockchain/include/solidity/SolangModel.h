@@ -5,12 +5,12 @@
 #ifndef LIBBLOCKCHAIN_SOLANGTOLLVM_H
 #define LIBBLOCKCHAIN_SOLANGTOLLVM_H
 
-#include "BlockchainToLLVM.h"
+#include "domain/libBlockchain/include/BlockchainModel.h"
 //#include "llvm/IR/Function.h"
-#include "../../../program/Function.h"
+#include "program/Function.h"
 
 namespace blockchain {
-    class SolangToLLVM : public BlockchainToLLVM {
+    class SolangModel : public BlockchainModel {
     public:
         bool isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const override;
         //bool isExternalCall(const llvm::Function &llvmFn) override;

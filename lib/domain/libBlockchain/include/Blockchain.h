@@ -5,23 +5,22 @@
 #ifndef LIBBLOCKCHAIN_BLOCKCHAIN_H
 #define LIBBLOCKCHAIN_BLOCKCHAIN_H
 
-//#include "llvm/IR/Function.h"
-#include "../../../program/Function.h"
-//#include "llvm/IR/Instruction.h"
-#include "../../../program/Instruction.h"
+#include <program/Function.h>
+#include <program/Instruction.h>
+#include <program/LLVMtoVanguard.h>
+#include <analysis/alias/AAWrapper.h>
+#include <domain/Domain.h>
+#include <domain/Container.h>
 #include "BlkContract.h"
-#include "../../../detectors/AAWrapper.h"
-#include "../../Domain.h"
+#include <utility>
 #include <vector>
-#include "../../../program/LLVMtoVanguard.h"
-
-using namespace std;
 
 namespace blockchain {
-class Blockchain : public BlkNode, public vanguard::Domain {
+class Blockchain : public BlkNode, public vanguard::Domain, public vanguard::Container<BlkContract> {
     public:
         // Methods inherited from BlkNode
-        Blockchain(NodeType t, BlockchainToLLVM *blk2llvm, string &name, string &version, vector<BlkContract *> *contracts) : BlkNode(t, blk2llvm, name), srcVersion(version), allContracts(contracts) {}
+        Blockchain(NodeType t, BlockchainModel *blk2llvm, std::string &name, std::string &version, std::vector<BlkContract *> contracts)
+            : BlkNode(t, blk2llvm, name), vanguard::Container<BlkContract>(std::move(contracts)), srcVersion(version) {};
         ~Blockchain();
 
         static inline bool classof(const Blockchain &) { return true; }
@@ -32,14 +31,12 @@ class Blockchain : public BlkNode, public vanguard::Domain {
             return false;
         }
 
-        static std::string getThing();
-
         virtual bool allowsReentrancy() const = 0;
         virtual bool getsSender(vanguard::Instruction &ins) const = 0;
         virtual bool getsValue(vanguard::Instruction &ins) const = 0;
         virtual bool isSelfDestruct(vanguard::Instruction &ins) const = 0;
         virtual bool isContractFunction(vanguard::Function &fn) const;
-        virtual const vector<BlkContract *> &contracts() const;
+        virtual const std::vector<BlkContract *> &contracts() const;
         virtual const BlkContract *findDeclaringContract(vanguard::Function &fn) const;
         virtual const BlkFunction *findFunction(vanguard::Function &fn) const;
         virtual bool isAnyExternalCall(vanguard::Function &fn) const;
@@ -48,16 +45,15 @@ class Blockchain : public BlkNode, public vanguard::Domain {
         virtual bool isDelegateCall(vanguard::Function &fn) const;
 
         // overridden from Domain class, implementation begins L83 Blockchain.cpp
-        virtual bool resolvesCalls() override;
-        virtual std::list<vanguard::CallEdge*> getCallees(vanguard::Context context, vanguard::CallExpr &ins) override;
-        virtual bool hasAdditionalStorage() override;
-        virtual std::list<vanguard::Value*> getAdditionalStorage() override;
-        virtual std::list<vanguard::Value*> getStorageReads(vanguard::Instruction& ins) override;
-        virtual std::list<vanguard::Value*> getStorageWrites(vanguard::Instruction& ins) override;
+        bool resolvesCalls() override;
+        std::list<vanguard::CallEdge*> getCallees(vanguard::Context context, vanguard::CallExpr &ins) override;
+        bool hasAdditionalStorage() override;
+        std::list<vanguard::Value*> getAdditionalStorage() override;
+        std::list<vanguard::Value*> getStorageReads(vanguard::Instruction& ins) override;
+        std::list<vanguard::Value*> getStorageWrites(vanguard::Instruction& ins) override;
 
     protected:
-        string srcVersion;
-        vector<BlkContract *> *allContracts;
+        std::string srcVersion;
     };
 }
 

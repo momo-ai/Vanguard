@@ -3,15 +3,15 @@
 //
 
 #include "../include/SummaryReader.h"
-#include "../include/Solidity.h"
+#include "domain/libBlockchain/include/Solidity/Solidity.h"
 #include <fstream>
 #include "../rapidjson/document.h"
 #include "../rapidjson/istreamwrapper.h"
 #include <stdexcept>
 #include <iostream>
-#include "../include/SolangToLLVM.h"
-#include "../include/InkToLLVM.h"
-#include "../include/Ink.h"
+#include "domain/libBlockchain/include/Solidity/SolangModel.h"
+#include "domain/libBlockchain/include/Ink/InkModel.h"
+#include "domain/libBlockchain/include/Ink/Ink.h"
 #include "../include/BlkEvent.h"
 
 using namespace std;
@@ -51,14 +51,13 @@ namespace blockchain {
         string version = val["version"].GetString();
 
         Blockchain *blockchain;
-        auto contracts = new vector<BlkContract *>();
+        vector<BlkContract *> contracts = {};
+
         if(compiler == "Solang") {
-            llvmTrans = new SolangToLLVM();
-            blockchain = new Solidity(llvmTrans, compiler, version, contracts);
+            llvmTrans = new SolangModel();
         }
         else if(compiler == "cargo-contract") {
-            llvmTrans = new InkToLLVM(*alias);
-            blockchain = new Ink(llvmTrans, compiler, version, contracts, *alias);
+            llvmTrans = new InkModel(*alias);
         }
         else {
             error(string("Unknown compiler: ") + compiler);
@@ -67,14 +66,21 @@ namespace blockchain {
         if(val.HasMember("contracts")) {
             require(val["contracts"].IsArray(), "Summary contracts must be an array");
             for(rapidjson::Value &contractVal : val["contracts"].GetArray()) {
-                contracts->push_back(readContract(contractVal));
+                contracts.push_back(readContract(contractVal));
             }
         }
 
         for(auto &ref : storageRefs) {
             require(storageDecls.find(ref.second) != storageDecls.end(), string("Could not find referenced declaration for ") +
-                    ref.first->blkName());
+                                                                         ref.first->blkName());
             ref.first->setReferenced(storageDecls[ref.second]);
+        }
+
+        if(compiler == "Solang") {
+            blockchain = new Solidity(llvmTrans, compiler, version, contracts);
+        }
+        else if(compiler == "cargo-contract") {
+            blockchain = new Ink(llvmTrans, compiler, version, contracts, *alias);
         }
 
         return blockchain;
@@ -87,56 +93,56 @@ namespace blockchain {
         int id = val["id"].GetInt();
         string name = val["name"].GetString();
 
-        auto inherits = new vector<BlkUserType *>();
+        vector<BlkUserType *> inherits = {};
         if(val.HasMember("inherits")) {
             require(val["inherits"].IsArray(), "contract inherits must be an array of UserType");
 
             for(rapidjson::Value &iVal : val["inherits"].GetArray()) {
-                inherits->push_back(readUserType(iVal));
+                inherits.push_back(readUserType(iVal));
             }
         }
 
-        auto events = new vector<BlkEvent *>();
+        vector<BlkEvent *> events = {};
         if(val.HasMember("events")) {
             require(val["events"].IsArray(), "Contract events must be an array of Function");
 
             for(rapidjson::Value &eVal : val["events"].GetArray()) {
-                events->push_back(readEvent(eVal));
+                events.push_back(readEvent(eVal));
             }
         }
 
-        auto functions = new vector<BlkFunction *>();
+        vector<BlkFunction *> functions = {};
         if(val.HasMember("functions")) {
             require(val["functions"].IsArray(), "Contract functions must be an array of Function");
 
             for(rapidjson::Value &fVal : val["functions"].GetArray()) {
-                functions->push_back(readFunction(fVal));
+                functions.push_back(readFunction(fVal));
             }
         }
 
-        auto variables = new vector<BlkVariable *>();
+        vector<BlkVariable *> variables = {};
         if(val.HasMember("variables")) {
             require(val["variables"].IsArray(), "Contract variables must be an array of Variable");
 
             for(rapidjson::Value &vVal : val["variables"].GetArray()) {
-                variables->push_back(readVariable(vVal));
+                variables.push_back(readVariable(vVal));
             }
         }
 
-        auto structs = new vector<BlkStruct *>();
+        vector<BlkStruct *> structs = {};
         if(val.HasMember("structs")) {
             require(val["structs"].IsArray(), "Contract structs must be an array of Struct");
             for(rapidjson::Value &sVal : val["structs"].GetArray()) {
-                structs->push_back(readStruct(sVal));
+                structs.push_back(readStruct(sVal));
             }
         }
 
-        auto enums = new vector<BlkEnum *>();
+        vector<BlkEnum *> enums = {};
         if(val.HasMember("enums")) {
             require(val["enums"].IsArray(), "Contract enums must be an array of Enum");
 
             for(rapidjson::Value &eVal : val["enums"].GetArray()) {
-                enums->push_back(readEnum(eVal));
+                enums.push_back(readEnum(eVal));
             }
         }
 
@@ -150,12 +156,12 @@ namespace blockchain {
 
         string name = val["name"].GetString();
 
-        auto params = new vector<BlkVariable *>();
+        vector<BlkVariable *> params = {};
         if(val.HasMember("params")) {
             require(val["params"].IsArray(), "Function params must be array of Variable");
 
             for(auto &pVal : val["params"].GetArray()) {
-                params->push_back(readVariable(pVal));
+                params.push_back(readVariable(pVal));
             }
         }
 
@@ -171,12 +177,12 @@ namespace blockchain {
         int id = val["id"].GetInt();
         string name = val["name"].GetString();
 
-        auto fields = new vector<BlkVariable *>();
+        vector<BlkVariable *> fields = {};
         if(val.HasMember("fields")) {
             require(val["fields"].IsArray(), "Struct fields must be an array of Variable");
 
             for(auto &fVal : val["fields"].GetArray()) {
-                fields->push_back(readVariable(fVal));
+                fields.push_back(readVariable(fVal));
             }
         }
 
@@ -192,7 +198,7 @@ namespace blockchain {
         int id = val["id"].GetInt();
         string name = val["name"].GetString();
 
-        auto values = new map<string, int>();
+        map<string, int> values = {};
         if(val.HasMember("values")) {
             require(val["values"].IsObject(), "Enum values must be an object");
             for(auto &enumVal : val["values"].GetObject()) {
@@ -200,7 +206,7 @@ namespace blockchain {
                 require(enumVal.value.IsNumber(), "Enum value must map to number");
                 string valName = enumVal.name.GetString();
                 int valId = enumVal.value.GetInt();
-                (*values)[valName] = valId;
+                values[valName] = valId;
             }
         }
 
@@ -220,32 +226,32 @@ namespace blockchain {
         Visibility visibility = BlkFunction::toVisibility(val["visibility"].GetString());
         Mutability mutability = BlkFunction::toMutability(val["mutability"].GetString());
 
-        auto params = new vector<BlkVariable *>();
+        vector<BlkVariable *> params = {};
         if(val.HasMember("params")) {
             require(val["params"].IsArray(), "Function params must be array of Variable");
 
             for(auto &pVal : val["params"].GetArray()) {
-                params->push_back(readVariable(pVal));
+                params.push_back(readVariable(pVal));
             }
         }
 
-        auto returns = new vector<BlkVariable *>();
+        vector<BlkVariable *> returns = {};
         if(val.HasMember("returns")) {
             require(val["returns"].IsArray(), "Function returns must be array of Variable");
 
             for(auto &rVal : val["returns"].GetArray()) {
-                returns->push_back(readVariable(rVal));
+                returns.push_back(readVariable(rVal));
             }
         }
 
-        auto modifiers = new vector<string>();
+        vector<string> modifiers = {};
         if(val.HasMember("modifiers")) {
             require(val["modifiers"].IsArray(), "Function modifiers must be array of string");
 
             for(auto &mVal : val["modifiers"].GetArray()) {
                 require(mVal.IsString(), "Found modifier that isn't a string modifier");
 
-                modifiers->emplace_back(mVal.GetString());
+                modifiers.emplace_back(mVal.GetString());
             }
         }
 

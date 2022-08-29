@@ -5,7 +5,7 @@
 #ifndef VANGUARD_DETECTOR_H
 #define VANGUARD_DETECTOR_H
 
-#include "Requirement.h"
+#include "../analysis/Requirement.h"
 
 namespace vanguard {
     class Detector {

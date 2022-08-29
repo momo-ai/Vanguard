@@ -5,18 +5,18 @@
 #ifndef LIBBLOCKCHAIN_INKTOLLVM_H
 #define LIBBLOCKCHAIN_INKTOLLVM_H
 
-#include "BlockchainToLLVM.h"
-#include "../../../detectors/AAWrapper.h"
+#include "domain/libBlockchain/include/BlockchainModel.h"
+#include "analysis/alias/AAWrapper.h"
 #include "llvm/Analysis/MemoryLocation.h"
 //#include "llvm/IR/Function.h"
-#include "../../../program/Function.h"
-#include "../../../program/LLVMtoVanguard.h"
+#include "program/Function.h"
+#include "program/LLVMtoVanguard.h"
 
 
 namespace blockchain {
-    class InkToLLVM : public BlockchainToLLVM {
+    class InkModel : public BlockchainModel {
     public:
-        explicit InkToLLVM(vanguard::AAWrapper &alias);
+        explicit InkModel(vanguard::AAWrapper &alias);
         bool isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const override;
         bool isAnyExternalCall(vanguard::Function &fn) const override;
         bool isCall(vanguard::Function &fn) const override;

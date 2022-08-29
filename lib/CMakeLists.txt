@@ -38,6 +38,10 @@ add_subdirectory(program)
 
 #target_include_directories(Vanguard PRIVATE ${Z3_CXX_INCLUDE_DIRS})
 #target_include_directories(Vanguard PRIVATE ${LIBBLOCKCHAIN_INCLUDE_DIRS})
+target_include_directories(Vanguard PUBLIC
+        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+        $<INSTALL_INTERFACE:lib>  # <prefix>/include/mylib
+        )
 #target_link_libraries(Vanguard PRIVATE ${Z3_LIBRARIES})
 #target_link_libraries(Vanguard PRIVATE BlockchainStatic)
 

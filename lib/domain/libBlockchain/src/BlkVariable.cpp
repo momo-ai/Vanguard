@@ -3,12 +3,13 @@
 //
 
 #include "../include/BlkVariable.h"
-#include "../include/BlockchainToLLVM.h"
+#include "../include/BlockchainModel.h"
 
+using namespace std;
 
 namespace blockchain {
     // TODO: Confirm with Jon that this is all that is needed to set
-    BlkVariable::BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type) : BlkNode(VARIABLE, blk2llvm, name), vanguard::Variable(vanguard::BLKVARIABLE), varTy(type) {
+    BlkVariable::BlkVariable(BlockchainModel *blk2llvm, string &name, BlkType *type) : BlkNode(VARIABLE, blk2llvm, name), vanguard::Variable(vanguard::BLKVARIABLE), varTy(type) {
         type->parent(this);
         // or do we do type->getType()
     }

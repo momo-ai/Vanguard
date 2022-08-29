@@ -8,7 +8,7 @@
 #include <string>
 
 namespace blockchain {
-    class BlockchainToLLVM;
+    class BlockchainModel;
 
     enum NodeType {
         BLOCKCHAIN_BEGIN,
@@ -36,7 +36,7 @@ namespace blockchain {
 
     class BlkNode {
     public:
-        explicit BlkNode(NodeType t, BlockchainToLLVM *blk2llvm, std::string &name);
+        explicit BlkNode(NodeType t, BlockchainModel *blk2llvm, std::string &name);
 
         static inline bool classof(const BlkNode &) { return true; }
         static inline bool classof(const BlkNode *) { return true; }
@@ -47,25 +47,19 @@ namespace blockchain {
         void parent(BlkNode *parent);
         NodeType type() const;
     protected:
-        BlockchainToLLVM *blkTollvm;
+        BlockchainModel *blkTollvm;
         template<typename collection>
-        void deleter(collection *collect) {
-            if(collect != nullptr) {
-                for(auto it : *collect) {
-                    delete it;
-                }
-                collect->clear();
+        void deleter(collection &collect) {
+            for(auto it : collect) {
+                delete it;
             }
-
-            delete collect;
+            collect.clear();
         }
 
         template<typename collection>
-        void registerParent(collection *collect) {
-            if(collect != nullptr) {
-                for(auto it : *collect) {
-                    it->parent(this);
-                }
+        void registerParent(collection &collect) {
+            for(auto it : collect) {
+                it->parent(this);
             }
         }
     private:

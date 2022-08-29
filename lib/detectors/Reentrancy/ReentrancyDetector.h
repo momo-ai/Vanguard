@@ -9,7 +9,7 @@
 //#import "../../Vanguard.cpp"
 #include "../../domain/libBlockchain/include/Blockchain.h"
 #include "../../program/InstructionClassVisitor.h"
-#include "../AARequirement.h"
+#include "../../analysis/alias/AARequirement.h"
 
 namespace vanguard {
     class ReentrancyDetector : public FunctionDetector, public vanguard::InstructionClassVisitor {
@@ -20,7 +20,7 @@ namespace vanguard {
         bool transfer(Instruction &ins);
         bool endFn(Function &fn);
         std::string vulnerabilityReport();
-        vector<Block *> findReachable(Block &blk, unordered_set<Block *> *exclude);
+        std::vector<Block *> findReachable(Block &blk, std::unordered_set<Block *> *exclude);
 
         // OG
         std::vector<Requirement *> registerAnalyses() override;
@@ -42,7 +42,7 @@ namespace vanguard {
         std::map<Function *,Function *> potentialReentrancies; // Tracks potential reentrant funcs and external call
         std::map<Function *,std::tuple<bool,bool>> fnInfo; // Tracks for each func if it (1) has extern call or (2) has store
         bool modified = false; // Tracks if current function being analyzed has been updated in fnInfo on this pass
-        string summary;
+        std::string summary;
         // OG
 //        ReentrancyAnalysis *analyzer;
     };

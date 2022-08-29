@@ -12,7 +12,7 @@ namespace blockchain {
     class BlkTypeVisitor;
     class BlkType : public BlkNode, public vanguard::Type {
     public:
-        explicit BlkType(NodeType t, BlockchainToLLVM *blk2llvm, std::string &name) : BlkNode(t, blk2llvm, name) {}
+        explicit BlkType(NodeType t, BlockchainModel *blk2llvm, std::string &name) : BlkNode(t, blk2llvm, name) {}
         virtual ~BlkType() = default;
 
         static inline bool classof(const BlkType &) { return true; }

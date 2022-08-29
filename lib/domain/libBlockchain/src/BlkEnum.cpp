@@ -4,12 +4,12 @@
 
 #include "../include/BlkEnum.h"
 
+using namespace std;
+
 namespace blockchain {
-    BlkEnum::BlkEnum(BlockchainToLLVM *blk2llvm, string &name, map<std::string, int> *vals) : BlkStorage(ENUM, blk2llvm, name) {
-        values = vals;
+    BlkEnum::BlkEnum(BlockchainModel *blk2llvm, string &name, map<std::string, int> vals) : values(std::move(vals)), BlkStorage(ENUM, blk2llvm, name) {
     }
 
     BlkEnum::~BlkEnum() {
-        delete values;
     }
 }

@@ -5,12 +5,12 @@
 #ifndef LIBBLOCKCHAIN_INK_H
 #define LIBBLOCKCHAIN_INK_H
 
-#include "Blockchain.h"
+#include "domain/libBlockchain/include/Blockchain.h"
 
 namespace blockchain {
     class Ink : public Blockchain {
     public:
-        Ink(BlockchainToLLVM *blk2llvm, string &c, string &v, vector<BlkContract *> *contracts, vanguard::AAWrapper &alias);
+        Ink(BlockchainModel *blk2llvm, std::string &c, std::string &v, std::vector<BlkContract *> contracts, vanguard::AAWrapper &alias);
 
         static inline bool classof(const Ink &) { return true; }
         static inline bool classof(const Ink *) { return true; }

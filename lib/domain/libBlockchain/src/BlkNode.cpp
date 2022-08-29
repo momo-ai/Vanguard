@@ -3,10 +3,10 @@
 //
 
 #include "../include/BlkNode.h"
-#include "../include/BlockchainToLLVM.h"
+#include "../include/BlockchainModel.h"
 
 namespace blockchain {
-    BlkNode::BlkNode(NodeType t, BlockchainToLLVM *blk2llvm, std::string &name) : ty(t), name(name), blkTollvm(blk2llvm), blkParent(nullptr) {}
+    BlkNode::BlkNode(NodeType t, BlockchainModel *blk2llvm, std::string &name) : ty(t), name(name), blkTollvm(blk2llvm), blkParent(nullptr) {}
 
     std::string BlkNode::blkName() const {
         return name;

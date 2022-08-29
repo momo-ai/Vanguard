@@ -2,18 +2,19 @@
 // Created by Jon Stephens on 3/23/22.
 //
 
-#include "../include/SolangToLLVM.h"
+#include "domain/libBlockchain/include/Solidity/SolangModel.h"
 #include "llvm/IR/Instructions.h"
-#include "../include/BlkElementaryType.h"
-#include "../include/BlkMapType.h"
-#include "../include/BlkUserType.h"
-#include "../include/BlkArrayType.h"
+#include "domain/libBlockchain/include/BlkElementaryType.h"
+#include "domain/libBlockchain/include/BlkMapType.h"
+#include "domain/libBlockchain/include/BlkUserType.h"
+#include "domain/libBlockchain/include/BlkArrayType.h"
 #include <regex>
 #include <sstream>
 #include <stdexcept>
-#include "../include/BlkTypeVisitor.h"
+#include "domain/libBlockchain/include/BlkTypeVisitor.h"
 
 using namespace llvm;
+using namespace std;
 
 namespace blockchain {
     class TypeTrans : public BlkTypeVisitor {
@@ -54,7 +55,7 @@ namespace blockchain {
         return trans.result;
     }
 
-    bool SolangToLLVM::isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const {
+    bool SolangModel::isTranslation(const BlkFunction &blockchainFn, vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -88,11 +89,11 @@ namespace blockchain {
         return regex_match(llvmFn.getName().str(), reg);
     }
 
-    bool SolangToLLVM::isAnyExternalCall(vanguard::Function &fn) const {
+    bool SolangModel::isAnyExternalCall(vanguard::Function &fn) const {
         return isCall(fn) || isStaticCall(fn) || isDelegateCall(fn);
     }
 
-    bool SolangToLLVM::isCall(vanguard::Function &fn) const {
+    bool SolangModel::isCall(vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -102,7 +103,7 @@ namespace blockchain {
         return name == "call";
     }
 
-    bool SolangToLLVM::isStaticCall(vanguard::Function &fn) const {
+    bool SolangModel::isStaticCall(vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -112,7 +113,7 @@ namespace blockchain {
         return name == "callStatic";
     }
 
-    bool SolangToLLVM::isDelegateCall(vanguard::Function &fn) const {
+    bool SolangModel::isDelegateCall(vanguard::Function &fn) const {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -122,7 +123,7 @@ namespace blockchain {
         return name == "callDelegate";
     }
 
-    bool SolangToLLVM::writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
+    bool SolangModel::writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(auto call = llvm::dyn_cast<CallInst>(&llvmIns)) {
             auto fn = call->getCalledFunction();
@@ -138,7 +139,7 @@ namespace blockchain {
         return false;
     }
 
-    bool SolangToLLVM::readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
+    bool SolangModel::readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(auto call = llvm::dyn_cast<CallInst>(&llvmIns)) {
             auto fn = call->getCalledFunction();
@@ -154,7 +155,7 @@ namespace blockchain {
         return false;
     }
 
-    bool SolangToLLVM::writesStorage(vanguard::Function &fn) {
+    bool SolangModel::writesStorage(vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;
@@ -169,7 +170,7 @@ namespace blockchain {
         return regex_match(fnName, reg);
     }
 
-    bool SolangToLLVM::readsStorage(vanguard::Function &fn) {
+    bool SolangModel::readsStorage(vanguard::Function &fn) {
         const llvm::Function& llvmFn = fn.unwrap();
         if(!llvmFn.hasName()) {
             return false;

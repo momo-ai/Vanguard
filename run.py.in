@@ -15,7 +15,7 @@ from tabulate import tabulate
 AS_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "llvm-as")
 LLVM_AS_CMD=AS_PATH + " {} -o {}"
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
-# Solidity paths
+# solidity paths
 SOLANG_PATH=os.path.join("./solang")
 SOLIDITY_PREPROCESSOR_PATH=os.path.join(SCRIPT_PATH, "deps", "SolidityPreprocessor", "src", "preprocessor.js")
 SOLIDITY_SUMMARIZER_PATH=os.path.join(SCRIPT_PATH, "deps", "SolidityPreprocessor", "src", "summarizer.js")
@@ -38,7 +38,7 @@ DETECTORS = ["statGen", "fnPrinter", "reentrancyBasic", "irValidator"]
 # Subprocess Commands
 ############################
 VANGUARD_CMD = "{} --detectors {{}} --summary {{}} {{}}".format(VANGUARD_EXEC)
-# Solidity commands
+# solidity commands
 IR_SOLANG_CMD="{} --target ewasm --emit llvm-ir -o {{}} {{}}".format(SOLANG_PATH)
 BC_SOLANG_CMD="{} --target ewasm --emit llvm-bc -o {{}} {{}}".format(SOLANG_PATH)
 SOLIDITY_PREPROCESSOR_CMD="node {} {{}}".format(SOLIDITY_PREPROCESSOR_PATH)
@@ -72,10 +72,10 @@ def preprocess_file(args, lang, ext):
         summary_name = file_name.replace(".{}".format(ext), "_summary.json")
         summary_path = os.path.join(OUT_DIR, summary_name)
         with open(summary_path, "wb") as f:
-            print("Running Solidity summarizer...", end="")
+            print("Running solidity summarizer...", end="")
             summary = subprocess.check_output(summarizer_cmd.split(), stderr=subprocess.DEVNULL)
             f.write(summary)
-            print("Completed Solidity summarizer, summary at {}.".format(summary_path))
+            print("Completed solidity summarizer, summary at {}.".format(summary_path))
 
         # Generate preprocessor command
         preprocessor_cmd = SOLIDITY_PREPROCESSOR_CMD.format(args.src_path,OUT_DIR)
@@ -84,10 +84,10 @@ def preprocess_file(args, lang, ext):
         preprocessed_name = file_name.replace(".{}".format(ext), "_instrumented.{}".format(ext))
         preprocessed_path = os.path.join(OUT_DIR, preprocessed_name)
         with open(preprocessed_path, "wb") as f:
-            print("Running Solidity preprocessor...", end="")
+            print("Running solidity preprocessor...", end="")
             preprocessed = subprocess.check_output(preprocessor_cmd.split(), stderr=subprocess.DEVNULL)
             f.write(preprocessed)
-            print("Completed Solidity preprocessor, preprocessed version at {}.".format(preprocessed_path))
+            print("Completed solidity preprocessor, preprocessed version at {}.".format(preprocessed_path))
 
         # Generate commandline command for Solang
         solang_cmd = BC_SOLANG_CMD.format(OUT_DIR, preprocessed_path)

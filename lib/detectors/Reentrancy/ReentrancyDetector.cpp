@@ -4,7 +4,7 @@
 
 #include "ReentrancyDetector.h"
 #include "../../domain/libBlockchain/include/SummaryReader.h"
-#include "../AARequirement.h"
+#include "../../analysis/alias/AARequirement.h"
 #include "../../program/InstructionClasses.h"
 #include <list>
 #include <iostream>
@@ -12,7 +12,7 @@
 namespace vanguard { // Reentrancy {
     ReentrancyDetector::ReentrancyDetector(const std::string& summaryFile) {
         if(summaryFile.empty()) {
-            throw runtime_error("Must provide a summary to the reentrancy detector");
+            throw std::runtime_error("Must provide a summary to the reentrancy detector");
         }
 
         summary = summaryFile;
@@ -30,7 +30,7 @@ namespace vanguard { // Reentrancy {
         lastExternalCall = nullptr;
         if (fnInfo.find(curFn) == fnInfo.end()) {
             // Initialize entry for function if not yet analyzed
-            fnInfo[curFn] = make_tuple(false, false);
+            fnInfo[curFn] = std::make_tuple(false, false);
         }
         return false;
     }
@@ -40,12 +40,12 @@ namespace vanguard { // Reentrancy {
         //string cfname = called_func->getName().str();
         if (fnInfo.find(calledFn) != fnInfo.end()) {
             // Run checks if called function is already analyzed
-            tuple<bool,bool> calledFnInfo = fnInfo[calledFn];
+            std::tuple<bool,bool> calledFnInfo = fnInfo[calledFn];
             if (get<1>(fnInfo[calledFn])) {
                 // If call has store, record in curr func and check for prev external call
                 if (!get<1>(fnInfo[curFn])) {
                     // If call has store, record that current function has store
-                    fnInfo[curFn] = make_tuple(get<0>(fnInfo[curFn]), true);
+                    fnInfo[curFn] = std::make_tuple(get<0>(fnInfo[curFn]), true);
                     modified = true;
                 }
                 if (lastExternalCall && potentialReentrancies.find(curFn) == potentialReentrancies.end()) {
@@ -57,7 +57,7 @@ namespace vanguard { // Reentrancy {
                 // If call has external, record that current function has external call
                 lastExternalCall = calledFn;
                 if (!get<0>(fnInfo[curFn])) {
-                    fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
+                    fnInfo[curFn] = std::make_tuple(true, get<1>(fnInfo[curFn]));
                     modified = true;
                 }
             }
@@ -67,7 +67,7 @@ namespace vanguard { // Reentrancy {
             lastExternalCall = calledFn;
             if (!get<0>(fnInfo[curFn])) {
                 // Indicate function has ext call if not already indicated
-                fnInfo[curFn] = make_tuple(true, get<1>(fnInfo[curFn]));
+                fnInfo[curFn] = std::make_tuple(true, get<1>(fnInfo[curFn]));
                 modified = true;
             }
         }
@@ -81,7 +81,7 @@ namespace vanguard { // Reentrancy {
             // Detect store to contract state
             if (!get<1>(fnInfo[curFn])) {
                 // Indicate function has store if not already indicated
-                fnInfo[curFn] = make_tuple(get<0>(fnInfo[curFn]), true);
+                fnInfo[curFn] = std::make_tuple(get<0>(fnInfo[curFn]), true);
                 modified = true;
             }
             if (lastExternalCall && potentialReentrancies.find(curFn) == potentialReentrancies.end()) {
@@ -96,9 +96,9 @@ namespace vanguard { // Reentrancy {
         return modified;
     }
 
-    string ReentrancyDetector::vulnerabilityReport()  {
-        string report = "Reentrancy Report:\n";
-        for(pair<Function *, Function *> tup : potentialReentrancies) {
+    std::string ReentrancyDetector::vulnerabilityReport()  {
+        std::string report = "Reentrancy Report:\n";
+        for(std::pair<Function *, Function *> tup : potentialReentrancies) {
             report += "Function '" + chain->findFunction(*tup.first)->blkName() + "' has potential reentrancy \n";
 
 //            for(auto pubFn : reachingPublicFns(chain, tup.first)) {
@@ -118,10 +118,10 @@ namespace vanguard { // Reentrancy {
     }
 
 
-    vector<Block *> ReentrancyDetector::findReachable(Block &blk, unordered_set<Block *> *exclude) {
-        vector<Block*> reachable = {};
-        list<Block *> wl;
-        unordered_set<Block *> seen;
+    std::vector<Block *> ReentrancyDetector::findReachable(Block &blk, std::unordered_set<Block *> *exclude) {
+        std::vector<Block*> reachable = {};
+        std::list<Block *> wl;
+        std::unordered_set<Block *> seen;
 
         wl.push_back(&blk);
         while(!wl.empty()) {
@@ -160,11 +160,11 @@ namespace vanguard { // Reentrancy {
             return false;
         }
 
-        string name = fn.name();
+        std::string name = fn.name();
         modified = beginFn(fn) || modified;
 
-        unordered_set<Block* > wlContents;
-        list<Block* > instWorklist;
+        std::unordered_set<Block* > wlContents;
+        std::list<Block* > instWorklist;
         // TODO: There is no way to iterate thru blocks in a fn
         // getbody and travel down the links
         for (Block* blk : fn.blocks()) {
@@ -182,7 +182,7 @@ namespace vanguard { // Reentrancy {
                 if (transfer(*inst)) {
                     modified = true;
                     // TODO: Implement re-analyzing affected  functions of true positives
-                    vector<Block *> reachable = findReachable(*blk, &wlContents);
+                    std::vector<Block *> reachable = findReachable(*blk, &wlContents);
                     instWorklist.insert(instWorklist.begin(), reachable.begin(), reachable.end());
                     wlContents.insert(reachable.begin(), reachable.end());
 //                    delete reachable;
@@ -197,11 +197,11 @@ namespace vanguard { // Reentrancy {
     }
 
     void ReentrancyDetector::report() {
-        string theRep = vulnerabilityReport();
-        std::cout << theRep << endl;
+        std::string theRep = vulnerabilityReport();
+        std::cout << theRep << std::endl;
     }
 
-    string ReentrancyDetector::name() {
+    std::string ReentrancyDetector::name() {
         return "reentrancyBasic";
     }
 

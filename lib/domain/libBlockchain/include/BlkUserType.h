@@ -13,7 +13,7 @@ namespace blockchain {
     class BlkTypeVisitor;
     class BlkUserType : public BlkType {
     public:
-        BlkUserType(BlockchainToLLVM *blk2llvm, std::string &name, BlkStorage *referenced);
+        BlkUserType(BlockchainModel *blk2llvm, std::string &name, BlkStorage *referenced);
         ~BlkUserType();
 
         static inline bool classof(const BlkUserType &) { return true; }
