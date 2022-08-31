@@ -19,6 +19,8 @@ if (${LLVM_VERSION_MAJOR} VERSION_GREATER_EQUAL 10)
 endif ()
 
 add_subdirectory(lib)  # Use your pass name here.
+# TODO Here: define a bunch of variables in CMAKE that can be used as string substitutes into configure file
+# Pass them in as options in CMake, try to set up variables
 configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
 
 ## Install target

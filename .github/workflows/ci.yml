@@ -16,15 +16,14 @@ jobs:
         with:
           install_url: https://releases.nixos.org/nix/nix-2.9.2/install
       - name: Build libVanguard component
+      # removed from line 21   .#solidity-preprocessor .#solang
         run: |
           nix build --print-build-logs .#libVanguard
           echo "Done."
-      - name: Build SolidityPreprocessor
+      - name: Build preprocessor components
         run: |
-          nix build '.?submodules=1#solidity-preprocessor'
-      - name: Test IR Validator
-        run: |
-          python3 run.py --src_path test/PuppetPool.sol  --detector irValidator
-          echo "Done." 
-
-      # does not yet build preprocessors, python, other compoennts
+          nix build .#rust-preprocessor '.?submodules=1#solidity-preprocessor'
+      # - name: Test IR Validator
+      #   run: |
+      #     python3 run.py --src_path test/PuppetPool.sol  --detector irValidator
+      #     echo "Done."
