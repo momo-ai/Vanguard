@@ -1,5 +1,5 @@
 { stdenv, cmake, ninja,
-  llvmPackages_13, lib, nodePackages 
+  llvmPackages_13, lib, nodePackages, solang, python3
 }:
 
 let
@@ -8,11 +8,10 @@ in
 stdenv.mkDerivation {
   name = "Vanguard";
   version = "0.0.1";
-  nativeBuildInputs = [ cmake ninja ];
+  nativeBuildInputs = [ cmake ninja python3 ];
   src = ./.; #lib.cleanSource
   buildInputs = [
     libllvm
-    nodePackages.typescript 
   ];
 
   postInstall = ''

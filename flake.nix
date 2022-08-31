@@ -23,7 +23,7 @@
       default = pkgs.libVanguard;
 
       # for debugging
-      inherit (pkgs) solang solidity-preprocessor;
+      inherit (pkgs) solang solidity-preprocessor rust-preprocessor;
     };
 
     devShells = flake-utils.lib.flattenTree {
@@ -69,6 +69,8 @@
 
         inherit (final) lib nodejs;
       };
+
+      rust-preprocessor = final.callPackage ./rust-preprocessor.nix {}; 
     };
   };
 }

@@ -12,6 +12,7 @@ from tabulate import tabulate
 ############################
 # PATHS (NOTE: Update these with correct local paths if necessary!)
 ############################
+#TODO: Figure out how to specify all of these using CMake variables
 AS_PATH = os.path.join("${LLVM_TOOLS_BINARY_DIR}", "llvm-as")
 LLVM_AS_CMD=AS_PATH + " {} -o {}"
 SCRIPT_PATH = os.path.abspath(os.path.dirname(sys.argv[0]))
