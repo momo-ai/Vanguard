@@ -7,7 +7,7 @@
 
 #include <program/Function.h>
 #include <program/Instruction.h>
-#include <program/LLVMtoVanguard.h>
+#include <program/LLVMFactory.h>
 #include <analysis/alias/AAWrapper.h>
 #include <domain/Domain.h>
 #include <domain/Container.h>

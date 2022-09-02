@@ -5,8 +5,8 @@
 
 namespace vanguard {
     class CallEdge {
-        Function* caller();
-        Function* callee();
+        Universe::Function* caller();
+        Universe::Function* callee();
     };
 }
 

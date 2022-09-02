@@ -6,17 +6,20 @@
 #include "llvm/IR/DerivedTypes.h"
 
 namespace vanguard{
+    class UnitFactory;
 
     class Type{
         public:
-            Type();
+            Type(UnitFactory &factory);
 
             virtual std::string name() const = 0;
+    protected:
+        UnitFactory &factory;
     };
 
     class IntegerType: public Type{
         public:
-            explicit IntegerType(const llvm::IntegerType&);
+            explicit IntegerType(UnitFactory &factory, const llvm::IntegerType&);
 
             IntegerType(const IntegerType&) = delete;
 
@@ -32,7 +35,7 @@ namespace vanguard{
 
     class ArrayType: public Type{
         public:
-            explicit ArrayType(const llvm::ArrayType&);
+            explicit ArrayType(UnitFactory &factory, const llvm::ArrayType&);
 
             ArrayType(const ArrayType&) = delete;
 
@@ -66,7 +69,7 @@ namespace vanguard{
 
     class PointerType: public Type{
         public:
-            explicit PointerType(const llvm::PointerType& pointer);
+            explicit PointerType(UnitFactory &factory, const llvm::PointerType& pointer);
 
             PointerType(const PointerType&) = delete;
             
@@ -84,7 +87,7 @@ namespace vanguard{
 
     class StructType: public Type{
         public:
-            explicit StructType(const llvm::StructType& structT);
+            explicit StructType(UnitFactory &factory, const llvm::StructType& structT);
 
             StructType(const StructType&) = delete;
 
@@ -106,7 +109,7 @@ namespace vanguard{
 
     class VectorType: public Type{
         public:
-            explicit VectorType(const llvm::VectorType& vector);
+            explicit VectorType(UnitFactory &factory, const llvm::VectorType& vector);
 
             VectorType(const VectorType&) = delete;
 
@@ -123,7 +126,7 @@ namespace vanguard{
 
     class VoidType: public Type{
         public:
-            explicit VoidType(const llvm::Type&);
+            explicit VoidType(UnitFactory &factory, const llvm::Type&);
 
             VoidType(const VoidType&) = delete;
 
@@ -137,7 +140,7 @@ namespace vanguard{
 
     class LabelType: public Type{
     public:
-        explicit  LabelType(const llvm::Type&);
+        explicit  LabelType(UnitFactory &factory, const llvm::Type&);
 
         LabelType(const LabelType&) = delete;
 

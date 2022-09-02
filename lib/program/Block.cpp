@@ -1,13 +1,12 @@
 #include "Block.h"
 #include "llvm/IR/CFG.h"
-#include "LLVMtoVanguard.h"
+#include "UnitFactory.h"
 
 namespace vanguard{
 
-    Block::Block(const llvm::BasicBlock &blk): block(blk) {
-    }
+    Universe::Block::Block(UnitFactory &factory, const llvm::BasicBlock &blk): factory(factory), block(blk) {}
 
-    std::string Block::name(){
+    std::string Universe::Block::name(){
         if (block.hasName()) {
             return block.getName().str();
         }
@@ -15,34 +14,31 @@ namespace vanguard{
     }
 
 
-    Function* Block::parent(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateFunction(block.getParent());
+    Universe::Function* Universe::Block::parent(){
+        return factory.createFn(block.getParent());
     }
 
-    std::list<Instruction*> Block::instructions(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+    std::list<Universe::Instruction*> Universe::Block::instructions(){
         std::list<Instruction*> instructions = {};
         for (auto &I : block){
-            instructions.push_back(llvmToVanguard.translateInstruction(&I));
+            instructions.push_back(factory.createIns(&I));
         }
         return instructions;
     }
 
-    bool Block::isEntry(){
+    bool Universe::Block::isEntry(){
         return block.isEntryBlock();
     }
 
-    std::unordered_set< Block* > Block::successors(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+    std::unordered_set<Universe::Block* > Universe::Block::successors(){
         std::unordered_set<Block*> allSuccessors = {};
         for (auto *succ : llvm::successors(&block)) {
-            allSuccessors.insert(llvmToVanguard.translateBlock(succ));
+            allSuccessors.insert(factory.createBlk(succ));
         }
         return allSuccessors;
     }
 
-    const llvm::BasicBlock &Block::unwrap(){
+    const llvm::BasicBlock &Universe::Block::unwrap(){
         return block;
     }
 

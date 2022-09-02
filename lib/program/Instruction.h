@@ -1,7 +1,8 @@
 #ifndef VANGUARD_PROGRAM_INSTRUCTION_H
 #define VANGUARD_PROGRAM_INSTRUCTION_H
 
-#include "Function.h"
+#include "Universe.h"
+#include "Value.h"
 
 namespace vanguard{
 
@@ -21,8 +22,7 @@ namespace vanguard{
     };
 
     class InstructionClassVisitor;
-    class Instruction{
-
+    class Universe::Instruction{
     public:
         static inline bool classof(const Instruction &) { return true; }
         static inline bool classof(const Instruction *) { return true; }
@@ -39,7 +39,7 @@ namespace vanguard{
 
         virtual Instruction * getSuccessor() const = 0;
 
-        virtual std::list<Instruction*> getAllSuccessors() const = 0;
+        virtual std::list<Universe::Instruction*> getAllSuccessors() const = 0;
 
         virtual Value* operand(unsigned i) const = 0;
 

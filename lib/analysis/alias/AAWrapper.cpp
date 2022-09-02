@@ -11,7 +11,7 @@ namespace vanguard {
     AAWrapper::AAWrapper() : curFn(nullptr), fnAlias(nullptr) {}
 
 
-    bool AAWrapper::noAlias(Function &fn) {
+    bool AAWrapper::noAlias(Universe::Function &fn) {
         return fn.unwrap().isDeclaration();
     }
 }

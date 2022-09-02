@@ -33,6 +33,10 @@ namespace vanguard {
 
         static char ID;
 
+        static Detector::Domain domain() {
+            return Detector::BLOCKCHAIN;
+        }
+
     private:
         AARequirement *aa = nullptr;
         blockchain::Blockchain *chain = nullptr;

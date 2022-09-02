@@ -3,6 +3,7 @@
 //
 
 #include "FunctionPrinter.h"
+#include <program/Function.h>
 #include <iostream>
 
 namespace vanguard {
@@ -16,7 +17,7 @@ namespace vanguard {
 
     void FunctionPrinter::startDetection() {}
 
-    bool FunctionPrinter::detect(Function &fn) {
+    bool FunctionPrinter::detect(Domain::Function &fn) {
         std::cout << "Found Function: " << fn.name() << std::endl;
         return false;
     }

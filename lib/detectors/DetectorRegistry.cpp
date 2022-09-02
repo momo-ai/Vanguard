@@ -3,10 +3,11 @@
 //
 
 #include "DetectorRegistry.h"
-#include "StatGen/StatGen.h"
-#include "IRValidator/IRValidator.h"
+//#include "StatGen/StatGen.h"
+//#include "IRValidator/IRValidator.h"
 #include "FunctionPrinter/FunctionPrinter.h"
-#include "Reentrancy/ReentrancyDetector.h"
+#include "domain/libBlockchain/Blockchain.h"
+//#include "Reentrancy/ReentrancyDetector.h"
 #include <llvm/Support/CommandLine.h>
 
 /* This is how you can add additional detectors from external sources. Essentially add them in at compile time and
@@ -20,56 +21,49 @@ void addToRegistry(vanguard::DetectorRegistry *registry) {
 static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain Summary"), llvm::cl::value_desc("filename"), llvm::cl::Optional);
 
 
-extern "C" __attribute__((__weak__))
-void addToRegistry(vanguard::DetectorRegistry *registry) {}
+//extern "C" __attribute__((__weak__))
+//void addToRegistry(vanguard::DetectorRegistry *registry) {}
 
 namespace vanguard {
     DetectorRegistry *DetectorRegistry::instance = nullptr;
+
     DetectorRegistry &DetectorRegistry::getInstance() {
         if(instance == nullptr) {
             instance = new DetectorRegistry();
-            addToRegistry(instance);
+            //addToRegistry(instance);
         }
 
         return *instance;
     }
 
-    DetectorRegistry::DetectorRegistry() {
-        add(StatGen::name(), new StatGen());
-        add(FunctionPrinter::name(), new FunctionPrinter());
-        add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
-        add(IRValidator::name(), new IRValidator());
+    Detector::DetectorDomain domainUnion(Detector::DetectorDomain d1, Detector::DetectorDomain d2) {
+        return d1 > d2 ? d1 : d2;
     }
 
-    DetectorRegistry::~DetectorRegistry() {
-        for(auto &entry : registry) {
-            delete entry.second;
+    Detector::DetectorDomain DetectorRegistry::domain(const std::vector<std::string>& detectorNames) {
+        Detector::DetectorDomain domain = Detector::DetectorDomain::BASIC;
+
+        for(const auto& name : detectorNames) {
+            domain = domainUnion(domain, registry[name]);
         }
-        registry.clear();
+
+        return domain;
     }
 
-    bool DetectorRegistry::add(const std::string& name, ProgramDetector *detect) {
+    bool DetectorRegistry::add(const std::string& name, Detector::DetectorDomain domain) {
         if(registry.find(name) == registry.end()) {
-            registry[name] = detect;
+            registry[name] = domain;
             return true;
         }
 
         return false;
     }
 
-    ProgramDetector *DetectorRegistry::get(const std::string& name) {
-        if(registry.find(name) == registry.end()) {
-            return nullptr;
-        }
-
-        return registry[name];
-    }
-
-    std::vector<ProgramDetector *> DetectorRegistry::all() {
-        std::vector<ProgramDetector *> detectors;
+    std::vector<std::string> DetectorRegistry::all() {
+        std::vector<std::string> detectors;
 
         for(auto &entry : registry) {
-            detectors.push_back(entry.second);
+            detectors.push_back(entry.first);
         }
 
         return detectors;

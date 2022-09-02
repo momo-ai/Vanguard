@@ -1,12 +1,12 @@
 #include "Type.h"
-#include "LLVMtoVanguard.h"
+#include "LLVMFactory.h"
 
 namespace vanguard{
     
-    Type::Type(){}
+    Type::Type(UnitFactory &factory) : factory{factory} {}
 
     //Integer subclass
-    IntegerType::IntegerType(const llvm::IntegerType& intT): integer(intT){}
+    IntegerType::IntegerType(UnitFactory &factory, const llvm::IntegerType& intT): Type(factory), integer(intT){}
 
     unsigned IntegerType::width(){
         return integer.getBitWidth()/8;
@@ -21,11 +21,10 @@ namespace vanguard{
     }
 
     //Array subclass
-    ArrayType::ArrayType(const llvm::ArrayType& arr): array(arr){}
+    ArrayType::ArrayType(UnitFactory &factory, const llvm::ArrayType& arr): Type(factory), array(arr){}
 
     Type* ArrayType::baseType() const {
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(array.getElementType());
+        return factory.createType(array.getElementType());
     }
 
     uint64_t ArrayType::length() const {
@@ -66,15 +65,14 @@ namespace vanguard{
 //    }
 
     //Pointer subclass
-    PointerType::PointerType(const llvm::PointerType& ptr): pointer(ptr){}
+    PointerType::PointerType(UnitFactory &factory, const llvm::PointerType& ptr): Type(factory), pointer(ptr){}
     
     bool PointerType::isOpaque(){
         return pointer.isOpaque();
     }
 
     Type* PointerType::referencedType() const {
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(pointer.getElementType());
+        return factory.createType(pointer.getElementType());
     }
 
     std::string PointerType::name() const {
@@ -86,23 +84,21 @@ namespace vanguard{
     }
 
     //Struct subclass
-    StructType::StructType(const llvm::StructType& structt): structT(structt){}
+    StructType::StructType(UnitFactory &factory, const llvm::StructType& structt): Type(factory), structT(structt){}
 
     unsigned StructType::numFields(){
         return structT.getStructNumElements();
     }
 
     Type* StructType::getTypeAtIndex(unsigned n){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(structT.getStructElementType(n));
+        return factory.createType(structT.getStructElementType(n));
     }
 
     std::list<Type*> StructType::fieldTypes(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Type*> fieldTypesList = {};
         unsigned numFields = structT.getStructNumElements();
         for(unsigned n = 0; n < numFields; n++){
-            fieldTypesList.push_back(llvmToVanguard.translateType(structT.getStructElementType(n)));
+            fieldTypesList.push_back(factory.createType(structT.getStructElementType(n)));
         }
         return fieldTypesList;
     }
@@ -116,11 +112,10 @@ namespace vanguard{
     }
 
     //Vector subclass
-    VectorType::VectorType(const llvm::VectorType& vec): vector(vec){}
+    VectorType::VectorType(UnitFactory &factory, const llvm::VectorType& vec): Type(factory), vector(vec){}
 
     Type* VectorType::baseType() const {
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(vector.getElementType());
+        return factory.createType(vector.getElementType());
     }
 
     std::string VectorType::name() const {
@@ -132,7 +127,7 @@ namespace vanguard{
     }
 
     //Void Subclass
-    VoidType::VoidType(const llvm::Type &vt): voidType(vt) {}
+    VoidType::VoidType(UnitFactory &factory, const llvm::Type &vt): Type(factory), voidType(vt) {}
 
     std::string VoidType::name() const {
         return "VoidType";
@@ -143,7 +138,7 @@ namespace vanguard{
     }
 
     //Label Subclass
-    LabelType::LabelType(const llvm::Type &lbt): labelType(lbt) {}
+    LabelType::LabelType(UnitFactory &factory, const llvm::Type &lbt): Type(factory), labelType(lbt) {}
 
     std::string LabelType::name() const {
         return "LabelType";

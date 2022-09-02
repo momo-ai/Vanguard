@@ -2,14 +2,15 @@
 #define VANGUARD_PROGRAM_BLOCK_H
 
 #include "Instruction.h"
+#include "Universe.h"
 #include <unordered_set>
 #include <list>
 #include "llvm/IR/BasicBlock.h"
 
 namespace vanguard{
-    class Block{
+    class Universe::Block{
     public:
-        explicit Block(const llvm::BasicBlock &block);
+        explicit Block(UnitFactory &factory, const llvm::BasicBlock &block);
 
         Block(const Block&) = delete;
 
@@ -25,9 +26,9 @@ namespace vanguard{
 
         const llvm::BasicBlock& unwrap();
 
-    private:
+    protected:
         const llvm::BasicBlock& block;
-
+        UnitFactory &factory;
     };
 }
 

@@ -13,8 +13,63 @@ namespace vanguard {
 
     enum UnOp{Neg, Not};
 
+    /*template<typename Wrapped>
+    class Universe::Instruction::Common {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::Branch {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::Return {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::Error {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::Assignment {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::BinaryOpExpr {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::UnaryOpExpr {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::CallExpr {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::CastExpr {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::TernaryExpr {
+
+    };
+
+    template<typename Wrapped>
+    class Universe::Instruction::UnknownExpr {
+
+    };*/
+
     // Branch Instruction
-    class Branch : public Instruction {
+    class Branch : public Universe::Instruction {
     public:
         static inline bool classof(const Branch &) { return true; }
         static inline bool classof(const Branch *) { return true; }
@@ -26,7 +81,7 @@ namespace vanguard {
 
         virtual bool isConditional() const = 0;
         virtual Value* condition() const = 0;
-        virtual std::list<Block*> targets() const = 0;
+        virtual std::list<Universe::Block*> targets() const = 0;
 
         InstructionClassEnum instructionClass() const override {
             return BRANCH;
@@ -34,7 +89,7 @@ namespace vanguard {
     };
 
     //Return Instruction
-    class Return : public Instruction {
+    class Return : public Universe::Instruction {
     public:
         static inline bool classof(const Return &) { return true; }
         static inline bool classof(const Return *) { return true; }
@@ -52,7 +107,7 @@ namespace vanguard {
         }
     };
 
-    class Error : public Instruction {
+    class Error : public Universe::Instruction {
     public:
         static inline bool classof(const Error &) { return true; }
         static inline bool classof(const Error *) { return true; }
@@ -69,7 +124,7 @@ namespace vanguard {
         }
     };
 
-    class Expression : public Instruction {
+    class Expression : public Universe::Instruction {
     public:
         static inline bool classof(const Expression &) { return true; }
         static inline bool classof(const Expression *) { return true; }
@@ -79,7 +134,7 @@ namespace vanguard {
             return false;
         }
 
-        virtual Variable* result() const = 0;
+        virtual Value* result() const = 0;
     };
 
     // Assign Instruction
@@ -145,7 +200,7 @@ namespace vanguard {
         }
 
         virtual bool hasReturn() const = 0;
-        virtual Function* target() const = 0;
+        virtual Universe::Function* target() const = 0;
         virtual std::list<Value*> args() const = 0;
 
         InstructionClassEnum instructionClass() const override {

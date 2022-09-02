@@ -29,13 +29,13 @@ namespace vanguard {
             // is valueish just a Value? 
             virtual std::list<Value*> getAdditionalStorage() = 0;
 
-            virtual bool readsStorage(Instruction& ins) = 0;
+            virtual bool readsStorage(Universe::Instruction& ins) = 0;
 
-            virtual bool writesStorage(Instruction& ins) = 0;
+            virtual bool writesStorage(Universe::Instruction& ins) = 0;
 
-            virtual std::list<Value*> getStorageReads(Instruction& ins) = 0;
+            virtual std::list<Value*> getStorageReads(Universe::Instruction& ins) = 0;
 
-            virtual std::list<Value*> getStorageWrites(Instruction& ins) = 0;
+            virtual std::list<Value*> getStorageWrites(Universe::Instruction& ins) = 0;
     };
 }
 

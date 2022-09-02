@@ -7,8 +7,9 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
-
-#include "../../domain/libBlockchain/include/Blockchain.h"
+#include <program/Block.h>
+#include <program/Function.h>
+#include <program/CompilationUnit.h>
 
 namespace vanguard {
     std::vector<Requirement *> StatGen::registerAnalyses() {
@@ -24,15 +25,15 @@ namespace vanguard {
         return "statGen";
     }
 
-    void StatGen::countBody(Block *blk) {
+    void StatGen::countBody(Universe::Block *blk) {
         assert(blk != nullptr && "Function does not have a body");
         assert(blk->isEntry() && "Fn body not marked as entry block");
 
-        std::unordered_set<Block *> seen = { blk };
-        std::vector<Block *> worklist = { blk };
+        std::unordered_set<Universe::Block *> seen = { blk };
+        std::vector<Universe::Block *> worklist = { blk };
 
         while(!worklist.empty()) {
-            Block *curBlk = worklist.back();
+            Universe::Block *curBlk = worklist.back();
             worklist.pop_back();
 
             totBlks++;
@@ -51,7 +52,7 @@ namespace vanguard {
         }
     }
 
-    void StatGen::detect(CompilationUnit &unit) {
+    void StatGen::detect(Universe::CompilationUnit &unit) {
         for(auto fn : unit.functions()) {
             totFns++;
             if(fn->hasBody()) {

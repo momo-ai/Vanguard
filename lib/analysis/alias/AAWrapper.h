@@ -12,10 +12,10 @@ namespace vanguard {
     class AAWrapper {
     public:
         AAWrapper();
-        virtual llvm::AAResults *request(Function &reqFn) = 0;
-        bool noAlias(Function &fn);
+        virtual llvm::AAResults *request(Universe::Function &reqFn) = 0;
+        bool noAlias(Universe::Function &fn);
     protected:
-        Function *curFn;
+        Universe::Function *curFn;
         llvm::AAResults *fnAlias;
     };
 }

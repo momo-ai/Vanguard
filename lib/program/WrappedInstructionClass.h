@@ -10,27 +10,27 @@
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/InstrTypes.h"
 #include "llvm/IR/Instructions.h"
-#include "LLVMtoVanguard.h"
+#include "LLVMFactory.h"
 #include <string>
 #include <list>
 #include "InstructionClassVisitor.h"
+#include "Block.h"
 
 namespace vanguard {
 
     template<typename Derived, typename Wrapped> class WrappedInstructionClass : public Derived {
         static_assert(std::is_base_of<llvm::Instruction, Wrapped>::value, "Wrapped must inherit from LLVM instruction.");
-        //static_assert(std::is_base_of<vanguard::Instruction, Derived>::value, "Derived must inherit from Vanguard instruction.");
+        static_assert(std::is_base_of<vanguard::Universe::Instruction, Derived>::value, "Derived must inherit from Vanguard instruction.");
     public:
 
-        explicit WrappedInstructionClass(const Wrapped &inst): ins(inst){}
+        explicit WrappedInstructionClass(UnitFactory &factory, const Wrapped &inst): ins(inst), factory(factory) {}
 
         std::string name() const override {
             return ins.getName().str();
         }
 
-        Block* parent() const override {
-            auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-            return llvmToVanguard.translateBlock(ins.getParent());
+        Universe::Block* parent() const override {
+            return factory.createBlk(ins.getParent());
         }
 
         bool mayReadOrWriteToMemory() const override {
@@ -41,7 +41,7 @@ namespace vanguard {
             return ins.willReturn();
         }
 
-        Instruction* getSuccessor() const override {
+        Universe::Instruction* getSuccessor() const override {
             if (ins.isTerminator()){
                 return nullptr;
             }
@@ -50,18 +50,16 @@ namespace vanguard {
                 return nullptr;
             }
             else{
-                auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-                return llvmToVanguard.translateInstruction(nextInst);
+                return factory.createIns(nextInst);
             }
         }
 
-        std::list<Instruction*> getAllSuccessors() const override  {
-            std::list<Instruction *> allSuccessors = {};
+        std::list<Universe::Instruction*> getAllSuccessors() const override  {
+            std::list<Universe::Instruction *> allSuccessors = {};
             if (ins.isTerminator()) {
-                auto &llvmToVanguard = LLVMtoVanguard::getInstance();
                 int numSuccessors = ins.getNumSuccessors();
                 for (int i = 0; i < numSuccessors; i++) {
-                    allSuccessors.push_back(llvmToVanguard.translateBlock(ins.getSuccessor(i))->instructions().front());
+                    allSuccessors.push_back(factory.createBlk(ins.getSuccessor(i))->instructions().front());
                 }
                 return allSuccessors;
             }
@@ -71,8 +69,7 @@ namespace vanguard {
         }
 
         Value* operand(unsigned i) const override {
-            auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-            return llvmToVanguard.translateValue(ins.getOperand(i));
+            return factory.createVal(ins.getOperand(i));
         }
 
         unsigned numOperands() const override {
@@ -95,6 +92,7 @@ namespace vanguard {
 
     protected:
         const Wrapped &ins;
+        UnitFactory &factory;
     };
 }
 

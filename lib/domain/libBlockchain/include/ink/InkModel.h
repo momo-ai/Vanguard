@@ -10,7 +10,7 @@
 #include "llvm/Analysis/MemoryLocation.h"
 //#include "llvm/IR/Function.h"
 #include "program/Function.h"
-#include "program/LLVMtoVanguard.h"
+#include "program/LLVMFactory.h"
 
 
 namespace blockchain {

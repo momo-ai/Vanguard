@@ -23,14 +23,20 @@
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Analysis/AliasAnalysis.h>
 #include <llvm/Demangle/Demangle.h>
-#include "program/Program.h"
-#include "program/LLVMtoVanguard.h"
+#include "program/Universe.h"
+#include "program/LLVMFactory.h"
 #include "detectors/DetectorRegistry.h"
+#include "program/Universe.h"
+#include "program/CompilationUnit.h"
+#include "program/LLVMFactory.h"
+#include "domain/libBlockchain/BlockchainFactory.h"
+#include "domain/libBlockchain/Blockchain.h"
 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
 
-void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::ProgramDetector *detector, vanguard::Program &prog) {
+template<typename Domain>
+void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::UniverseDetector<Domain> *detector, Domain &prog) {
     auto requirements = detector->registerAnalyses();
     for(auto req : requirements) {
         req->fetch(mam, fam);
@@ -39,6 +45,23 @@ void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisMa
     detector->startDetection();
     detector->detect(prog);
     detector->report();
+}
+
+template<typename Domain>
+void runDetectors(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::DetectorRegistry &registry, const std::vector<std::string>& detectorNames, Domain &prog) {
+    for(auto name : detectorNames) {
+        auto detector = registry.get<Domain>(name);
+        if(detector == nullptr) {
+            llvm::errs() << "Unknown pass: " << name << "\n";
+        }
+    }
+
+    for(auto name : detectorNames) {
+        auto detector = registry.get<Domain>(name);
+        if(detector != nullptr) {
+            performDetection(mam, fam, detector, prog);
+        }
+    }
 }
 
 void initializeLLVM(int argc, char **argv) {
@@ -154,10 +177,8 @@ int main(int argc, char **argv) {
         return llvm::None;
     };
 
-    auto &llvmTrans = vanguard::LLVMtoVanguard::getInstance();
-
     std::vector<std::unique_ptr<llvm::Module>> modules;
-    std::vector<vanguard::CompilationUnit *> units;
+    //std::vector<vanguard::Blockchain<vanguard::Universe>::CompilationUnit *> units;
     for (auto inFile: inputFiles) {
         auto module = parseIRFile(inputFiles[0], Err, ctxt, setDataLayout);
         if (!module) {
@@ -166,32 +187,27 @@ int main(int argc, char **argv) {
         }
 
         modules.push_back(move(module));
-        units.push_back(llvmTrans.translateModule(modules.back().get()));
+        //units.push_back(dynamic_cast<vanguard::Blockchain<vanguard::Universe>::CompilationUnit *>(factory->createUnit(modules.back().get())));
         MPM.run(*module, MAM);
     }
 
     vanguard::DetectorRegistry &detectorRegistry = vanguard::DetectorRegistry::getInstance();
-    vanguard::Program prog(units);
 
-    if(detectors.empty()) {
-        for(auto detector : detectorRegistry.all()) {
-            performDetection(MAM, FAM, detector, prog);
-        }
+    auto detectorNames = detectors.empty() ? detectorRegistry.all() : detectors;
+    auto domain = detectorRegistry.domain(detectorNames);
+
+    if(domain == vanguard::Detector::BASIC) {
+        vanguard::LLVMFactory factory;
+        vanguard::Universe prog(factory, modules);
+        runDetectors<vanguard::Universe>(MAM, FAM, detectorRegistry, detectorNames, prog);
+    }
+    else if(domain == vanguard::Detector::BLOCKCHAIN) {
+        vanguard::BlockchainFactory factory;
+        vanguard::Blockchain<vanguard::Universe> prog(factory, modules);
+        runDetectors<vanguard::Blockchain<vanguard::Universe>>(MAM, FAM, detectorRegistry, detectorNames, prog);
     }
     else {
-        for(auto name : detectors) {
-            auto detector = detectorRegistry.get(name);
-            if(detector == nullptr) {
-                llvm::errs() << "Unknown pass: " << name << "\n";
-            }
-        }
-
-        for(auto name : detectors) {
-            auto detector = detectorRegistry.get(name);
-            if(detector != nullptr) {
-                performDetection(MAM, FAM, detector, prog);
-            }
-        }
+        throw std::runtime_error("Unknown domain");
     }
 
     /* Example of how to fetch results from the opt passes

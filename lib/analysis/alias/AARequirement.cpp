@@ -6,7 +6,7 @@
 #include <llvm/IR/PassManager.h>
 
 namespace vanguard {
-    llvm::AAResults *AARequirement::request(Function &reqFn) {
+    llvm::AAResults *AARequirement::request(Universe::Function &reqFn) {
         if(noAlias(reqFn)) {
             return nullptr;
         }

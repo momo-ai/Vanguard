@@ -8,16 +8,21 @@
 #include "../UnitDetector.h"
 
 namespace vanguard {
-    class IRValidator : public UnitDetector {
+    template<typename Domain>
+    class IRValidator : public UnitDetector<Domain> {
     public:
         std::vector<Requirement *> registerAnalyses() override;
         void startDetection() override;
-        void detect(CompilationUnit &unit) override;
+        void detect(typename Domain::CompilationUnit &unit) override;
         void report() override;
 
         static std::string name();
+
+        static Detector::Domain domain() {
+            return Detector::BASIC;
+        }
     private:
-        void countBody(Block *blk);
+        void countBody(typename Domain::Block *blk);
 
         int totFns = 0;
         int totIns = 0;

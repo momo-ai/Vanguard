@@ -1,6 +1,7 @@
 #ifndef VANGUARD_PROGRAM_FUNCTION_H
 #define VANGUARD_PROGRAM_FUNCTION_H
 
+#include "Universe.h"
 #include "Type.h"
 #include "Value.h"
 #include "llvm/IR/Function.h"
@@ -10,33 +11,31 @@
 
 namespace vanguard {
 
-    class Instruction;
-    class Block;
-
-    class Function{    
+    class Universe::Function{
     public:
-        explicit Function(const llvm::Function &func);
+        explicit Function(UnitFactory &factory, const llvm::Function &func);
 
         Function(const Function&) = delete;
 
         std::string name();
 
-        std::list<Argument*> params();
+        virtual std::list<Argument*> params();
 
-        Type* returnType();
+        virtual Type* returnType();
 
         bool hasBody();
 
         Block* body();
 
-        std::list<Instruction*> instructions();
+        virtual std::list<Instruction*> instructions();
 
-        std::list<Block *> blocks();
+        virtual std::list<Block *> blocks();
 
         const llvm::Function &unwrap();
 
-    private:
+    protected:
         const llvm::Function &function;
+        UnitFactory &factory;
     };
 
 }

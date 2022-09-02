@@ -4,6 +4,8 @@
 #include <cassert>
 #include <iostream>
 #include "../../program/WrappedInstructions.h"
+#include <program/Function.h>
+#include <program/CompilationUnit.h>
 
 namespace vanguard {
     static bool debug_ir_validator = false;
@@ -156,7 +158,7 @@ namespace vanguard {
         }
     };
 
-    std::string getInstructionString(const Instruction &v){
+    std::string getInstructionString(const Universe::Instruction &v){
         InstructionTrans trans;
         v.accept(trans);
         return trans.result;
@@ -176,15 +178,15 @@ namespace vanguard {
         return "irValidator";
     }
 
-    void IRValidator::countBody(Block *blk) {
+    void IRValidator::countBody(Universe::Block *blk) {
         assert(blk != nullptr && "Function does not have a body");
         assert(blk->isEntry() && "Fn body not marked as entry block");
 
-        std::unordered_set<Block *> seen = { blk };
-        std::vector<Block *> worklist = { blk };
+        std::unordered_set<Universe::Block *> seen = { blk };
+        std::vector<Universe::Block *> worklist = { blk };
 
         while(!worklist.empty()) {
-            Block *curBlk = worklist.back();
+            Universe::Block *curBlk = worklist.back();
             worklist.pop_back();
 
             totBlks++;
@@ -203,7 +205,7 @@ namespace vanguard {
         }
     }
 
-    void IRValidator::detect(CompilationUnit &unit) {
+    void IRValidator::detect(Universe::CompilationUnit &unit) {
         moduleName = unit.name();
         sourceFileName = unit.sourceFile();
 
@@ -281,7 +283,7 @@ namespace vanguard {
             if (debug_ir_validator) {
                 std::cout << fn->name() << ":\n";
             }
-            std::list<Instruction*> instructionsList = fn->instructions();
+            std::list<Universe::Instruction*> instructionsList = fn->instructions();
             if(!instructionsList.empty()) {
                 for (auto instruction: instructionsList) {
                     std::string instString = getInstructionString(*instruction);
