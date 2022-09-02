@@ -19,4 +19,7 @@ jobs:
         run: |
           nix build --print-build-logs .#libVanguard
           echo "Done."
+      - name: Build SolidityPreprocessor
+        run: |
+          nix build '.?submodules=1#solidity-preprocessor'
       # does not yet build preprocessors, python, other compoennts
