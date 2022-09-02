@@ -1,11 +1,8 @@
 #include "LLVMFactory.h"
-#include "Function.h"
-#include "Block.h"
-#include "Instruction.h"
 #include "WrappedInstructions.h"
-#include "CompilationUnit.h"
 #include "Type.h"
 #include "Value.h"
+#include <program/WrappedValue.h>
 
 namespace vanguard{
 
@@ -123,25 +120,25 @@ namespace vanguard{
 
         if (valueMap.find(val) == valueMap.end()){
             if (auto globalVariable = llvm::dyn_cast<llvm::GlobalVariable>(val)){
-                valueMap[val] = new GlobalVariable(*this,*globalVariable);
+                valueMap[val] = new WrappedVariable<Variable, llvm::GlobalVariable>(*globalVariable, *this);
             }
             else if (auto argument = llvm::dyn_cast<llvm::Argument>(val)){
-                valueMap[val] = new Argument(*this,*argument);
+                valueMap[val] = new WrappedVariable<Variable, llvm::Argument>(*argument, *this);
             }
             else if (auto instVar = llvm::dyn_cast<llvm::Instruction>(val)){
-                valueMap[val] = new InstructionVariable(*this,*instVar);
+                valueMap[val] = new WrappedVariable<Variable, llvm::Instruction>(*instVar, *this);
             }
             else if (auto integer = llvm::dyn_cast<llvm::ConstantInt>(val)){
-                valueMap[val] = new IntegerLiteral(*this,*integer);
+                valueMap[val] = new WrappedLiteral<Literal, llvm::ConstantInt>(*integer, *this);
             }
             else if (auto string = llvm::dyn_cast<llvm::ConstantDataSequential>(val)){
-                valueMap[val] = new StringLiteral(*this,*string);
+                valueMap[val] = new WrappedLiteral<Literal, llvm::ConstantDataSequential>(*string, *this);
             }
             else if(auto constant = llvm::dyn_cast<llvm::Constant>(val)){
-                valueMap[val] = new Constant(*this,*constant);
+                valueMap[val] = new WrappedConstant<Constant, llvm::Constant>(*constant, *this);
             }
             else if(auto loc = llvm::dyn_cast<llvm::BasicBlock>(val)) {
-                valueMap[val] = new Location(*this,*loc);
+                valueMap[val] = new WrappedLocation<Location, llvm::BasicBlock>(*loc, *this);
             }
             else{
                 throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");

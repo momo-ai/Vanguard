@@ -4,8 +4,8 @@
 
 #include "BlockchainFactory.h"
 #include <program/Universe.h>
-#include <program/CompilationUnit.h>
 #include <program/WrappedInstructions.h>
+#include <program/WrappedValue.h>
 #include "Blockchain.h"
 
 namespace vanguard {
@@ -76,74 +76,5 @@ namespace vanguard {
         return blockMap[block];
     }
 
-    Type *BlockchainFactory::createType(const llvm::Type *t) {
-        if(t == nullptr) {
-            return nullptr;
-        }
 
-        if (typeMap.find(t) == typeMap.end()){
-            if (auto integer = llvm::dyn_cast<llvm::IntegerType>(t)){
-                typeMap[t] = (new IntegerType(*this,*integer));
-            }
-            else if (auto array = llvm::dyn_cast<llvm::ArrayType>(t)){
-                typeMap[t] = new ArrayType(*this,*array);
-            }
-                // else if (auto function = llvm::dyn_cast<llvm::FunctionType>(&t)){
-                //     typeMap[&t] = new FunctionT(*function);
-                // }
-            else if (auto pointer = llvm::dyn_cast<llvm::PointerType>(t)){
-                typeMap[t] = new PointerType(*this,*pointer);
-            }
-            else if (auto structT = llvm::dyn_cast<llvm::StructType>(t)){
-                typeMap[t] = new StructType(*this,*structT);
-            }
-            else if (auto vector = llvm::dyn_cast<llvm::VectorType>(t)){
-                typeMap[t] = new VectorType(*this,*vector);
-            }
-            else if (t->isVoidTy()){
-                typeMap[t] = new VoidType(*this,*t);
-            }
-            else if (t->isLabelTy()){
-                typeMap[t] = new LabelType(*this,*t);
-            }
-            else {
-                throw std::runtime_error("Given type cannot be translated since it does not exist in vanguard yet.");
-            }
-        }
-        return typeMap[t];
-    }
-
-    Value *BlockchainFactory::createVal(const llvm::Value *val) {
-        if(val == nullptr) {
-            return nullptr;
-        }
-
-        if (valueMap.find(val) == valueMap.end()){
-            if (auto globalVariable = llvm::dyn_cast<llvm::GlobalVariable>(val)){
-                valueMap[val] = new GlobalVariable(*this,*globalVariable);
-            }
-            else if (auto argument = llvm::dyn_cast<llvm::Argument>(val)){
-                valueMap[val] = new Argument(*this,*argument);
-            }
-            else if (auto instVar = llvm::dyn_cast<llvm::Instruction>(val)){
-                valueMap[val] = new InstructionVariable(*this,*instVar);
-            }
-            else if (auto integer = llvm::dyn_cast<llvm::ConstantInt>(val)){
-                valueMap[val] = new IntegerLiteral(*this,*integer);
-            }
-            else if (auto string = llvm::dyn_cast<llvm::ConstantDataSequential>(val)){
-                valueMap[val] = new StringLiteral(*this,*string);
-            }
-            else if(auto constant = llvm::dyn_cast<llvm::Constant>(val)){
-                valueMap[val] = new Constant(*this,*constant);
-            }
-            else if(auto loc = llvm::dyn_cast<llvm::BasicBlock>(val)) {
-                valueMap[val] = new Location(*this,*loc);
-            }
-            else{
-                throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");
-            }
-        }
-        return valueMap[val];
-    }
 }

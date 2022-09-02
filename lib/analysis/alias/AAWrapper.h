@@ -6,7 +6,7 @@
 #define VANGUARD_AAWRAPPER_H
 
 #include "llvm/Analysis/AliasAnalysis.h"
-#include "../../program/Function.h"
+#include <program/Universe.h>
 
 namespace vanguard {
     class AAWrapper {

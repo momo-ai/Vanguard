@@ -5,11 +5,11 @@
 #ifndef VANGUARD_BLOCKCHAINFACTORY_H
 #define VANGUARD_BLOCKCHAINFACTORY_H
 
-#include <program/UnitFactory.h>
+#include <program/LLVMFactory.h>
 #include <unordered_map>
 
 namespace vanguard {
-    class BlockchainFactory : public UnitFactory {
+    class BlockchainFactory : public LLVMFactory {
     public:
         BlockchainFactory() = default;
 
@@ -21,9 +21,9 @@ namespace vanguard {
 
         Universe::Block *createBlk(const llvm::BasicBlock *block) override;
 
-        Type *createType(const llvm::Type *t) override;
+        /*Type *createType(const llvm::Type *t) override;
 
-        Value *createVal(const llvm::Value *val) override;
+        Value *createVal(const llvm::Value *val) override;*/
 
     private:
 

@@ -27,7 +27,6 @@
 #include "program/LLVMFactory.h"
 #include "detectors/DetectorRegistry.h"
 #include "program/Universe.h"
-#include "program/CompilationUnit.h"
 #include "program/LLVMFactory.h"
 #include "domain/libBlockchain/BlockchainFactory.h"
 #include "domain/libBlockchain/Blockchain.h"

@@ -7,6 +7,8 @@
 
 #include <unordered_map>
 #include "FunctionPrinter/FunctionPrinter.h"
+#include "StatGen/StatGen.h"
+#include "IRValidator/IRValidator.h"
 
 namespace vanguard {
     class DetectorRegistry {
@@ -18,6 +20,13 @@ namespace vanguard {
             if(name == FunctionPrinter<Domain>::name()) {
                 return new FunctionPrinter<Domain>();
             }
+            else if(name == StatGen<Domain>::name()) {
+                return new StatGen<Domain>();
+            }
+            else if(name == IRValidator<Domain>::name()) {
+                return new IRValidator<Domain>();
+            }
+
 
             return nullptr;
         };
@@ -35,6 +44,8 @@ namespace vanguard {
         DetectorRegistry() {
             //assert(add(StatGen::name(), StatGen::domain()));
             add(FunctionPrinter<Universe>::name(), FunctionPrinter<Universe>::domain());
+            add(StatGen<Universe>::name(), StatGen<Universe>::domain());
+            add(IRValidator<Universe>::name(), IRValidator<Universe>::domain());
             //add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
             // add(IRValidator::name(), new IRValidator());
         }

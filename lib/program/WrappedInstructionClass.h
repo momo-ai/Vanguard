@@ -5,7 +5,7 @@
 #ifndef VANGUARD_WRAPPEDINSTRUCTIONCLASS_H
 #define VANGUARD_WRAPPEDINSTRUCTIONCLASS_H
 
-#include "Instruction.h"
+#include "Universe.h"
 #include "Value.h"
 #include "llvm/IR/Instruction.h"
 #include "llvm/IR/InstrTypes.h"

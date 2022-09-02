@@ -1,5 +1,4 @@
-#include "Function.h"
-#include "Block.h"
+#include "Universe.h"
 #include "LLVMFactory.h"
 #include "llvm/IR/InstIterator.h"
 
@@ -12,10 +11,10 @@ namespace vanguard{
         return function.getName().str();
     }
 
-    std::list<Argument*> Universe::Function::params(){
-        std::list<Argument*> params = {};
+    std::list<Variable*> Universe::Function::params(){
+        std::list<Variable*> params = {};
         for (auto itr = function.arg_begin(); itr != function.arg_end(); itr++){
-            params.push_back((Argument *) factory.createVal(llvm::dyn_cast<llvm::Value>(itr)));
+            params.push_back((Variable *) factory.createVal(itr));
         }
         return params;
     }

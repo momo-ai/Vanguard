@@ -8,7 +8,7 @@
 #include <unordered_set>
 #include <deque>
 #include "UnitDetector.h"
-#include <program/CompilationUnit.h>
+#include <program/Universe.h>
 
 namespace vanguard {
     template<class Domain>

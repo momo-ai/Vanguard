@@ -2,7 +2,6 @@
 #define VANGUARD_PROGRAM_VALUE_H
 
 #include "Universe.h"
-#include "Type.h"
 #include <string>
 #include "llvm/IR/Value.h"
 #include "llvm/IR/GlobalVariable.h"
@@ -13,29 +12,17 @@
 
 namespace vanguard{
     enum ValueClassEnum{
-        VARIABLE_BEGIN,
-        GLOBAL_VARIABLE = VARIABLE_BEGIN,
-        ARGUMENT,
-        BLKVARIABLE,
-        INSTRUCTION_VARIABLE,
-        VARIABLE_END = INSTRUCTION_VARIABLE,
-        LITERAL_BEGIN,
-        INTEGER_LITERAL = LITERAL_BEGIN,
-        STRING_LITERAL,
-        BOOLEAN_LITERAL,
-        LITERAL_END = BOOLEAN_LITERAL,
+        VARIABLE,
+        CONSTANT,
+        LITERAL,
         POINTER,
         MEMORY_REGION,
-        CONSTANT_BEGIN,
-        CONSTANT = CONSTANT_BEGIN,
-        CONSTANT_END = CONSTANT,
-        LOCATION_BEGIN,
-        LOCATION = LOCATION_BEGIN,
-        BLOCK_END = LOCATION
+        LOCATION,
     };
 
     class UnitFactory;
     class ValueClassVisitor;
+
     class Value{
     public:
         explicit Value(UnitFactory &factory, ValueClassEnum vc);
@@ -43,7 +30,7 @@ namespace vanguard{
         static inline bool classof(const Value &) { return true; }
         static inline bool classof(const Value *) { return true; }
 
-        virtual Type* type() const= 0;
+        virtual Type* type() const = 0;
 
         ValueClassEnum valueClass() const;
 
@@ -54,14 +41,121 @@ namespace vanguard{
         UnitFactory &factory;
     };
 
-    class Variable : public Value{
+    class Variable : public Value {
     public:
-        explicit Variable(UnitFactory &factory, ValueClassEnum vc) : Value(factory, vc) {};
+        explicit Variable(UnitFactory &factory) : Value(factory, VARIABLE) {};
+
+        static inline bool classof(const Variable &) { return true; }
+        static inline bool classof(const Variable *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == VARIABLE){ return true; }
+            return false;
+        }
+
         virtual bool hasName() const = 0;
         virtual std::string name() const = 0;
+        void accept(ValueClassVisitor &v) const override;
     };
 
-    class GlobalVariable: public Variable{
+    class Constant : public Value {
+    public:
+        explicit Constant(UnitFactory &factory) : Value(factory, CONSTANT) {};
+        static inline bool classof(const Constant &) { return true; }
+        static inline bool classof(const Constant *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == CONSTANT){ return true; }
+            return false;
+        }
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    //template<typename LitType>
+    class Literal : public Value {
+    public:
+        explicit Literal(UnitFactory &factory) : Value(factory, LITERAL) {};
+        static inline bool classof(const Literal &) { return true; }
+        static inline bool classof(const Literal *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == LITERAL){ return true; }
+            return false;
+        }
+
+        //virtual LitType value() const = 0;
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class Pointer : public Value {
+    public:
+        explicit Pointer(UnitFactory &factory) : Value(factory, POINTER) {};
+        static inline bool classof(const Pointer &) { return true; }
+        static inline bool classof(const Pointer *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == POINTER){ return true; }
+            return false;
+        }
+
+        virtual Value *base() const = 0;
+        virtual Value *offset() const = 0;
+        //virtual Type *refType() const = 0;
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class MemoryRegion : public Value {
+    public:
+        explicit MemoryRegion(UnitFactory &factory) : Value(factory, MEMORY_REGION) {};
+        static inline bool classof(const MemoryRegion &) { return true; }
+        static inline bool classof(const MemoryRegion *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == MEMORY_REGION){ return true; }
+            return false;
+        }
+
+        /*virtual const Pointer *pointer() const = 0;
+        virtual unsigned long size() const = 0;*/
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class Location : public Value {
+    public:
+        explicit Location(UnitFactory &factory) : Value(factory, LOCATION) {};
+        static inline bool classof(const Location &) { return true; }
+        static inline bool classof(const Location *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == LOCATION){ return true; }
+            return false;
+        }
+
+        virtual Universe::Block &loc() const = 0;
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class ValueClassVisitor{
+    public:
+        virtual void visit(const Variable &v) = 0;
+        virtual void visit(const Constant &v) = 0;
+        virtual void visit(const Literal &v) = 0;
+        virtual void visit(const Pointer &v) = 0;
+        virtual void visit(const MemoryRegion &v) = 0;
+        virtual void visit(const Location &v) = 0;
+    };
+
+
+
+
+
+
+
+
+
+
+
+    /*class GlobalVariable: public Variable{
     public:
         explicit GlobalVariable(UnitFactory &factory, const llvm::GlobalVariable &);
 
@@ -335,7 +429,7 @@ namespace vanguard{
         virtual void visit(const MemoryRegion &v) = 0;
         virtual void visit(const Constant &v) = 0;
         virtual void visit(const Location &v) = 0;
-    };
+    };*/
 }
 
 #endif

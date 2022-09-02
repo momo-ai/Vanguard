@@ -6,7 +6,7 @@
 #define VANGUARD_INSTRUCTIONCLASSES_H
 
 #include "Value.h"
-#include "Instruction.h"
+#include "Universe.h"
 
 namespace vanguard {
     enum BinOp{Add, Sub, Mul, Div, Mod, Shl, Shr, And, Or, Xor, IFCmpInst};

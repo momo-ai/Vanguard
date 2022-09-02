@@ -2,13 +2,37 @@
 #include "LLVMFactory.h"
 
 namespace vanguard{
-    Value::Value(UnitFactory &factory, ValueClassEnum vc): factory(factory), valClass(vc){}
+    Value::Value(UnitFactory &factory, ValueClassEnum vc): factory(factory), valClass(vc) {}
 
     ValueClassEnum Value::valueClass() const{
         return valClass;
     }
 
-    GlobalVariable::GlobalVariable(UnitFactory &factory, const llvm::GlobalVariable &gv): Variable(factory, GLOBAL_VARIABLE), globalVariable(gv) {}
+    void Variable::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    void Constant::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    void Literal::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    void Pointer::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    void MemoryRegion::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    void Location::accept(ValueClassVisitor &v) const {
+        return v.visit(*this);
+    }
+
+    /*GlobalVariable::GlobalVariable(UnitFactory &factory, const llvm::GlobalVariable &gv): Variable(factory, GLOBAL_VARIABLE), globalVariable(gv) {}
 
     Type* GlobalVariable::type() const{
         return factory.createType(globalVariable.getType());
@@ -143,28 +167,6 @@ namespace vanguard{
     MemoryRegion::MemoryRegion(UnitFactory &factory, const Pointer *ptr, unsigned long sz): Value(factory, MEMORY_REGION), ptr(ptr) , memSize(sz){}
 
 
-    /*Type* MemoryRegion::getType() const{
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(pointer->type());
-    }*/
-
-    /*Value *MemoryRegion::pointer() const{
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateValue(pointer);
-    }
-
-    Value *MemoryRegion::getIndex() const{
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateValue(index);
-    }
-
-    const llvm::Value* MemoryRegion::getLLVMPointer() const{
-        return pointer;
-    }
-
-    const llvm::Value* MemoryRegion::getLLVMIndex() const{
-        return index;
-    }*/
 
     const Pointer *MemoryRegion::pointer() const {
         return ptr;
@@ -213,5 +215,5 @@ namespace vanguard{
 
     Universe::Block &Location::loc() const {
         return *factory.createBlk(&location);
-    }
+    }*/
 }
