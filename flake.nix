@@ -15,16 +15,15 @@
           inherit system;
           overlays = [ self.overlays.default ];
         };
-
-        solc-typed-ast = pkgs.callPackage ./nix/solc-typed-ast { inherit pkgs; };
       in {
 
     packages = flake-utils.lib.flattenTree {
-      libVanguard = pkgs.libVanguard;
+      inherit (pkgs) libVanguard solc-typed-ast;
+
       default = pkgs.libVanguard;
 
       # for debugging
-      solang = pkgs.solang;
+      inherit (pkgs) solang solidity-preprocessor;
     };
 
     devShells = flake-utils.lib.flattenTree {
@@ -41,19 +40,35 @@
           pkgs.nodejs
           pkgs.nodePackages.typescript
           pkgs.solang
-          solc-typed-ast.solc-typed-ast
+          pkgs.solc-typed-ast
 
           # dependencies for rust frontend
           pkgs.rustc
           pkgs.cargo
         ];
       };
+
+      default = pkgs.libVanguard.overrideAttrs (attrs: {
+        buildInputs = attrs.buildInputs ++ [
+          pkgs.nodejs
+          pkgs.nodePackages.npm
+          pkgs.nodePackages.typescript
+        ];
+      });
     };
   }) // {
     overlays.default = final: prev: {
       libVanguard = with final; callPackage ./libVanguard.nix {};
 
+      solc-typed-ast = (final.callPackage ./nix/solc-typed-ast { pkgs = final; }).solc-typed-ast;
+
       solang = with final; callPackage ./solang.nix {};
+
+      solidity-preprocessor = final.callPackage ./nix/solidity-preprocessor.nix {
+        pkgs = final;
+
+        inherit (final) lib nodejs;
+      };
     };
   };
 }
