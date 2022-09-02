@@ -50,7 +50,7 @@
     overlays.default = final: prev: {
       libVanguard = with final; callPackage ./libVanguard.nix {};
 
-      solang = with final; callPackage ./solang.nix { system = "aarch64-darwin"; };
+      solang = with final; callPackage ./solang.nix {};
     };
   };
 }
