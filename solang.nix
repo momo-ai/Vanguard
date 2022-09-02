@@ -1,9 +1,6 @@
-{ lib, stdenv, fetchurl, autoPatchelfHook
+{ lib, stdenvNoCC, fetchurl, autoPatchelfHook
 
-, libiconv
-
-# which system is being built
-, system }:
+, libiconv }:
 
 let
   versions = {
@@ -15,41 +12,29 @@ let
     };
   };
 
-  patchPaths =
-    if stdenv.isDarwin
-    then ''
-      install_name_tool -id solang $out/bin/solang
-    ''
-    else ''
-    '';
+  system = stdenvNoCC.hostPlatform.system;
 in
-stdenv.mkDerivation {
+stdenvNoCC.mkDerivation {
   name = "solang";
   version = "0.1.12";
   nativeBuildInputs =
-    if stdenv.isDarwin
+    if stdenvNoCC.isDarwin
     then [ libiconv ]
     else [ autoPatchelfHook ];
 
-  src = fetchurl (versions."0.1.12".${system} // {
-    downloadToTemp = true;
-    postFetch = ''
-      install $downloadedFile $out
-    '';
-  });
-  sourceRoot = ".";
+  src = fetchurl {
+    inherit (versions."0.1.12".${system}) url sha256;
+  };
 
   dontUnpack = true;
-  dontConfigure = true;
-  dontBuild = true;
 
   installPhase = ''
+    mkdir -p $out/bin
     install -m755 -D $src $out/bin/solang
-    ${patchPaths}
   '';
 
   doInstallCheck = true;
-  installCheck = ''
+  installCheckPhase = ''
     $out/bin/solang --version > /dev/null
   '';
 }
