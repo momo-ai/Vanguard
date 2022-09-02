@@ -5,6 +5,9 @@
     flake-utils.url = "github:numtide/flake-utils/v1.0.0";
   };
 
+  # Custom colored bash prompt
+  nixConfig.bash-prompt = ''\[\e[0;32m\][vanguard]\[\e[m\] \[\e[38;5;244m\]\w\[\e[m\] % '';
+
   outputs = { self, nixpkgs, flake-utils }:
     flake-utils.lib.eachDefaultSystem (system:
       let
