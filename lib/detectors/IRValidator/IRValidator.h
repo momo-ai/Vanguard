@@ -65,7 +65,7 @@ namespace vanguard {
                 std::cout << "\n ---- Listing functions with their signature ---- \n";
             }
             std::vector< std::string > functionsNames = {};
-            std::vector< std::list< Variable* > > functionsArguments = {};
+            std::vector< std::vector< Variable* > > functionsArguments = {};
             std::vector< Type* > functionReturnTypes = {};
             int numFunctions = 0;
             for (auto function: unit.functions()){
@@ -108,7 +108,7 @@ namespace vanguard {
                 if (debug_ir_validator) {
                     std::cout << fn->name() << ":\n";
                 }
-                std::list<Universe::Instruction*> instructionsList = fn->instructions();
+                auto instructionsList = fn->instructions();
                 if(!instructionsList.empty()) {
                     for (auto instruction: instructionsList) {
                         std::string instString = getInstructionString(*instruction);

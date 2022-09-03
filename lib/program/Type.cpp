@@ -3,8 +3,44 @@
 
 namespace vanguard{
     
-    Type::Type(UnitFactory &factory) : factory{factory} {}
+    Type::Type(UnitFactory &factory, TypeSquared typeType) : typeType(typeType), factory{factory} {}
 
+    void IntegerType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void ObjectType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void MapType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void ArrayType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void PointerType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void StructType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void VoidType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void LocationType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+
+    void UnknownType::accept(TypeVisitor &v) const {
+        v.visit(*this);
+    }
+/*
     //Integer subclass
     IntegerType::IntegerType(UnitFactory &factory, const llvm::IntegerType& intT): Type(factory), integer(intT){}
 
@@ -146,5 +182,5 @@ namespace vanguard{
 
     const llvm::Type &LabelType::unwrap() {
         return labelType;
-    }
+    }*/
 }

@@ -12,6 +12,6 @@ namespace vanguard {
 
 
     bool AAWrapper::noAlias(Universe::Function &fn) {
-        return fn.unwrap().isDeclaration();
+        return fn.unwrap()->isDeclaration();
     }
 }

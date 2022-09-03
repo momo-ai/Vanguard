@@ -7,13 +7,9 @@
 #include <utility>
 
 namespace vanguard {
-    Universe::Universe(UnitFactory &factory, const std::vector<std::unique_ptr<llvm::Module>>& modules){
-        for(auto &mod : modules) {
-            programUnits.push_back(factory.createUnit(mod.get()));
-        }
-    }
+    Universe::Universe(UnitFactory &factory, std::vector<CompilationUnit *>  units) : programUnits(std::move(units)) {}
 
-    const std::vector<Universe::CompilationUnit *> &Universe::units() {
+    const std::vector<Universe::CompilationUnit *> &Universe::units() const {
         return programUnits;
     }
 }

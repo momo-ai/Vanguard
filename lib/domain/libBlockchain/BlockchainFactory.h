@@ -7,13 +7,31 @@
 
 #include <program/LLVMFactory.h>
 #include <unordered_map>
+#include "Blockchain.h"
+#include "BlkType.h"
+#include "BlkFunction.h"
+#include "BlockchainModel.h"
 
 namespace vanguard {
     class BlockchainFactory : public LLVMFactory {
     public:
         BlockchainFactory() = default;
 
-        Universe::CompilationUnit *createUnit(const llvm::Module *module) override;
+        BlkType<UnknownType> *createBasicType(const llvm::Module &module, BlockchainModel &model, std::string name);
+
+        BlkFunction<Universe> *createBlkFunction(const llvm::Module &module, BlockchainModel &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods);
+
+        Blockchain<Universe>::Contract *createContract(const llvm::Module &module, BlockchainModel &model, std::string& name, std::vector<BlkFunction<Universe> *>& fns, std::vector<Variable *>& vars);
+
+        BlkStructType<StructType> *createStruct(const llvm::Module &mod, BlockchainModel &model, const std::string& name, std::vector<Variable *> fields);
+
+        BlkVariable<Variable> *createVariable(const llvm::Module &module, BlockchainModel &model, std::string name, Type *type);
+
+        BlkArrayType<ArrayType> *createArrayType(const llvm::Module &module, BlockchainModel &model, std::string name, Type *base);
+
+        BlkMapType<MapType> *createMapType(const llvm::Module &module, BlockchainModel &model, std::string name, Type *keyType, Type *valType);
+
+        Blockchain<Universe>::CompilationUnit *createUnit(const llvm::Module *module, const std::string& summary);
 
         Universe::Function *createFn(const llvm::Function *function) override;
 
@@ -27,12 +45,12 @@ namespace vanguard {
 
     private:
 
-        std::unordered_map<const llvm::Module*, Universe::CompilationUnit*> moduleMap;
+        std::unordered_map<const llvm::Module*, Blockchain<Universe>::CompilationUnit*> moduleMap;
         std::unordered_map<const llvm::Function*, Universe::Function*> functionMap;
         std::unordered_map<const llvm::BasicBlock*, Universe::Block*> blockMap;
         std::unordered_map<const llvm::Instruction*, Universe::Instruction*> instructionMap;
-        std::unordered_map<const llvm::Type*, Type*> typeMap;
-        std::unordered_map<const llvm::Value*, Value*> valueMap;
+        //std::unordered_map<const llvm::Type*, Type*> typeMap;
+        //std::unordered_map<const llvm::Value*, Value*> valueMap;
     };
 }
 

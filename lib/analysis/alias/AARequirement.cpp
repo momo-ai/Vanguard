@@ -16,7 +16,7 @@ namespace vanguard {
         }
 
         curFn = &reqFn;
-        auto *fn = const_cast<llvm::Function *>(&reqFn.unwrap());
+        auto *fn = const_cast<llvm::Function *>(reqFn.unwrap());
         fnAlias = &fnAnalysis->getResult<llvm::AAManager>(*fn);
 
         return fnAlias;

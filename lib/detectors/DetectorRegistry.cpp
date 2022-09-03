@@ -27,6 +27,42 @@ static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain 
 namespace vanguard {
     DetectorRegistry *DetectorRegistry::instance = nullptr;
 
+    template<>
+    UniverseDetector<Universe> *DetectorRegistry::get(const std::string& name) {
+        if(name == FunctionPrinter<Universe>::name()) {
+            return new FunctionPrinter<Universe>();
+        }
+        else if(name == StatGen<Universe>::name()) {
+            return new StatGen<Universe>();
+        }
+        else if(name == IRValidator<Universe>::name()) {
+            return new IRValidator<Universe>();
+        }
+        /*else if(name == ReentrancyDetector<Domain>::name()) {
+            return new ReentrancyDetector<Domain>();
+        }*/
+
+        return nullptr;
+    };
+
+    template<>
+    UniverseDetector<Blockchain<Universe>> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
+        if(name == FunctionPrinter<Blockchain<Universe>>::name()) {
+            return new FunctionPrinter<Blockchain<Universe>>();
+        }
+        else if(name == StatGen<Blockchain<Universe>>::name()) {
+            return new StatGen<Blockchain<Universe>>();
+        }
+        else if(name == IRValidator<Blockchain<Universe>>::name()) {
+            return new IRValidator<Blockchain<Universe>>();
+        }
+        else if(name == ReentrancyDetector<Blockchain<Universe>>::name()) {
+            return new ReentrancyDetector<Blockchain<Universe>>();
+        }
+
+        return nullptr;
+    };
+
     DetectorRegistry &DetectorRegistry::getInstance() {
         if(instance == nullptr) {
             instance = new DetectorRegistry();

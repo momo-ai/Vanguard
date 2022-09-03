@@ -6,296 +6,388 @@
 
 namespace vanguard{
 
-    class BinaryIns: public WrappedInstructionClass<BinaryOpExpr, llvm::BinaryOperator> {
+    template<typename Domain>
+    class BinaryIns: public WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::BinaryOperator> {
         public:
-            explicit BinaryIns(UnitFactory &factory, const llvm::BinaryOperator &bop);
+            explicit BinaryIns(UnitFactory &factory, const llvm::BinaryOperator &bop) : WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::BinaryOperator>(bop, factory) {}
             BinaryIns(const BinaryIns&) = delete;
 
-            BinOp op() const override;
-            Value* result() const override;
+            BinOp op() const override {
+                unsigned opcode = this->wrapped.getOpcode();
+                BinOp binaryOpClass;
+                if (opcode == 13 || opcode == 14) binaryOpClass = Add;
+                else if(opcode == 15 || opcode == 16) binaryOpClass = Sub;
+                else if(opcode == 17 || opcode == 18) binaryOpClass = Mul;
+                else if (opcode == 19 || opcode == 20 || opcode == 21) binaryOpClass = Div;
+                else if (opcode == 22 || opcode == 23 || opcode == 24) binaryOpClass = Mod;
+                else if (opcode == 25)  binaryOpClass = Shl;
+                else if (opcode == 26 || opcode == 27) binaryOpClass = Shr;
+                else if (opcode == 28) binaryOpClass = And;
+                else if (opcode == 29) binaryOpClass = Or;
+                else if (opcode == 30) binaryOpClass = Xor;
+                else{
+                    throw std::runtime_error("The opcode "+ std::string(this->wrapped.getOpcodeName()) + " is not a binary operator class in vanguard.");
+                }
+                return binaryOpClass;
+            }
+
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class CmpIns: public WrappedInstructionClass<BinaryOpExpr, llvm::CmpInst> {
+    template<typename Domain>
+    class CmpIns: public WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::CmpInst> {
         public:
-            explicit CmpIns(UnitFactory &factory, const llvm::CmpInst &cmpinst);
+            explicit CmpIns(UnitFactory &factory, const llvm::CmpInst &cmpinst) : WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::CmpInst>(cmpinst, factory) {}
             CmpIns(const CmpIns&) = delete;
 
-            BinOp op() const override;
-            Value* result() const override;
+            BinOp op() const override {
+                unsigned opcode = this->wrapped.getOpcode();
+                BinOp binaryOpClass;
+                if (opcode == 53 || opcode == 54) binaryOpClass = IFCmpInst;
+                else {
+                    throw std::runtime_error("The opcode "+ std::string(this->wrapped.getOpcodeName()) + " is not a cmp operator class in vanguard.");
+                }
+                return  binaryOpClass;
+            }
+
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class BranchIns: public WrappedInstructionClass<Branch, llvm::BranchInst> {
+    template<typename Domain>
+    class BranchIns: public WrappedInstructionClass<Branch<Domain>, llvm::BranchInst> {
         public:
-            explicit BranchIns(UnitFactory &factory, const llvm::BranchInst &brInst);
+            explicit BranchIns(UnitFactory &factory, const llvm::BranchInst &brInst) : WrappedInstructionClass<Branch<Domain>, llvm::BranchInst>(brInst, factory) {}
             BranchIns(const BranchIns&) = delete;
 
-            bool isConditional() const override;
-            Value* condition() const override;
-            std::list<Universe::Block*> targets() const override;
+            bool isConditional() const override {
+                return this->wrapped.isConditional();
+            }
+
+            Value* condition() const override {
+                return this->factory.createVal(this->wrapped.getCondition());
+            }
+
+            std::list<Universe::Block*> targets() const override {
+                std::list<Universe::Block*> successors = {};
+                unsigned int n = this->wrapped.getNumSuccessors();
+                for(unsigned int i = 0; i < n; i++){
+                    successors.push_back(this->factory.createBlk(this->wrapped.getSuccessor(i)));
+                }
+                return successors;
+            }
     };
 
-    class IndirectBrIns: public WrappedInstructionClass<Branch, llvm::IndirectBrInst> {
+    template<typename Domain>
+    class IndirectBrIns: public WrappedInstructionClass<Branch<Domain>, llvm::IndirectBrInst> {
         public:
-            explicit IndirectBrIns(UnitFactory &factory, const llvm::IndirectBrInst &ibrInst);
+            explicit IndirectBrIns(UnitFactory &factory, const llvm::IndirectBrInst &ibrInst) : WrappedInstructionClass<Branch<Domain>, llvm::IndirectBrInst>(ibrInst, factory) {}
             IndirectBrIns(const IndirectBrIns&) = delete;
 
-            bool isConditional() const override;
-            Value * condition() const override;
-            std::list<Universe::Block*> targets() const override;
+            bool isConditional() const override {
+                return false;
+            }
 
-            //void accept(InstructionClassVisitor &v) const override;
+            Value * condition() const override {
+                throw std::runtime_error("Indirect Branch Instruction does not have a condition.");
+            }
+
+            std::list<Universe::Block*> targets() const override {
+                std::list<Universe::Block*> successors = {};
+                unsigned int n = this->wrapped.getNumSuccessors();
+                for(unsigned int i = 0; i < n; i++){
+                    successors.push_back(this->factory.createBlk(this->wrapped.getSuccessor(i)));
+                }
+                return successors;
+            }
     };
 
-    class SwitchIns: public WrappedInstructionClass<Branch, llvm::SwitchInst> {
+    template<typename Domain>
+    class SwitchIns: public WrappedInstructionClass<Branch<Domain>, llvm::SwitchInst> {
         public:
-            explicit SwitchIns(UnitFactory &factory, const llvm::SwitchInst &swInst);
+            explicit SwitchIns(UnitFactory &factory, const llvm::SwitchInst &swInst) : WrappedInstructionClass<Branch<Domain>, llvm::SwitchInst>(swInst, factory) {}
             SwitchIns(const SwitchIns&) = delete;
 
-            bool isConditional() const override;
-            Value* condition() const override;
-            std::list<Universe::Block*> targets() const override;
+            bool isConditional() const override {
+                return true;
+            }
 
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* condition() const override {
+                return this->factory.createVal(this->wrapped.getCondition());
+            }
+
+            std::list<Universe::Block*> targets() const override {
+                std::list<Universe::Block*> successors = {};
+                unsigned int n = this->wrapped.getNumSuccessors();
+                for(unsigned int i = 0; i < n; i++){
+                    successors.push_back(this->factory.createBlk(this->wrapped.getSuccessor(i)));
+                }
+                return successors;
+            }
     };
 
-    class UnaryIns: public WrappedInstructionClass<UnaryOpExpr, llvm::UnaryOperator> {
+    template<typename Domain>
+    class UnaryIns: public WrappedInstructionClass<UnaryOpExpr<Domain>, llvm::UnaryOperator> {
         public:
-            explicit UnaryIns(UnitFactory &factory, const llvm::UnaryOperator &uop);
+            explicit UnaryIns(UnitFactory &factory, const llvm::UnaryOperator &uop) : WrappedInstructionClass<UnaryOpExpr<Domain>, llvm::UnaryOperator>(uop, factory) {}
             UnaryIns(const UnaryIns&) = delete;
 
-            Value* result() const override;
-            Value* operand() const override;
-            UnOp op() const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
 
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* operand() const override {
+                return this->factory.createVal(this->wrapped.getOperand(0));
+            }
+
+            UnOp op() const override {
+                unsigned opcode = this->wrapped.getOpcode();
+                UnOp unaryOpClass;
+                if (opcode == 12) unaryOpClass = Neg;
+                else{
+                    throw std::runtime_error("The opcode "+ std::string(this->wrapped.getOpcodeName())+ " is not a unary operator class in Vanguard.");
+                }
+                return unaryOpClass;
+            }
     };
 
-    class CastIns: public WrappedInstructionClass<CastExpr, llvm::CastInst> {
+    template<typename Domain>
+    class CastIns: public WrappedInstructionClass<CastExpr<Domain>, llvm::CastInst> {
     public:
-        explicit CastIns(UnitFactory &factory, const llvm::CastInst &ci);
+        explicit CastIns(UnitFactory &factory, const llvm::CastInst &ci): WrappedInstructionClass<CastExpr<Domain>, llvm::CastInst>(ci, factory) {}
         CastIns(const CastIns&) = delete;
 
-        Value* result() const override;
-        Type *castTo() const override;
+        Value* result() const override {
+            auto* insVar = this->factory.createVal(&this->wrapped);
+            return insVar;
+        }
 
-        //void accept(InstructionClassVisitor &v) const override;
+        Type *castTo() const override {
+            return this->factory.createType(this->wrapped.getDestTy());
+        }
     };
 
-    class CallIns: public WrappedInstructionClass<CallExpr, llvm::CallBase> {
+    template<typename Domain>
+    class CallIns: public WrappedInstructionClass<CallExpr<Domain>, llvm::CallBase> {
         public:
-            explicit CallIns(UnitFactory &factory, const llvm::CallBase &cb);
+            explicit CallIns(UnitFactory &factory, const llvm::CallBase &cb) : WrappedInstructionClass<CallExpr<Domain>, llvm::CallBase>(cb, factory) {}
             CallIns(const CallIns&) = delete;
 
-            Value* result() const override;
-            bool hasReturn() const override;
-            Universe::Function* target() const override;
-            std::list<Value*> args() const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
 
-            //void accept(InstructionClassVisitor &v) const override;
+            bool hasReturn() const override {
+                return !this->wrapped.doesNotReturn();
+            }
+
+            Universe::Function* target() const override {
+                return this->factory.createFn(this->wrapped.getCalledFunction());
+            }
+
+            std::list<Value*> args() const override {
+                std::list<Value*> args = {};
+                for(auto itr = this->wrapped.arg_begin(); itr != this->wrapped.arg_end(); itr++){
+                    args.push_back(this->factory.createVal(*itr));
+                }
+                return args;
+            }
     };
 
-    class UnreachableIns: public WrappedInstructionClass<Error, llvm::UnreachableInst> {
+    template<typename Domain>
+    class UnreachableIns: public WrappedInstructionClass<Error<Domain>, llvm::UnreachableInst> {
         public:
-            explicit UnreachableIns(UnitFactory &factory, const llvm::UnreachableInst &ui);
+            explicit UnreachableIns(UnitFactory &factory, const llvm::UnreachableInst &ui)
+                    : WrappedInstructionClass<Error<Domain>, llvm::UnreachableInst>(ui, factory) {}
             UnreachableIns(const UnreachableIns&) = delete;
 
-            std::string msg() const override;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            std::string msg() const override {
+                return "This instruction is unreachable.";
+            }
     };
 
-    class ReturnIns: public WrappedInstructionClass<Return, llvm::ReturnInst> {
+    template<typename Domain>
+    class ReturnIns: public WrappedInstructionClass<Return<Domain>, llvm::ReturnInst> {
         public:
-            explicit ReturnIns(UnitFactory &factory, const llvm::ReturnInst &retInst);
+            explicit ReturnIns(UnitFactory &factory, const llvm::ReturnInst &retInst) : WrappedInstructionClass<Return<Domain>, llvm::ReturnInst>(retInst, factory) {}
             ReturnIns(const ReturnIns&) = delete;
 
-            bool returnsValue() const override;
-            Value* value() const override;
+            bool returnsValue() const override {
+                return this->wrapped.getReturnValue() != nullptr;
+            }
 
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* value() const override {
+                return this->factory.createVal(this->wrapped.getReturnValue());
+            }
     };
 
-    class SelectIns: public WrappedInstructionClass<TernaryExpr, llvm::SelectInst> {
+    template<typename Domain>
+    class SelectIns: public WrappedInstructionClass<TernaryExpr<Domain>, llvm::SelectInst> {
         public:
-            explicit SelectIns(UnitFactory &factory, const llvm::SelectInst &si);
+            explicit SelectIns(UnitFactory &factory, const llvm::SelectInst &si) : WrappedInstructionClass<TernaryExpr<Domain>, llvm::SelectInst>(si, factory) {}
             SelectIns(const SelectIns&) = delete;
 
-            Value* result() const override;
-            Value *condition() const override;
-            Value *trueValue() const override;
-            Value *falseValue() const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
 
-            //void accept(InstructionClassVisitor &v) const override;
+            Value *condition() const override {
+                return this->factory.createVal(this->wrapped.getCondition());
+            }
+
+            Value *trueValue() const override {
+                return this->factory.createVal(this->wrapped.getTrueValue());
+            }
+
+            Value *falseValue() const override {
+                return this->factory.createVal(this->wrapped.getFalseValue());
+            }
     };
 
-    class ExtractElementIns: public WrappedInstructionClass<UnknownExpr, llvm::ExtractElementInst> {
+    template<typename Domain>
+    class ExtractElementIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractElementInst> {
     public:
-        explicit ExtractElementIns(UnitFactory &factory, const llvm::ExtractElementInst &eei);
+        explicit ExtractElementIns(UnitFactory &factory, const llvm::ExtractElementInst &eei)
+                : WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractElementInst>(eei, factory) {}
         ExtractElementIns(const ExtractElementIns&) = delete;
 
-        Value* result() const override;
-
-//        Value* operand(unsigned i) const override;
-//        unsigned numOperands() const override;
-    private:
-//        MemoryRegion *region;
-
-        //Value *getVectorOperand() const;
-
-        //Value *getIndexOperand() const;
-
-        //void accept(InstructionClassVisitor &v) const override;
+        Value* result() const override {
+            auto* insVar = this->factory.createVal(&this->wrapped);
+            return insVar;
+        }
     };
 
     //https://llvm.org/docs/LangRef.html#extractvalue-instruction
-    class ExtractValueIns: public WrappedInstructionClass<UnknownExpr, llvm::ExtractValueInst> {
+    template<typename Domain>
+    class ExtractValueIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractValueInst> {
     public:
-        explicit ExtractValueIns(UnitFactory &factory, const llvm::ExtractValueInst &evi);
+        explicit ExtractValueIns(UnitFactory &factory, const llvm::ExtractValueInst &evi)
+                : WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractValueInst>(evi, factory) {}
         ExtractValueIns(const ExtractValueIns&) = delete;
 
-        Value* result() const override;
-
-//        Value *getAggregateOperand() const;
-//
-//        std::list<unsigned> getIndices() const;
-
-        //void accept(InstructionClassVisitor &v) const override;
+        Value* result() const override {
+            auto* insVar = this->factory.createVal(&this->wrapped);
+            return insVar;
+        }
     };
 
-    class LoadIns: public WrappedInstructionClass<UnknownExpr, llvm::LoadInst> {
+    template<typename Domain>
+    class LoadIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::LoadInst> {
     public:
-        explicit LoadIns(UnitFactory &factory, const llvm::LoadInst&);
+        explicit LoadIns(UnitFactory &factory, const llvm::LoadInst &li): WrappedInstructionClass<UnknownExpr<Domain>, llvm::LoadInst>(li, factory) {}
         LoadIns(const LoadIns&) = delete;
 
-        Value* result() const override;
-
-//        Value *getPointerOperand() const;
-//
-//        Type *getPointerOperandType() const;
-//
-//        unsigned getSize() const;
-
-        //void accept(InstructionClassVisitor &v) const override;
+        Value* result() const override {
+            auto* insVar = this->factory.createVal(&this->wrapped);
+            return insVar;
+        }
     };
 
-    class InsertValueIns: public WrappedInstructionClass<UnknownExpr, llvm::InsertValueInst> {
+    template<typename Domain>
+    class InsertValueIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertValueInst> {
         public:
-            explicit InsertValueIns(UnitFactory &factory, const llvm::InsertValueInst &ivi);
+            explicit InsertValueIns(UnitFactory &factory, const llvm::InsertValueInst &ivi)
+                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertValueInst>(ivi, factory) {}
             InsertValueIns(const InsertValueIns&) = delete;
 
-            Value* result() const override;
-
-//            Value *getAggregateOperand() const;
-//
-//            Value *getInsertedValueOperand() const;
-//
-//            std::list<unsigned> getIndices() const;
-//
-//            MemoryRegion* getMemoryAddress() const override;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class InsertElementIns: public WrappedInstructionClass<UnknownExpr, llvm::InsertElementInst> {
+    template<typename Domain>
+    class InsertElementIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertElementInst> {
         public:
-            explicit InsertElementIns(UnitFactory &factory, const llvm::InsertElementInst &iei);
+            explicit InsertElementIns(UnitFactory &factory, const llvm::InsertElementInst &iei)
+                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertElementInst>(iei, factory) {}
             InsertElementIns(const InsertElementIns&) = delete;
 
-            Value* result() const override;
-
-//            Value *getVector() const;
-//
-//            Value *getInsertedElement() const;
-//
-//            Value *getIndex() const;
-//
-//            MemoryRegion* getMemoryAddress() const override;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class StoreIns: public WrappedInstructionClass<UnknownExpr, llvm::StoreInst> {
+    template<typename Domain>
+    class StoreIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::StoreInst> {
         public:
-            explicit StoreIns(UnitFactory &factory, const llvm::StoreInst &si);
+            explicit StoreIns(UnitFactory &factory, const llvm::StoreInst &si) : WrappedInstructionClass<UnknownExpr<Domain>, llvm::StoreInst>(si, factory) {}
             StoreIns(const StoreIns&) = delete;
 
-            Value* result() const override;
-
-//            Value *getPointerOperand() const;
-//
-//            Value *getValueOperand() const;
-//
-//            Type *getPointerOperandType() const;
-//
-//            unsigned getSize() const;
-//
-//            MemoryRegion* getMemoryAddress() const override;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class ShuffleVectorIns: public WrappedInstructionClass<UnknownExpr, llvm::ShuffleVectorInst> {
+    template<typename Domain>
+    class ShuffleVectorIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::ShuffleVectorInst> {
         public:
-            explicit ShuffleVectorIns(UnitFactory &factory, const llvm::ShuffleVectorInst &svi);
+            explicit ShuffleVectorIns(UnitFactory &factory, const llvm::ShuffleVectorInst &svi)
+                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::ShuffleVectorInst>(svi, factory) {}
             ShuffleVectorIns(const ShuffleVectorIns&) = delete;
 
-            Value* result() const override;
-
-            //MemoryRegion* getMemoryAddress() const override;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class AllocaIns: public WrappedInstructionClass<UnknownExpr, llvm::AllocaInst> {
+    template<typename Domain>
+    class AllocaIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::AllocaInst> {
     public:
-        explicit AllocaIns(UnitFactory &factory, const llvm::AllocaInst&);
+        explicit AllocaIns(UnitFactory &factory, const llvm::AllocaInst &ai): WrappedInstructionClass<UnknownExpr<Domain>, llvm::AllocaInst>(ai, factory) {}
         AllocaIns(const AllocaIns&) = delete;
 
-        Value* result() const override;
-
-//        Type *getAllocatedType() const;
-//
-//        MemoryRegion* getMemoryAddress() const override;
-
-        //void accept(InstructionClassVisitor &v) const override;
+        Value* result() const override {
+            auto* insVar = this->factory.createVal(&this->wrapped);
+            return insVar;
+        }
     };
 
-    class PHIIns: public WrappedInstructionClass<UnknownExpr, llvm::PHINode> {
+    template<typename Domain>
+    class PHIIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::PHINode> {
         public:
-            explicit PHIIns(UnitFactory &factory, const llvm::PHINode &phin);
+            explicit PHIIns(UnitFactory &factory, const llvm::PHINode &phin) : WrappedInstructionClass<UnknownExpr<Domain>, llvm::PHINode>(phin, factory) {}
             PHIIns(const PHIIns&) = delete;
 
-            Value* result() const override;
-
-//            unsigned getNumIncomingValues() const;
-//
-//            std::vector<Value *> getIncomingValues() const;
-//
-//            std::vector<Block *> getIncomingBlocks() const;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class GetElementPtrIns: public WrappedInstructionClass<UnknownExpr, llvm::GetElementPtrInst> {
+    template<typename Domain>
+    class GetElementPtrIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::GetElementPtrInst> {
         public:
-            explicit GetElementPtrIns(UnitFactory &factory, const llvm::GetElementPtrInst &gepi);
-            Value* result() const override;
+            explicit GetElementPtrIns(UnitFactory &factory, const llvm::GetElementPtrInst &gepi)
+                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::GetElementPtrInst>(gepi, factory) {}
 
-//            Value *getPointerOperand() const;
-//
-//            Type *getPointerOperandType() const;
-
-            //void accept(InstructionClassVisitor &v) const override;
+            Value* result() const override {
+                auto* insVar = this->factory.createVal(&this->wrapped);
+                return insVar;
+            }
     };
 
-    class FreezeIns: public WrappedInstructionClass<UnknownExpr, llvm::FreezeInst> {
+    template<typename Domain>
+    class FreezeIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::FreezeInst> {
     public:
-        explicit FreezeIns(UnitFactory &factory, const llvm::FreezeInst&);
+        explicit FreezeIns(UnitFactory &factory, const llvm::FreezeInst &fi): WrappedInstructionClass<UnknownExpr<Domain>, llvm::FreezeInst>(fi, factory) {}
         FreezeIns(const FreezeIns&) = delete;
 
-        Value* result() const override;
-
-        //void accept(InstructionClassVisitor &v) const override;
+        Value* result() const override {
+            auto* insVar = this->factory.createVal(&this->wrapped);
+            return insVar;
+        }
     };
 
 }

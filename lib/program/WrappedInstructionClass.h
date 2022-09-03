@@ -15,69 +15,41 @@
 #include <list>
 #include "InstructionClassVisitor.h"
 #include "Block.h"
+#include "Wrapped.h"
 
 namespace vanguard {
 
-    template<typename Derived, typename Wrapped> class WrappedInstructionClass : public Derived {
-        static_assert(std::is_base_of<llvm::Instruction, Wrapped>::value, "Wrapped must inherit from LLVM instruction.");
+    template<typename Derived, typename Wrap>
+    class WrappedInstructionClass : public Wrapped<Derived, Wrap> {
+        static_assert(std::is_base_of<llvm::Instruction, Wrap>::value, "Wrapped must inherit from LLVM instruction.");
         static_assert(std::is_base_of<vanguard::Universe::Instruction, Derived>::value, "Derived must inherit from Vanguard instruction.");
     public:
 
-        explicit WrappedInstructionClass(UnitFactory &factory, const Wrapped &inst): ins(inst), factory(factory) {}
+        template<typename ...Args>
+        explicit WrappedInstructionClass(Args&&... args) : Wrapped<Derived, Wrap>(std::forward<Args>(args)...) {};
 
         std::string name() const override {
-            return ins.getName().str();
+            return this->wrapped.getName().str();
         }
 
         Universe::Block* parent() const override {
-            return factory.createBlk(ins.getParent());
-        }
-
-        bool mayReadOrWriteToMemory() const override {
-            return ins.mayReadOrWriteMemory();
+            return this->factory.createBlk(this->wrapped.getParent());
         }
 
         bool willReturn() const override {
-            return ins.willReturn();
-        }
-
-        Universe::Instruction* getSuccessor() const override {
-            if (ins.isTerminator()){
-                return nullptr;
-            }
-            auto nextInst = ins.getNextNonDebugInstruction();
-            if (nextInst == nullptr){
-                return nullptr;
-            }
-            else{
-                return factory.createIns(nextInst);
-            }
-        }
-
-        std::list<Universe::Instruction*> getAllSuccessors() const override  {
-            std::list<Universe::Instruction *> allSuccessors = {};
-            if (ins.isTerminator()) {
-                int numSuccessors = ins.getNumSuccessors();
-                for (int i = 0; i < numSuccessors; i++) {
-                    allSuccessors.push_back(factory.createBlk(ins.getSuccessor(i))->instructions().front());
-                }
-                return allSuccessors;
-            }
-            else{
-                return allSuccessors;
-            }
+            return this->wrapped.willReturn();
         }
 
         Value* operand(unsigned i) const override {
-            return factory.createVal(ins.getOperand(i));
+            return this->factory.createVal(this->wrapped.getOperand(i));
         }
 
         unsigned numOperands() const override {
-            return ins.getNumOperands();
+            return this->wrapped.getNumOperands();
         }
 
-        const Wrapped &unwrap()  const override {
-            return ins;
+        const Wrap &unwrap()  const override {
+            return this->wrapped;
         }
 
         void accept(InstructionClassVisitor &v) const override {
@@ -89,10 +61,6 @@ namespace vanguard {
                 v.visit(*derived);
             }
         }
-
-    protected:
-        const Wrapped &ins;
-        UnitFactory &factory;
     };
 }
 

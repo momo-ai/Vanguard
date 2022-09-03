@@ -9,26 +9,22 @@
 #include "Value.h"
 
 namespace vanguard {
-    template<typename Base, typename Wrapped>
-    class WrappedValue : public Base {
+    template<typename Base, typename Wrap>
+    class WrappedValue : public Wrapped<Base, Wrap> {
     public:
         template<typename ...Args>
-        explicit WrappedValue(const Wrapped &w, Args&&... args) : wrapped(w), Base(std::forward<Args>(args)...) {};
+        explicit WrappedValue(Args&&... args) : Wrapped<Base, Wrap>(std::forward<Args>(args)...) {};
 
         Type* type() const override {
-            return this->factory.createType(wrapped.getType());
+            return this->factory.createType(this->wrapped.getType());
         }
-
-        Wrapped &unwrap() { return wrapped; }
-    protected:
-        const Wrapped &wrapped;
     };
 
-    template<typename Base, typename Wrapped>
-    class WrappedVariable : public WrappedValue<Base, Wrapped> {
+    template<typename Base, typename Wrap>
+    class WrappedVariable : public WrappedValue<Base, Wrap> {
     public:
         template<typename ...Args>
-        explicit WrappedVariable(Args&&... args) : WrappedValue<Base, Wrapped>(std::forward<Args>(args)...) {};
+        explicit WrappedVariable(Args&&... args) : WrappedValue<Base, Wrap>(std::forward<Args>(args)...) {};
 
         /*Type* type() const override {
             return WrappedValue<Base, Wrapped>::type();
@@ -43,11 +39,11 @@ namespace vanguard {
         }
     };
 
-    template<typename Base, typename Wrapped>
-    class WrappedConstant : public WrappedValue<Base, Wrapped> {
+    template<typename Base, typename Wrap>
+    class WrappedConstant : public WrappedValue<Base, Wrap> {
     public:
         template<typename ...Args>
-        explicit WrappedConstant(Args&&... args) : WrappedValue<Base, Wrapped>(std::forward<Args>(args)...) {};
+        explicit WrappedConstant(Args&&... args) : WrappedValue<Base, Wrap>(std::forward<Args>(args)...) {};
     };
 
     template<typename Base, typename Wrapped>
@@ -57,11 +53,11 @@ namespace vanguard {
         explicit WrappedLiteral(Args&&... args) : WrappedValue<Base, Wrapped>(std::forward<Args>(args)...) {};
     };
 
-    template<typename Base, typename Wrapped>
-    class WrappedPointer : public WrappedValue<Base, Wrapped> {
+    template<typename Base, typename Wrap>
+    class WrappedPointer : public WrappedValue<Base, Wrap> {
     public:
         template<typename ...Args>
-        explicit WrappedPointer(const Wrapped &base, const llvm::Value *offset, Args&&... args) : WrappedValue<Base, Wrapped>(base, std::forward<Args>(args)...) {};
+        explicit WrappedPointer(const Wrap &base, const llvm::Value *offset, Args&&... args) : WrappedValue<Base, Wrap>(base, std::forward<Args>(args)...) {};
 
         Value *base() const override {
             return this->factory.createVal(&this->wrapped);
@@ -78,18 +74,18 @@ namespace vanguard {
         const llvm::Value *ptrOffset;
     };
 
-    template<typename Base, typename Wrapped>
-    class WrappedMemoryRegion : public WrappedValue<Base, Wrapped> {
+    template<typename Base, typename Wrap>
+    class WrappedMemoryRegion : public WrappedValue<Base, Wrap> {
     public:
         template<typename ...Args>
-        explicit WrappedMemoryRegion(Args&&... args) : WrappedValue<Base, Wrapped>(std::forward<Args>(args)...) {};
+        explicit WrappedMemoryRegion(Args&&... args) : WrappedValue<Base, Wrap>(std::forward<Args>(args)...) {};
     };
 
-    template<typename Base, typename Wrapped>
-    class WrappedLocation : public WrappedValue<Base, Wrapped> {
+    template<typename Base, typename Wrap>
+    class WrappedLocation : public WrappedValue<Base, Wrap> {
     public:
         template<typename ...Args>
-        explicit WrappedLocation(Args&&... args) : WrappedValue<Base, Wrapped>(std::forward<Args>(args)...) {};
+        explicit WrappedLocation(Args&&... args) : WrappedValue<Base, Wrap>(std::forward<Args>(args)...) {};
 
         virtual Universe::Block &loc() const  {
             return *this->factory.createBlk(&(this->wrapped));

@@ -35,19 +35,19 @@ static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vangua
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
 
 template<typename Domain>
-void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::UniverseDetector<Domain> *detector, Domain &prog) {
+void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::UniverseDetector<Domain> *detector, Domain &universe) {
     auto requirements = detector->registerAnalyses();
     for(auto req : requirements) {
         req->fetch(mam, fam);
     }
 
     detector->startDetection();
-    detector->detect(prog);
+    detector->detect(universe);
     detector->report();
 }
 
 template<typename Domain>
-void runDetectors(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::DetectorRegistry &registry, const std::vector<std::string>& detectorNames, Domain &prog) {
+void runDetectors(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::DetectorRegistry &registry, const std::vector<std::string>& detectorNames, Domain &universe) {
     for(auto name : detectorNames) {
         auto detector = registry.get<Domain>(name);
         if(detector == nullptr) {
@@ -58,7 +58,7 @@ void runDetectors(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManage
     for(auto name : detectorNames) {
         auto detector = registry.get<Domain>(name);
         if(detector != nullptr) {
-            performDetection(mam, fam, detector, prog);
+            performDetection(mam, fam, detector, universe);
         }
     }
 }
@@ -176,8 +176,8 @@ int main(int argc, char **argv) {
         return llvm::None;
     };
 
+    std::unordered_map<llvm::Module *, std::string> filenames;
     std::vector<std::unique_ptr<llvm::Module>> modules;
-    //std::vector<vanguard::Blockchain<vanguard::Universe>::CompilationUnit *> units;
     for (auto inFile: inputFiles) {
         auto module = parseIRFile(inputFiles[0], Err, ctxt, setDataLayout);
         if (!module) {
@@ -185,8 +185,8 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        filenames[module.get()] = inFile;
         modules.push_back(move(module));
-        //units.push_back(dynamic_cast<vanguard::Blockchain<vanguard::Universe>::CompilationUnit *>(factory->createUnit(modules.back().get())));
         MPM.run(*module, MAM);
     }
 
@@ -197,13 +197,25 @@ int main(int argc, char **argv) {
 
     if(domain == vanguard::Detector::BASIC) {
         vanguard::LLVMFactory factory;
-        vanguard::Universe prog(factory, modules);
-        runDetectors<vanguard::Universe>(MAM, FAM, detectorRegistry, detectorNames, prog);
+        std::vector<vanguard::Universe::CompilationUnit *> units;
+        units.reserve(modules.size());
+for(auto &mod : modules) {
+            units.push_back(factory.createUnit(modules.back().get()));
+        }
+        vanguard::Universe universe(factory, units);
+        runDetectors<vanguard::Universe>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else if(domain == vanguard::Detector::BLOCKCHAIN) {
         vanguard::BlockchainFactory factory;
-        vanguard::Blockchain<vanguard::Universe> prog(factory, modules);
-        runDetectors<vanguard::Blockchain<vanguard::Universe>>(MAM, FAM, detectorRegistry, detectorNames, prog);
+        std::vector<vanguard::Universe::CompilationUnit *> units;
+        units.reserve(modules.size());
+        for(auto &mod : modules) {
+            std::string filename = filenames[mod.get()];
+            std::string summary = filename.substr(0, filename.length() - 2) + "json";
+            units.push_back(factory.createUnit(modules.back().get(), summary));
+        }
+        vanguard::Blockchain<vanguard::Universe> universe(factory, units);
+        runDetectors<vanguard::Blockchain<vanguard::Universe>>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else {
         throw std::runtime_error("Unknown domain");

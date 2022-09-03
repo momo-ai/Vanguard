@@ -42,7 +42,7 @@ namespace vanguard {
 
         class CompilationUnit {
         public:
-            explicit CompilationUnit(UnitFactory &factory, const llvm::Module& mod);
+            explicit CompilationUnit(UnitFactory &factory, const llvm::Module* mod);
             CompilationUnit(const CompilationUnit&) = delete;
             std::string name();
             std::string sourceFile();
@@ -50,65 +50,65 @@ namespace vanguard {
             Value* findGlobalVariable(std::string name);
             virtual std::list<Universe::Function *> functions();
             virtual std::list<Value*> globalVariables();
-            const llvm::Module& unwrap();
+            const llvm::Module* unwrap();
         protected:
             UnitFactory &factory;
         private:
-            const llvm::Module& module;
+            const llvm::Module* module;
         };
 
         class Function {
         public:
-            explicit Function(UnitFactory &factory, const llvm::Function &func);
+            explicit Function(UnitFactory &factory, const llvm::Function *func);
             Function(const Function&) = delete;
-            std::string name();
-            virtual std::list<Variable*> params();
-            virtual Type* returnType();
-            bool hasBody();
-            Block* body();
-            virtual std::list<Instruction*> instructions();
-            virtual std::list<Block *> blocks();
-            const llvm::Function &unwrap();
+            virtual std::string name() const;
+            virtual std::vector<Variable*> params() const;
+            virtual Type* returnType() const;
+            virtual bool hasBody() const;
+            virtual Block* body() const;
+            virtual std::vector<Instruction*> instructions() const;
+            virtual std::vector<Block *> blocks() const;
+            const llvm::Function *unwrap();
         protected:
-            const llvm::Function &function;
+            const llvm::Function *function;
             UnitFactory &factory;
         };
 
         class Block {
         public:
-            explicit Block(UnitFactory &factory, const llvm::BasicBlock &block);
+            explicit Block(UnitFactory &factory, const llvm::BasicBlock *block);
             Block(const Block&) = delete;
             std::string name();
             Function* parent();
             std::list<Instruction *> instructions();
             bool isEntry();
             std::unordered_set<Block *> successors();
-            const llvm::BasicBlock& unwrap();
+            const llvm::BasicBlock* unwrap();
         protected:
-            const llvm::BasicBlock& block;
+            const llvm::BasicBlock* block;
             UnitFactory &factory;
         };
 
         class Instruction {
         public:
+            explicit Instruction(UnitFactory &factory) : factory(factory) {};
             static inline bool classof(const Instruction &) { return true; }
             static inline bool classof(const Instruction *) { return true; }
 
             virtual InstructionClassEnum instructionClass() const = 0;
             virtual std::string name() const = 0;
             virtual Block* parent() const = 0;
-            virtual bool mayReadOrWriteToMemory() const = 0;
             virtual bool willReturn() const = 0;
-            virtual Instruction * getSuccessor() const = 0;
-            virtual std::list<Universe::Instruction*> getAllSuccessors() const = 0;
             virtual Value* operand(unsigned i) const = 0;
             virtual unsigned numOperands() const = 0;
             virtual const llvm::Instruction &unwrap() const = 0;
             virtual void accept(InstructionClassVisitor &v) const = 0;
+        protected:
+            UnitFactory &factory;
         };
 
-        explicit Universe(UnitFactory &factory, const std::vector<std::unique_ptr<llvm::Module>>& modules);
-        const std::vector<CompilationUnit *> &units();
+        explicit Universe(UnitFactory &factory, std::vector<CompilationUnit *>  units);
+        const std::vector<CompilationUnit *> &units() const;
 
     private:
         std::vector<CompilationUnit *> programUnits;

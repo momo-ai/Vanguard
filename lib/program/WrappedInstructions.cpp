@@ -14,10 +14,10 @@ namespace vanguard{
     };
 
     // Binary Operator
-    BinaryIns::BinaryIns(UnitFactory &factory, const llvm::BinaryOperator &bop) : WrappedInstructionClass<BinaryOpExpr, llvm::BinaryOperator>(factory, bop) {}
+    BinaryIns::BinaryIns(UnitFactory &factory, const llvm::BinaryOperator &bop) : WrappedInstructionClass<BinaryOpExpr, llvm::BinaryOperator>(bop, factory) {}
 
     BinOp BinaryIns::op() const {
-        unsigned opcode = ins.getOpcode();
+        unsigned opcode = this->wrapped.getOpcode();
         BinOp binaryOpClass;
         if (opcode == 13 || opcode == 14) binaryOpClass = Add;
         else if(opcode == 15 || opcode == 16) binaryOpClass = Sub;
@@ -30,57 +30,57 @@ namespace vanguard{
         else if (opcode == 29) binaryOpClass = Or;
         else if (opcode == 30) binaryOpClass = Xor;
         else{
-            throw std::runtime_error("The opcode "+ std::string(ins.getOpcodeName()) + " is not a binary operator class in vanguard.");
+            throw std::runtime_error("The opcode "+ std::string(this->wrapped.getOpcodeName()) + " is not a binary operator class in vanguard.");
         }
         return binaryOpClass;
     }
 
     Value* BinaryIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
 
     //Compare Instruction
-    CmpIns::CmpIns(UnitFactory &factory, const llvm::CmpInst &cmpinst) : WrappedInstructionClass<BinaryOpExpr, llvm::CmpInst>(factory, cmpinst) {}
+    CmpIns::CmpIns(UnitFactory &factory, const llvm::CmpInst &cmpinst) : WrappedInstructionClass<BinaryOpExpr, llvm::CmpInst>(cmpinst, factory) {}
 
     BinOp CmpIns::op() const{
-        unsigned opcode = ins.getOpcode();
+        unsigned opcode = this->wrapped.getOpcode();
         BinOp binaryOpClass;
         if (opcode == 53 || opcode == 54) binaryOpClass = IFCmpInst;
         else {
-            throw std::runtime_error("The opcode "+ std::string(ins.getOpcodeName()) + " is not a cmp operator class in vanguard.");
+            throw std::runtime_error("The opcode "+ std::string(this->wrapped.getOpcodeName()) + " is not a cmp operator class in vanguard.");
         }
         return  binaryOpClass;
     }
 
     Value* CmpIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     //Branch Inst
-    BranchIns::BranchIns(UnitFactory &factory, const llvm::BranchInst &brInst) : WrappedInstructionClass<Branch, llvm::BranchInst>(factory, brInst) {}
+    BranchIns::BranchIns(UnitFactory &factory, const llvm::BranchInst &brInst) : WrappedInstructionClass<Branch, llvm::BranchInst>(brInst, factory) {}
 
     bool BranchIns::isConditional() const{
-        return ins.isConditional();
+        return this->wrapped.isConditional();
     }
 
     Value* BranchIns::condition() const{
-        return factory.createVal(ins.getCondition());
+        return factory.createVal(this->wrapped.getCondition());
     }
 
     std::list<Universe::Block*> BranchIns::targets() const{
         std::list<Universe::Block*> successors = {};
-        unsigned int n = ins.getNumSuccessors();
+        unsigned int n = this->wrapped.getNumSuccessors();
         for(unsigned int i = 0; i < n; i++){
-            successors.push_back(factory.createBlk(ins.getSuccessor(i)));
+            successors.push_back(factory.createBlk(this->wrapped.getSuccessor(i)));
         }
         return successors;
     }
 
     //Indirect Branch Instruction
-    IndirectBrIns::IndirectBrIns(UnitFactory &factory, const llvm::IndirectBrInst &ibrInst) : WrappedInstructionClass<Branch, llvm::IndirectBrInst>(factory, ibrInst) {}
+    IndirectBrIns::IndirectBrIns(UnitFactory &factory, const llvm::IndirectBrInst &ibrInst) : WrappedInstructionClass<Branch, llvm::IndirectBrInst>(ibrInst, factory) {}
 
     bool IndirectBrIns::isConditional() const {
         return false;
@@ -92,86 +92,86 @@ namespace vanguard{
 
     std::list<Universe::Block*> IndirectBrIns::targets() const{
         std::list<Universe::Block*> successors = {};
-        unsigned int n = ins.getNumSuccessors();
+        unsigned int n = this->wrapped.getNumSuccessors();
         for(unsigned int i = 0; i < n; i++){
-            successors.push_back(factory.createBlk(ins.getSuccessor(i)));
+            successors.push_back(factory.createBlk(this->wrapped.getSuccessor(i)));
         }
         return successors;
     }
 
     //Switch Instruction
-    SwitchIns::SwitchIns(UnitFactory &factory, const llvm::SwitchInst &swInst) : WrappedInstructionClass<Branch, llvm::SwitchInst>(factory, swInst) {}
+    SwitchIns::SwitchIns(UnitFactory &factory, const llvm::SwitchInst &swInst) : WrappedInstructionClass<Branch, llvm::SwitchInst>(swInst, factory) {}
 
     bool SwitchIns::isConditional() const {
         return true;
     }
 
     Value* SwitchIns::condition() const{
-        return factory.createVal(ins.getCondition());
+        return factory.createVal(this->wrapped.getCondition());
     }
 
     std::list<Universe::Block*> SwitchIns::targets() const{
         std::list<Universe::Block*> successors = {};
-        unsigned int n = ins.getNumSuccessors();
+        unsigned int n = this->wrapped.getNumSuccessors();
         for(unsigned int i = 0; i < n; i++){
-            successors.push_back(factory.createBlk(ins.getSuccessor(i)));
+            successors.push_back(factory.createBlk(this->wrapped.getSuccessor(i)));
         }
         return successors;
     }
 
     //Unary Operator
-    UnaryIns::UnaryIns(UnitFactory &factory, const llvm::UnaryOperator &uop) : WrappedInstructionClass<UnaryOpExpr, llvm::UnaryOperator>(factory, uop) {}
+    UnaryIns::UnaryIns(UnitFactory &factory, const llvm::UnaryOperator &uop) : WrappedInstructionClass<UnaryOpExpr, llvm::UnaryOperator>(uop, factory) {}
 
     Value* UnaryIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     UnOp UnaryIns::op() const{
-        unsigned opcode = ins.getOpcode();
+        unsigned opcode = this->wrapped.getOpcode();
         UnOp unaryOpClass;
         if (opcode == 12) unaryOpClass = Neg;
         else{
-            throw std::runtime_error("The opcode "+ std::string(ins.getOpcodeName())+ " is not a unary operator class in Vanguard.");
+            throw std::runtime_error("The opcode "+ std::string(this->wrapped.getOpcodeName())+ " is not a unary operator class in Vanguard.");
         }
         return unaryOpClass;
     }
 
     Value* UnaryIns::operand() const{
-        return factory.createVal(ins.getOperand(0));
+        return factory.createVal(this->wrapped.getOperand(0));
     }
 
     //Cast Instruction
-    CastIns::CastIns(UnitFactory &factory, const llvm::CastInst &ci): WrappedInstructionClass<CastExpr, llvm::CastInst>(factory, ci) {}
+    CastIns::CastIns(UnitFactory &factory, const llvm::CastInst &ci): WrappedInstructionClass<CastExpr, llvm::CastInst>(ci, factory) {}
 
     Value* CastIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     Type *CastIns::castTo() const {
-        return factory.createType(ins.getDestTy());
+        return factory.createType(this->wrapped.getDestTy());
     }
 
     //Call
-    CallIns::CallIns(UnitFactory &factory, const llvm::CallBase &cb) : WrappedInstructionClass<CallExpr, llvm::CallBase>(factory, cb) {}
+    CallIns::CallIns(UnitFactory &factory, const llvm::CallBase &cb) : WrappedInstructionClass<CallExpr, llvm::CallBase>(cb, factory) {}
 
     Value* CallIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     bool CallIns::hasReturn() const {
-        return !ins.doesNotReturn();
+        return !this->wrapped.doesNotReturn();
     }
 
     Universe::Function* CallIns::target() const{
-        return factory.createFn(ins.getCalledFunction());
+        return factory.createFn(this->wrapped.getCalledFunction());
     }
 
     std::list<Value*> CallIns::args() const{
         std::list<Value*> args = {};
-        for(auto itr = ins.arg_begin(); itr != ins.arg_end(); itr++){
+        for(auto itr = this->wrapped.arg_begin(); itr != this->wrapped.arg_end(); itr++){
             args.push_back(factory.createVal(*itr));
         }
         return args;
@@ -179,49 +179,49 @@ namespace vanguard{
 
     //Unreachable Instruction
     UnreachableIns::UnreachableIns(UnitFactory &factory, const llvm::UnreachableInst &ui)
-            : WrappedInstructionClass<Error, llvm::UnreachableInst>(factory, ui) {}
+            : WrappedInstructionClass<Error, llvm::UnreachableInst>(ui, factory) {}
 
     std::string UnreachableIns::msg() const{
         return "This instruction is unreachable.";
     }
 
     //Return Inst
-    ReturnIns::ReturnIns(UnitFactory &factory, const llvm::ReturnInst &retInst) : WrappedInstructionClass<Return, llvm::ReturnInst>(factory, retInst) {}
+    ReturnIns::ReturnIns(UnitFactory &factory, const llvm::ReturnInst &retInst) : WrappedInstructionClass<Return, llvm::ReturnInst>(retInst, factory) {}
 
     bool ReturnIns::returnsValue() const{
-        return ins.getReturnValue() != nullptr;
+        return this->wrapped.getReturnValue() != nullptr;
     }
 
     Value* ReturnIns::value() const{
-        return factory.createVal(ins.getReturnValue());
+        return factory.createVal(this->wrapped.getReturnValue());
     }
 
     //Select Inst
-    SelectIns::SelectIns(UnitFactory &factory, const llvm::SelectInst &si) : WrappedInstructionClass<TernaryExpr, llvm::SelectInst>(factory, si) {}
+    SelectIns::SelectIns(UnitFactory &factory, const llvm::SelectInst &si) : WrappedInstructionClass<TernaryExpr, llvm::SelectInst>(si, factory) {}
 
     Value* SelectIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     Value *SelectIns::condition() const{
-        return factory.createVal(ins.getCondition());
+        return factory.createVal(this->wrapped.getCondition());
     }
 
     Value *SelectIns::trueValue() const {
-        return factory.createVal(ins.getTrueValue());
+        return factory.createVal(this->wrapped.getTrueValue());
     }
 
     Value *SelectIns::falseValue() const {
-        return factory.createVal(ins.getFalseValue());
+        return factory.createVal(this->wrapped.getFalseValue());
     }
 
     //Extract Element Inst
     ExtractElementIns::ExtractElementIns(UnitFactory &factory, const llvm::ExtractElementInst &eei)
-            : WrappedInstructionClass<UnknownExpr, llvm::ExtractElementInst>(factory, eei) {}
+            : WrappedInstructionClass<UnknownExpr, llvm::ExtractElementInst>(eei, factory) {}
 
     Value* ExtractElementIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -237,10 +237,10 @@ namespace vanguard{
 
     //Extract Value Inst
     ExtractValueIns::ExtractValueIns(UnitFactory &factory, const llvm::ExtractValueInst &evi)
-            : WrappedInstructionClass<UnknownExpr, llvm::ExtractValueInst>(factory, evi) {}
+            : WrappedInstructionClass<UnknownExpr, llvm::ExtractValueInst>(evi, factory) {}
 
     Value* ExtractValueIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -259,10 +259,10 @@ namespace vanguard{
     }*/
 
     //Load Instruction
-    LoadIns::LoadIns(UnitFactory &factory, const llvm::LoadInst &li): WrappedInstructionClass<UnknownExpr, llvm::LoadInst>(factory, li) {}
+    LoadIns::LoadIns(UnitFactory &factory, const llvm::LoadInst &li): WrappedInstructionClass<UnknownExpr, llvm::LoadInst>(li, factory) {}
 
     Value* LoadIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -282,10 +282,10 @@ namespace vanguard{
 
     //Insert Value Inst
     InsertValueIns::InsertValueIns(UnitFactory &factory, const llvm::InsertValueInst &ivi)
-            : WrappedInstructionClass<UnknownExpr, llvm::InsertValueInst>(factory, ivi) {}
+            : WrappedInstructionClass<UnknownExpr, llvm::InsertValueInst>(ivi, factory) {}
 
     Value* InsertValueIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -314,10 +314,10 @@ namespace vanguard{
 
     //Insert Element Inst
     InsertElementIns::InsertElementIns(UnitFactory &factory, const llvm::InsertElementInst &iei)
-            : WrappedInstructionClass<UnknownExpr, llvm::InsertElementInst>(factory, iei) {}
+            : WrappedInstructionClass<UnknownExpr, llvm::InsertElementInst>(iei, factory) {}
 
     Value* InsertElementIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -342,10 +342,10 @@ namespace vanguard{
     }*/
 
     //Store Inst
-    StoreIns::StoreIns(UnitFactory &factory, const llvm::StoreInst &si) : WrappedInstructionClass<UnknownExpr, llvm::StoreInst>(factory, si) {}
+    StoreIns::StoreIns(UnitFactory &factory, const llvm::StoreInst &si) : WrappedInstructionClass<UnknownExpr, llvm::StoreInst>(si, factory) {}
 
     Value* StoreIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -375,7 +375,7 @@ namespace vanguard{
 
     //Shuffule Vector Inst
     ShuffleVectorIns::ShuffleVectorIns(UnitFactory &factory, const llvm::ShuffleVectorInst &svi)
-            : WrappedInstructionClass<UnknownExpr, llvm::ShuffleVectorInst>(factory, svi) {}
+            : WrappedInstructionClass<UnknownExpr, llvm::ShuffleVectorInst>(svi, factory) {}
 
     /*MemoryRegion* ShuffleVectorIns::getMemoryAddress() const{
         auto* memAd = new MemoryRegion(ins.operand(2), sizeof(ins.operand(2)));
@@ -383,12 +383,12 @@ namespace vanguard{
     }*/
 
     Value* ShuffleVectorIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     //Alloca Instruction
-    AllocaIns::AllocaIns(UnitFactory &factory, const llvm::AllocaInst &ai): WrappedInstructionClass<UnknownExpr, llvm::AllocaInst>(factory, ai) {}
+    AllocaIns::AllocaIns(UnitFactory &factory, const llvm::AllocaInst &ai): WrappedInstructionClass<UnknownExpr, llvm::AllocaInst>(ai, factory) {}
 
     /*Type *AllocaIns::getAllocatedType() const{
         LLVMtoVanguard &llvmToVanguard = LLVMtoVanguard::getInstance();
@@ -401,15 +401,15 @@ namespace vanguard{
     }*/
 
     Value* AllocaIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
     //PHI Node
-    PHIIns::PHIIns(UnitFactory &factory, const llvm::PHINode &phin) : WrappedInstructionClass<UnknownExpr, llvm::PHINode>(factory, phin) {}
+    PHIIns::PHIIns(UnitFactory &factory, const llvm::PHINode &phin) : WrappedInstructionClass<UnknownExpr, llvm::PHINode>(phin, factory) {}
 
     Value* PHIIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -439,10 +439,10 @@ namespace vanguard{
 
     //Get element pointer
     GetElementPtrIns::GetElementPtrIns(UnitFactory &factory, const llvm::GetElementPtrInst &gepi)
-            : WrappedInstructionClass<UnknownExpr, llvm::GetElementPtrInst>(factory, gepi) {}
+            : WrappedInstructionClass<UnknownExpr, llvm::GetElementPtrInst>(gepi, factory) {}
 
     Value* GetElementPtrIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 
@@ -457,10 +457,10 @@ namespace vanguard{
     }*/
 
     //Freeze Instruction
-    FreezeIns::FreezeIns(UnitFactory &factory, const llvm::FreezeInst &fi): WrappedInstructionClass<UnknownExpr, llvm::FreezeInst>(factory, fi) {}
+    FreezeIns::FreezeIns(UnitFactory &factory, const llvm::FreezeInst &fi): WrappedInstructionClass<UnknownExpr, llvm::FreezeInst>(fi, factory) {}
 
     Value* FreezeIns::result() const{
-        auto* insVar = factory.createVal(&ins);
+        auto* insVar = factory.createVal(&this->wrapped);
         return insVar;
     }
 }

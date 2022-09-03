@@ -3,19 +3,19 @@
 
 namespace vanguard{
 
-    Universe::CompilationUnit::CompilationUnit(UnitFactory &factory, const llvm::Module& mod): factory(factory), module(mod){}
+    Universe::CompilationUnit::CompilationUnit(UnitFactory &factory, const llvm::Module* mod): factory(factory), module(mod){}
 
     std::string Universe::CompilationUnit::name(){
-        return module.getModuleIdentifier();
+        return module->getModuleIdentifier();
     }
 
     std::string Universe::CompilationUnit::sourceFile(){
-        return module.getSourceFileName();
+        return module->getSourceFileName();
     }
 
     Universe::Function* Universe::CompilationUnit::findFunction(std::string name){
         //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        auto function = module.getFunction(llvm::StringRef(name));
+        auto function = module->getFunction(llvm::StringRef(name));
         if (function == nullptr) {
             return nullptr;
         }
@@ -24,7 +24,7 @@ namespace vanguard{
 
     Value* Universe::CompilationUnit::findGlobalVariable(std::string name){
         //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        auto globalVariable = module.getGlobalVariable(llvm::StringRef(name), true);
+        auto globalVariable = module->getGlobalVariable(llvm::StringRef(name), true);
         if (globalVariable == nullptr){
             return nullptr;
         }
@@ -34,7 +34,7 @@ namespace vanguard{
     std::list<Universe::Function*> Universe::CompilationUnit::functions(){
         //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Function*> allFunctions = {};
-        for(auto &F: module){
+        for(auto &F: *module){
             allFunctions.push_back(factory.createFn(&F));
         }
         return allFunctions;
@@ -43,13 +43,13 @@ namespace vanguard{
     std::list<Value*> Universe::CompilationUnit::globalVariables(){
         //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Value*> allGlobalVariables = {};
-        for (auto gv= module.global_begin(); gv != module.global_end(); gv++){
+        for (auto gv= module->global_begin(); gv != module->global_end(); gv++){
             allGlobalVariables.push_back(factory.createVal(&*gv));
         }
         return allGlobalVariables;
     }
 
-    const llvm::Module& Universe::CompilationUnit::unwrap() {
+    const llvm::Module* Universe::CompilationUnit::unwrap() {
         return module;
     }
 

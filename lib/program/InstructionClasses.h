@@ -69,12 +69,15 @@ namespace vanguard {
     };*/
 
     // Branch Instruction
-    class Branch : public Universe::Instruction {
+    template<typename Domain>
+    class Branch : public Domain::Instruction {
     public:
+        explicit Branch(UnitFactory &factory) : Domain::Instruction(factory) {};
+
         static inline bool classof(const Branch &) { return true; }
         static inline bool classof(const Branch *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == BRANCH){ return true; }
             return false;
         }
@@ -89,12 +92,14 @@ namespace vanguard {
     };
 
     //Return Instruction
-    class Return : public Universe::Instruction {
+    template<typename Domain>
+    class Return : public Domain::Instruction {
     public:
+        explicit Return(UnitFactory &factory) : Domain::Instruction(factory) {};
         static inline bool classof(const Return &) { return true; }
         static inline bool classof(const Return *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == RETURN){ return true; }
             return false;
         }
@@ -107,12 +112,14 @@ namespace vanguard {
         }
     };
 
-    class Error : public Universe::Instruction {
+    template<typename Domain>
+    class Error : public Domain::Instruction {
     public:
+        explicit Error(UnitFactory &factory) : Domain::Instruction(factory) {};
         static inline bool classof(const Error &) { return true; }
         static inline bool classof(const Error *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == ERROR){ return true; }
             return false;
         }
@@ -124,12 +131,14 @@ namespace vanguard {
         }
     };
 
-    class Expression : public Universe::Instruction {
+    template<typename Domain>
+    class Expression : public Domain::Instruction {
     public:
+        explicit Expression(UnitFactory &factory) : Domain::Instruction(factory) {};
         static inline bool classof(const Expression &) { return true; }
         static inline bool classof(const Expression *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() >= EXPRESSION_BEGIN && inst.instructionClass() <= EXPRESSION_END){ return true; }
             return false;
         }
@@ -138,12 +147,14 @@ namespace vanguard {
     };
 
     // Assign Instruction
-    class Assignment : public Expression {
+    template<typename Domain>
+    class Assignment : public Expression<Domain> {
     public:
+        explicit Assignment(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const Assignment &) { return true; }
         static inline bool classof(const Assignment *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == ASSIGNMENT){ return true; }
             return false;
         }
@@ -154,12 +165,14 @@ namespace vanguard {
     };
 
     //BinaryOpInstruction
-    class BinaryOpExpr : public Expression {
+    template<typename Domain>
+    class BinaryOpExpr : public Expression<Domain> {
     public:
+        explicit BinaryOpExpr(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const BinaryOpExpr &) { return true; }
         static inline bool classof(const BinaryOpExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == BIN_OP){ return true; }
             return false;
         }
@@ -171,12 +184,14 @@ namespace vanguard {
     };
 
     //Unary Operation Instruction
-    class  UnaryOpExpr : public Expression {
+    template<typename Domain>
+    class  UnaryOpExpr : public Expression<Domain> {
     public:
+        explicit UnaryOpExpr(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const UnaryOpExpr &) { return true; }
         static inline bool classof(const UnaryOpExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == UN_OP){ return true; }
             return false;
         }
@@ -189,12 +204,14 @@ namespace vanguard {
         }
     };
 
-    class CallExpr : public Expression {
+    template<typename Domain>
+    class CallExpr : public Expression<Domain> {
     public:
+        explicit CallExpr(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const CallExpr &) { return true; }
         static inline bool classof(const CallExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == CALL){ return true; }
             return false;
         }
@@ -208,12 +225,14 @@ namespace vanguard {
         }
     };
 
-    class CastExpr : public Expression {
+    template<typename Domain>
+    class CastExpr : public Expression<Domain> {
     public:
+        explicit CastExpr(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const CastExpr &) { return true; }
         static inline bool classof(const CastExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == CAST){ return true; }
             return false;
         }
@@ -225,12 +244,14 @@ namespace vanguard {
         }
     };
 
-    class TernaryExpr : public Expression {
+    template<typename Domain>
+    class TernaryExpr : public Expression<Domain> {
     public:
+        explicit TernaryExpr(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const TernaryExpr &) { return true; }
         static inline bool classof(const TernaryExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == TERNARY){ return true; }
             return false;
         }
@@ -244,12 +265,14 @@ namespace vanguard {
         }
     };
 
-    class UnknownExpr : public Expression {
+    template<typename Domain>
+    class UnknownExpr : public Expression<Domain> {
     public:
+        explicit UnknownExpr(UnitFactory &factory) : Expression<Domain>(factory) {};
         static inline bool classof(const UnknownExpr &) { return true; }
         static inline bool classof(const UnknownExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const typename Domain::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Domain::Instruction &inst) {
             if (inst.instructionClass() == UNKNOWN){ return true; }
             return false;
         }
