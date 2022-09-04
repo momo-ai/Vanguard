@@ -19,7 +19,7 @@
 
 namespace vanguard {
 
-    template<typename Derived, typename Wrap>
+    template<typename Derived, typename Domain, typename Wrap>
     class WrappedInstructionClass : public Wrapped<Derived, Wrap> {
         static_assert(std::is_base_of<llvm::Instruction, Wrap>::value, "Wrapped must inherit from LLVM instruction.");
         static_assert(std::is_base_of<vanguard::Universe::Instruction, Derived>::value, "Derived must inherit from Vanguard instruction.");
@@ -52,7 +52,7 @@ namespace vanguard {
             return this->wrapped;
         }
 
-        void accept(InstructionClassVisitor &v) const override {
+        void accept(InstructionClassVisitor<Domain> &v) const override {
             auto derived = llvm::dyn_cast<Derived>(this);
             if(derived == nullptr) {
                 throw std::runtime_error("Unable to cast");

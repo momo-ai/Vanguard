@@ -9,10 +9,10 @@
 
 namespace vanguard {
     template<class Domain>
-    class HelperFunction : public Blockchain<Domain>::Function {
+    class HelperFunction : public Domain::Function {
     public:
         template<typename ...Args>
-        explicit HelperFunction(Args&&... args) : Blockchain<Domain>::Function(std::forward<Args>(args)...) {};
+        explicit HelperFunction(Args&&... args) : Domain::Function(std::forward<Args>(args)...) {};
 
         bool isHelper() const override {
             return true;

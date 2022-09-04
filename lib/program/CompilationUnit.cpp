@@ -13,7 +13,7 @@ namespace vanguard{
         return module->getSourceFileName();
     }
 
-    Universe::Function* Universe::CompilationUnit::findFunction(std::string name){
+    Universe::Function* Universe::CompilationUnit::findFn(std::string name){
         //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         auto function = module->getFunction(llvm::StringRef(name));
         if (function == nullptr) {
@@ -31,7 +31,7 @@ namespace vanguard{
         return factory.createVal(globalVariable);
     }
 
-    std::list<Universe::Function*> Universe::CompilationUnit::functions(){
+    std::list<Universe::Function*> Universe::CompilationUnit::fns(){
         //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         std::list<Function*> allFunctions = {};
         for(auto &F: *module){

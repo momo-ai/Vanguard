@@ -9,6 +9,7 @@
 #include "domain/libBlockchain/Blockchain.h"
 //#include "Reentrancy/ReentrancyDetector.h"
 #include <llvm/Support/CommandLine.h>
+#include <program/Top.h>
 
 /* This is how you can add additional detectors from external sources. Essentially add them in at compile time and
  * then in a cpp file, implement the addToRegistry function.
@@ -28,15 +29,15 @@ namespace vanguard {
     DetectorRegistry *DetectorRegistry::instance = nullptr;
 
     template<>
-    UniverseDetector<Universe> *DetectorRegistry::get(const std::string& name) {
+    UniverseDetector<Top<Universe>> *DetectorRegistry::get(const std::string& name) {
         if(name == FunctionPrinter<Universe>::name()) {
-            return new FunctionPrinter<Universe>();
+            return new FunctionPrinter<Top<Universe>>();
         }
         else if(name == StatGen<Universe>::name()) {
-            return new StatGen<Universe>();
+            return new StatGen<Top<Universe>>();
         }
         else if(name == IRValidator<Universe>::name()) {
-            return new IRValidator<Universe>();
+            return new IRValidator<Top<Universe>>();
         }
         /*else if(name == ReentrancyDetector<Domain>::name()) {
             return new ReentrancyDetector<Domain>();
@@ -46,18 +47,18 @@ namespace vanguard {
     };
 
     template<>
-    UniverseDetector<Blockchain<Universe>> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
+    UniverseDetector<Top<Blockchain<Universe>>> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
         if(name == FunctionPrinter<Blockchain<Universe>>::name()) {
-            return new FunctionPrinter<Blockchain<Universe>>();
+            return new FunctionPrinter<Top<Blockchain<Universe>>>();
         }
         else if(name == StatGen<Blockchain<Universe>>::name()) {
-            return new StatGen<Blockchain<Universe>>();
+            return new StatGen<Top<Blockchain<Universe>>>();
         }
         else if(name == IRValidator<Blockchain<Universe>>::name()) {
-            return new IRValidator<Blockchain<Universe>>();
+            return new IRValidator<Top<Blockchain<Universe>>>();
         }
         else if(name == ReentrancyDetector<Blockchain<Universe>>::name()) {
-            return new ReentrancyDetector<Blockchain<Universe>>();
+            return new ReentrancyDetector<Top<Blockchain<Universe>>>();
         }
 
         return nullptr;

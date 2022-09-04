@@ -50,7 +50,7 @@ namespace vanguard {
         return trans.result;
     }
 
-    bool SolangModel::isImplementation(std::string contract, const BlkFunction<Universe> &blockchainFn, const llvm::Function &llvmFn) const {
+    bool SolangModel::isImplementation(std::string contract, const BlkFunction<Top<Blockchain<Universe>>> &blockchainFn, const llvm::Function &llvmFn) const {
         if(!llvmFn.hasName()) {
             return false;
         }

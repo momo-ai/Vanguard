@@ -4,6 +4,7 @@
 #include "Value.h"
 #include <program/WrappedValue.h>
 #include <program/WrappedType.h>
+#include "Top.h"
 
 namespace vanguard{
 
@@ -16,7 +17,7 @@ namespace vanguard{
         }
 
         if(moduleMap.find(module) == moduleMap.end()){
-            moduleMap[module] = new Universe::CompilationUnit(*this, module);
+            moduleMap[module] = new Top<Universe>::CompilationUnit(*this, module);
         }
         return moduleMap[module];
     }
@@ -27,7 +28,7 @@ namespace vanguard{
         }
 
         if(functionMap.find(fn) == functionMap.end()) {
-            functionMap[fn] = new Universe::Function(*this, fn);
+            functionMap[fn] = new Top<Universe>::Function(*this, fn);
         }
         return functionMap[fn];
     }
@@ -39,28 +40,28 @@ namespace vanguard{
 
         if (instructionMap.find(ins) == instructionMap.end()) {
             unsigned opcode = ins->getOpcode();
-            if (opcode == 1) instructionMap[ins] = new ReturnIns<Universe>(*this,*llvm::dyn_cast<llvm::ReturnInst>(ins));
-            else if (opcode == 2) instructionMap[ins] = new BranchIns<Universe>(*this,*llvm::dyn_cast<llvm::BranchInst>(ins));
-            else if (opcode == 3)  instructionMap[ins] = new SwitchIns<Universe>(*this,*llvm::dyn_cast<llvm::SwitchInst>(ins));
-            else if (opcode == 4) instructionMap[ins] = new IndirectBrIns<Universe>(*this,*llvm::dyn_cast<llvm::IndirectBrInst>(ins));
-            else if (opcode == 7) instructionMap[ins] = new UnreachableIns<Universe>(*this,*llvm::dyn_cast<llvm::UnreachableInst>(ins));
-            else if (opcode == 12) instructionMap[ins] = new UnaryIns<Universe>(*this,*llvm::dyn_cast<llvm::UnaryOperator>(ins));
-            else if (opcode >= 13 && opcode <= 30) instructionMap[ins] = new BinaryIns<Universe>(*this,*llvm::dyn_cast<llvm::BinaryOperator>(ins));
-            else if (opcode == 31) instructionMap[ins] = new AllocaIns<Universe>(*this,*llvm::dyn_cast<llvm::AllocaInst>(ins));
-            else if (opcode == 32) instructionMap[ins] = new LoadIns<Universe>(*this,*llvm::dyn_cast<llvm::LoadInst>(ins));
-            else if (opcode == 33)  instructionMap[ins] = new StoreIns<Universe>(*this,*llvm::dyn_cast<llvm::StoreInst>(ins));
-            else if (opcode == 34) instructionMap[ins] = new GetElementPtrIns<Universe>(*this,*llvm::dyn_cast<llvm::GetElementPtrInst>(ins));
-            else if (opcode >= 38 && opcode <= 50) instructionMap[ins] = new CastIns<Universe>(*this,*llvm::dyn_cast<llvm::CastInst>(ins));
-            else if (opcode == 53 || opcode == 54) instructionMap[ins] = new CmpIns<Universe>(*this,*llvm::dyn_cast<llvm::CmpInst>(ins));
-            else if (opcode == 55) instructionMap[ins] = new PHIIns<Universe>(*this,*llvm::dyn_cast<llvm::PHINode>(ins));
-            else if (opcode == 56) instructionMap[ins] = new CallIns<Universe>(*this,*llvm::dyn_cast<llvm::CallBase>(ins));
-            else if (opcode == 57) instructionMap[ins] = new SelectIns<Universe>(*this,*llvm::dyn_cast<llvm::SelectInst>(ins));
-            else if (opcode == 61) instructionMap[ins] = new ExtractElementIns<Universe>(*this,*llvm::dyn_cast<llvm::ExtractElementInst>(ins));
-            else if (opcode == 62) instructionMap[ins] = new InsertElementIns<Universe>(*this,*llvm::dyn_cast<llvm::InsertElementInst>(ins));
-            else if (opcode == 63) instructionMap[ins] = new ShuffleVectorIns<Universe>(*this,*llvm::dyn_cast<llvm::ShuffleVectorInst>(ins));
-            else if (opcode == 64) instructionMap[ins] = new ExtractValueIns<Universe>(*this,*llvm::dyn_cast<llvm::ExtractValueInst>(ins));
-            else if (opcode == 65) instructionMap[ins] = new InsertValueIns<Universe>(*this,*llvm::dyn_cast<llvm::InsertValueInst>(ins));
-            else if (opcode == 67) instructionMap[ins] = new FreezeIns<Universe>(*this,*llvm::dyn_cast<llvm::FreezeInst>(ins));
+            if (opcode == 1) instructionMap[ins] = new ReturnIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::ReturnInst>(ins));
+            else if (opcode == 2) instructionMap[ins] = new BranchIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::BranchInst>(ins));
+            else if (opcode == 3)  instructionMap[ins] = new SwitchIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::SwitchInst>(ins));
+            else if (opcode == 4) instructionMap[ins] = new IndirectBrIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::IndirectBrInst>(ins));
+            else if (opcode == 7) instructionMap[ins] = new UnreachableIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::UnreachableInst>(ins));
+            else if (opcode == 12) instructionMap[ins] = new UnaryIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::UnaryOperator>(ins));
+            else if (opcode >= 13 && opcode <= 30) instructionMap[ins] = new BinaryIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::BinaryOperator>(ins));
+            else if (opcode == 31) instructionMap[ins] = new AllocaIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::AllocaInst>(ins));
+            else if (opcode == 32) instructionMap[ins] = new LoadIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::LoadInst>(ins));
+            else if (opcode == 33)  instructionMap[ins] = new StoreIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::StoreInst>(ins));
+            else if (opcode == 34) instructionMap[ins] = new GetElementPtrIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::GetElementPtrInst>(ins));
+            else if (opcode >= 38 && opcode <= 50) instructionMap[ins] = new CastIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::CastInst>(ins));
+            else if (opcode == 53 || opcode == 54) instructionMap[ins] = new CmpIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::CmpInst>(ins));
+            else if (opcode == 55) instructionMap[ins] = new PHIIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::PHINode>(ins));
+            else if (opcode == 56) instructionMap[ins] = new CallIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::CallBase>(ins));
+            else if (opcode == 57) instructionMap[ins] = new SelectIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::SelectInst>(ins));
+            else if (opcode == 61) instructionMap[ins] = new ExtractElementIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::ExtractElementInst>(ins));
+            else if (opcode == 62) instructionMap[ins] = new InsertElementIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::InsertElementInst>(ins));
+            else if (opcode == 63) instructionMap[ins] = new ShuffleVectorIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::ShuffleVectorInst>(ins));
+            else if (opcode == 64) instructionMap[ins] = new ExtractValueIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::ExtractValueInst>(ins));
+            else if (opcode == 65) instructionMap[ins] = new InsertValueIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::InsertValueInst>(ins));
+            else if (opcode == 67) instructionMap[ins] = new FreezeIns<Top<Universe>>(*this,*llvm::dyn_cast<llvm::FreezeInst>(ins));
             else throw std::runtime_error("The instruction class " + (std::string)ins->getOpcodeName() + " with opcode " + std::to_string(opcode) + " does not exist in Vanguard yet.");
         }
         return instructionMap[ins];
@@ -72,7 +73,7 @@ namespace vanguard{
         }
 
         if (blockMap.find(block) == blockMap.end()){
-            blockMap[block] = new Universe::Block(*this, block);
+            blockMap[block] = new Top<Universe>::Block(*this, block);
         }
         return blockMap[block];
     }

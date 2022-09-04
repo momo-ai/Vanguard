@@ -30,6 +30,7 @@
 #include "program/LLVMFactory.h"
 #include "domain/libBlockchain/BlockchainFactory.h"
 #include "domain/libBlockchain/Blockchain.h"
+#include "program/Top.h"
 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
@@ -202,8 +203,8 @@ int main(int argc, char **argv) {
 for(auto &mod : modules) {
             units.push_back(factory.createUnit(modules.back().get()));
         }
-        vanguard::Universe universe(factory, units);
-        runDetectors<vanguard::Universe>(MAM, FAM, detectorRegistry, detectorNames, universe);
+        vanguard::Top<vanguard::Universe> universe(factory, units);
+        runDetectors<vanguard::Top<vanguard::Universe>>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else if(domain == vanguard::Detector::BLOCKCHAIN) {
         vanguard::BlockchainFactory factory;
@@ -214,8 +215,8 @@ for(auto &mod : modules) {
             std::string summary = filename.substr(0, filename.length() - 2) + "json";
             units.push_back(factory.createUnit(modules.back().get(), summary));
         }
-        vanguard::Blockchain<vanguard::Universe> universe(factory, units);
-        runDetectors<vanguard::Blockchain<vanguard::Universe>>(MAM, FAM, detectorRegistry, detectorNames, universe);
+        vanguard::Top<vanguard::Blockchain<vanguard::Universe>> universe(factory, units);
+        runDetectors<vanguard::Top<vanguard::Blockchain<vanguard::Universe>>>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else {
         throw std::runtime_error("Unknown domain");

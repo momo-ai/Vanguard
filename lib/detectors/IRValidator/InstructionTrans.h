@@ -10,7 +10,8 @@
 #include "ValueTrans.h"
 
 namespace vanguard {
-    class InstructionTrans: public InstructionClassVisitor{
+    template<typename Domain>
+    class InstructionTrans: public InstructionClassVisitor<Domain>{
     public:
         std::string getValueString(const Value &v){
             ValueTrans trans;
@@ -19,7 +20,7 @@ namespace vanguard {
         }
 
         std::string result;
-        void visit(const BinaryOpExpr<Universe> &inst) override{
+        void visit(const BinaryOpExpr<Domain> &inst) override{
             auto op = inst.op();
             auto varResult = inst.result();
             result = "BinaryIns of BinaryOpClass " + std::to_string(op) + " has LHS: " + getValueString(*varResult) + " and operands: ";
@@ -29,7 +30,7 @@ namespace vanguard {
             result += getValueString(*inst.operand(1));
         }
 
-        void visit(const Branch<Universe> &inst) override{
+        void visit(const Branch<Domain> &inst) override{
             result = "BranchIns ";
             if (inst.isConditional()){
                 result+= "with condition " + getValueString(*inst.condition()) + ", ";
@@ -47,16 +48,16 @@ namespace vanguard {
             }
         }
 
-        void visit(const UnaryOpExpr<Universe> &inst) override{
+        void visit(const UnaryOpExpr<Domain> &inst) override{
             result = "UnaryIns of UnaryOpClass " + std::to_string(inst.op()) + " has operand " +
                      getValueString(*inst.operand());
         }
 
-        void visit(const CastExpr<Universe> &inst) override{
+        void visit(const CastExpr<Domain> &inst) override{
             result = "CastIns casts to " + inst.castTo()->name() ;
         }
 
-        void visit(const CallExpr<Universe> &inst) override{
+        void visit(const CallExpr<Domain> &inst) override{
             result = "Call to function " + inst.target()->name() + " with arguments: ";
             auto args = inst.args();
             for (auto arg: args){
@@ -64,11 +65,11 @@ namespace vanguard {
             }
         }
 
-        void visit(const Error<Universe> &inst) override {
+        void visit(const Error<Domain> &inst) override {
             result = "UnreachableIns: " + inst.msg() ;
         }
 
-        void visit(const Return<Universe> &inst) override {
+        void visit(const Return<Domain> &inst) override {
             result = "ReturnIns ";
             if (inst.returnsValue()){
                 result += "returns value " + getValueString(*inst.value());
@@ -78,16 +79,16 @@ namespace vanguard {
             }
         }
 
-        void visit(const TernaryExpr<Universe> &inst) override{
+        void visit(const TernaryExpr<Domain> &inst) override{
             result = "SelectIns with condition " + getValueString(*inst.condition()) + " has true Value " +
                      getValueString(*inst.trueValue()) + " and false value " + getValueString(*inst.falseValue());
         }
 
-        void visit(const Assignment<Universe> &inst) override {
+        void visit(const Assignment<Domain> &inst) override {
             result = "assigns " + getValueString(*inst.result());
         }
 
-        void visit(const UnknownExpr<Universe> &inst) override {
+        void visit(const UnknownExpr<Domain> &inst) override {
             result = "Unknown expression";
         }
     };

@@ -27,11 +27,11 @@ namespace vanguard{
         return !function->isDeclaration();
     }
 
-    Universe::Block* Universe::Function::body() const {
+    Universe::Block* Universe::Function::head() const {
         return factory.createBlk(&function->getEntryBlock());
     }
 
-    std::vector<Universe::Instruction*> Universe::Function::instructions() const {
+    std::vector<Universe::Instruction*> Universe::Function::insts() const {
         std::vector<Instruction*> instructionsList = {};
         for (auto &blk : *function){
             for(auto &ins : blk) {
@@ -41,7 +41,7 @@ namespace vanguard{
         return instructionsList;
     }
 
-    std::vector<Universe::Block *> Universe::Function::blocks() const {
+    std::vector<Universe::Block *> Universe::Function::blks() const {
         std::vector<Block *> blocks = {};
         for (auto &blk : *function){
             blocks.push_back(factory.createBlk(&blk));

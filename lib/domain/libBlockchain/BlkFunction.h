@@ -28,10 +28,10 @@ namespace vanguard {
     };
 
     template<class Domain>
-    class BlkFunction : public Blockchain<Domain>::Function {
+    class BlkFunction : public Domain::Function {
     public:
         template<typename ...Args>
-        explicit BlkFunction(std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods, Args&&... args) : fnParams(std::move(params)), rets(std::move(rets)), mods(std::move(mods)), fnName(std::move(name)), isCnstr(isCnstr), vis(vis), mut(mut), Blockchain<Domain>::Function(std::forward<Args>(args)...) {};
+        explicit BlkFunction(std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods, Args&&... args) : fnParams(std::move(params)), rets(std::move(rets)), mods(std::move(mods)), fnName(std::move(name)), isCnstr(isCnstr), vis(vis), mut(mut), Domain::Function(std::forward<Args>(args)...) {};
 
         bool isHelper() const override {
             return false;

@@ -119,7 +119,7 @@ namespace vanguard {
             }
         }*/
 
-        vector<BlkFunction<Universe> *> functions = {};
+        vector<BlkFunction<Blockchain<Universe>> *> functions = {};
         if(val.HasMember("functions")) {
             require(val["functions"].IsArray(), "Contract functions must be an array of Function");
 
@@ -244,7 +244,7 @@ namespace vanguard {
         throw std::runtime_error("Unknown mutability " + mutStr);
     }
 
-    BlkFunction<Universe> *SummaryReader::readFunction(std::string contractName, rapidjson::Value &val) {
+    BlkFunction<Blockchain<Universe>> *SummaryReader::readFunction(std::string contractName, rapidjson::Value &val) {
         require(val.HasMember("name") && val["name"].IsString(), "Function must have a name");
         require(val.HasMember("isConstructor") && val["isConstructor"].IsBool(), "Must identify if function is a constructor");
         require(val.HasMember("visibility") && val["visibility"].IsString(), "Function must have a visibility");

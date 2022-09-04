@@ -4,7 +4,7 @@
 #include <cassert>
 #include <iostream>
 #include "../../program/WrappedInstructions.h"
-#include <program/Function.h>
+#include <program/Function.cpp>
 #include <program/CompilationUnit.h>
 
 namespace vanguard {

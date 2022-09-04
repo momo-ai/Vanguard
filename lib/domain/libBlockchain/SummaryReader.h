@@ -34,7 +34,7 @@ namespace vanguard {
         Blockchain<Universe>::Contract *readContract(rapidjson::Value &val);
         BlkStructType<StructType> *readStruct(rapidjson::Value &val);
         /*BlkEnum *readEnum(rapidjson::Value &val);*/
-        BlkFunction<Universe> *readFunction(std::string contractName, rapidjson::Value &val);
+        BlkFunction<Blockchain<Universe>> *readFunction(std::string contractName, rapidjson::Value &val);
         BlkVariable<Variable> *readVariable(rapidjson::Value &val);
         Type *readType(rapidjson::Value &val);
         ArrayType *readArrayType(rapidjson::Value &val);

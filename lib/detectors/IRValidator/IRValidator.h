@@ -24,8 +24,8 @@ namespace vanguard {
             totIns = 0;
         }
 
-        std::string getInstructionString(const Universe::Instruction &v){
-            InstructionTrans trans;
+        std::string getInstructionString(const typename Domain::Instruction &v){
+            InstructionTrans<Domain> trans;
             v.accept(trans);
             return trans.result;
         }
@@ -144,11 +144,11 @@ namespace vanguard {
             assert(blk != nullptr && "Function does not have a body");
             assert(blk->isEntry() && "Fn body not marked as entry block");
 
-            std::unordered_set<Universe::Block *> seen = { blk };
-            std::vector<Universe::Block *> worklist = { blk };
+            std::unordered_set<typename Domain::Block *> seen = { blk };
+            std::vector<typename Domain::Block *> worklist = { blk };
 
             while(!worklist.empty()) {
-                Universe::Block *curBlk = worklist.back();
+                typename Domain::Block *curBlk = worklist.back();
                 worklist.pop_back();
 
                 totBlks++;

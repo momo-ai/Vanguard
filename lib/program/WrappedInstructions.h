@@ -7,9 +7,9 @@
 namespace vanguard{
 
     template<typename Domain>
-    class BinaryIns: public WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::BinaryOperator> {
+    class BinaryIns: public WrappedInstructionClass<BinaryOpExpr<Domain>, Domain, llvm::BinaryOperator> {
         public:
-            explicit BinaryIns(UnitFactory &factory, const llvm::BinaryOperator &bop) : WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::BinaryOperator>(bop, factory) {}
+            explicit BinaryIns(UnitFactory &factory, const llvm::BinaryOperator &bop) : WrappedInstructionClass<BinaryOpExpr<Domain>, Domain, llvm::BinaryOperator>(bop, factory) {}
             BinaryIns(const BinaryIns&) = delete;
 
             BinOp op() const override {
@@ -38,9 +38,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class CmpIns: public WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::CmpInst> {
+    class CmpIns: public WrappedInstructionClass<BinaryOpExpr<Domain>, Domain, llvm::CmpInst> {
         public:
-            explicit CmpIns(UnitFactory &factory, const llvm::CmpInst &cmpinst) : WrappedInstructionClass<BinaryOpExpr<Domain>, llvm::CmpInst>(cmpinst, factory) {}
+            explicit CmpIns(UnitFactory &factory, const llvm::CmpInst &cmpinst) : WrappedInstructionClass<BinaryOpExpr<Domain>, Domain, llvm::CmpInst>(cmpinst, factory) {}
             CmpIns(const CmpIns&) = delete;
 
             BinOp op() const override {
@@ -60,9 +60,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class BranchIns: public WrappedInstructionClass<Branch<Domain>, llvm::BranchInst> {
+    class BranchIns: public WrappedInstructionClass<Branch<Domain>, Domain, llvm::BranchInst> {
         public:
-            explicit BranchIns(UnitFactory &factory, const llvm::BranchInst &brInst) : WrappedInstructionClass<Branch<Domain>, llvm::BranchInst>(brInst, factory) {}
+            explicit BranchIns(UnitFactory &factory, const llvm::BranchInst &brInst) : WrappedInstructionClass<Branch<Domain>, Domain, llvm::BranchInst>(brInst, factory) {}
             BranchIns(const BranchIns&) = delete;
 
             bool isConditional() const override {
@@ -84,9 +84,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class IndirectBrIns: public WrappedInstructionClass<Branch<Domain>, llvm::IndirectBrInst> {
+    class IndirectBrIns: public WrappedInstructionClass<Branch<Domain>, Domain, llvm::IndirectBrInst> {
         public:
-            explicit IndirectBrIns(UnitFactory &factory, const llvm::IndirectBrInst &ibrInst) : WrappedInstructionClass<Branch<Domain>, llvm::IndirectBrInst>(ibrInst, factory) {}
+            explicit IndirectBrIns(UnitFactory &factory, const llvm::IndirectBrInst &ibrInst) : WrappedInstructionClass<Branch<Domain>, Domain, llvm::IndirectBrInst>(ibrInst, factory) {}
             IndirectBrIns(const IndirectBrIns&) = delete;
 
             bool isConditional() const override {
@@ -108,9 +108,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class SwitchIns: public WrappedInstructionClass<Branch<Domain>, llvm::SwitchInst> {
+    class SwitchIns: public WrappedInstructionClass<Branch<Domain>, Domain, llvm::SwitchInst> {
         public:
-            explicit SwitchIns(UnitFactory &factory, const llvm::SwitchInst &swInst) : WrappedInstructionClass<Branch<Domain>, llvm::SwitchInst>(swInst, factory) {}
+            explicit SwitchIns(UnitFactory &factory, const llvm::SwitchInst &swInst) : WrappedInstructionClass<Branch<Domain>, Domain, llvm::SwitchInst>(swInst, factory) {}
             SwitchIns(const SwitchIns&) = delete;
 
             bool isConditional() const override {
@@ -132,9 +132,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class UnaryIns: public WrappedInstructionClass<UnaryOpExpr<Domain>, llvm::UnaryOperator> {
+    class UnaryIns: public WrappedInstructionClass<UnaryOpExpr<Domain>, Domain, llvm::UnaryOperator> {
         public:
-            explicit UnaryIns(UnitFactory &factory, const llvm::UnaryOperator &uop) : WrappedInstructionClass<UnaryOpExpr<Domain>, llvm::UnaryOperator>(uop, factory) {}
+            explicit UnaryIns(UnitFactory &factory, const llvm::UnaryOperator &uop) : WrappedInstructionClass<UnaryOpExpr<Domain>, Domain, llvm::UnaryOperator>(uop, factory) {}
             UnaryIns(const UnaryIns&) = delete;
 
             Value* result() const override {
@@ -158,9 +158,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class CastIns: public WrappedInstructionClass<CastExpr<Domain>, llvm::CastInst> {
+    class CastIns: public WrappedInstructionClass<CastExpr<Domain>, Domain, llvm::CastInst> {
     public:
-        explicit CastIns(UnitFactory &factory, const llvm::CastInst &ci): WrappedInstructionClass<CastExpr<Domain>, llvm::CastInst>(ci, factory) {}
+        explicit CastIns(UnitFactory &factory, const llvm::CastInst &ci): WrappedInstructionClass<CastExpr<Domain>, Domain, llvm::CastInst>(ci, factory) {}
         CastIns(const CastIns&) = delete;
 
         Value* result() const override {
@@ -174,9 +174,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class CallIns: public WrappedInstructionClass<CallExpr<Domain>, llvm::CallBase> {
+    class CallIns: public WrappedInstructionClass<CallExpr<Domain>, Domain, llvm::CallBase> {
         public:
-            explicit CallIns(UnitFactory &factory, const llvm::CallBase &cb) : WrappedInstructionClass<CallExpr<Domain>, llvm::CallBase>(cb, factory) {}
+            explicit CallIns(UnitFactory &factory, const llvm::CallBase &cb) : WrappedInstructionClass<CallExpr<Domain>, Domain, llvm::CallBase>(cb, factory) {}
             CallIns(const CallIns&) = delete;
 
             Value* result() const override {
@@ -202,10 +202,10 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class UnreachableIns: public WrappedInstructionClass<Error<Domain>, llvm::UnreachableInst> {
+    class UnreachableIns: public WrappedInstructionClass<Error<Domain>, Domain, llvm::UnreachableInst> {
         public:
             explicit UnreachableIns(UnitFactory &factory, const llvm::UnreachableInst &ui)
-                    : WrappedInstructionClass<Error<Domain>, llvm::UnreachableInst>(ui, factory) {}
+                    : WrappedInstructionClass<Error<Domain>, Domain, llvm::UnreachableInst>(ui, factory) {}
             UnreachableIns(const UnreachableIns&) = delete;
 
             std::string msg() const override {
@@ -214,9 +214,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class ReturnIns: public WrappedInstructionClass<Return<Domain>, llvm::ReturnInst> {
+    class ReturnIns: public WrappedInstructionClass<Return<Domain>, Domain, llvm::ReturnInst> {
         public:
-            explicit ReturnIns(UnitFactory &factory, const llvm::ReturnInst &retInst) : WrappedInstructionClass<Return<Domain>, llvm::ReturnInst>(retInst, factory) {}
+            explicit ReturnIns(UnitFactory &factory, const llvm::ReturnInst &retInst) : WrappedInstructionClass<Return<Domain>, Domain, llvm::ReturnInst>(retInst, factory) {}
             ReturnIns(const ReturnIns&) = delete;
 
             bool returnsValue() const override {
@@ -229,9 +229,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class SelectIns: public WrappedInstructionClass<TernaryExpr<Domain>, llvm::SelectInst> {
+    class SelectIns: public WrappedInstructionClass<TernaryExpr<Domain>, Domain, llvm::SelectInst> {
         public:
-            explicit SelectIns(UnitFactory &factory, const llvm::SelectInst &si) : WrappedInstructionClass<TernaryExpr<Domain>, llvm::SelectInst>(si, factory) {}
+            explicit SelectIns(UnitFactory &factory, const llvm::SelectInst &si) : WrappedInstructionClass<TernaryExpr<Domain>, Domain, llvm::SelectInst>(si, factory) {}
             SelectIns(const SelectIns&) = delete;
 
             Value* result() const override {
@@ -253,10 +253,10 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class ExtractElementIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractElementInst> {
+    class ExtractElementIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::ExtractElementInst> {
     public:
         explicit ExtractElementIns(UnitFactory &factory, const llvm::ExtractElementInst &eei)
-                : WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractElementInst>(eei, factory) {}
+                : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::ExtractElementInst>(eei, factory) {}
         ExtractElementIns(const ExtractElementIns&) = delete;
 
         Value* result() const override {
@@ -267,10 +267,10 @@ namespace vanguard{
 
     //https://llvm.org/docs/LangRef.html#extractvalue-instruction
     template<typename Domain>
-    class ExtractValueIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractValueInst> {
+    class ExtractValueIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::ExtractValueInst> {
     public:
         explicit ExtractValueIns(UnitFactory &factory, const llvm::ExtractValueInst &evi)
-                : WrappedInstructionClass<UnknownExpr<Domain>, llvm::ExtractValueInst>(evi, factory) {}
+                : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::ExtractValueInst>(evi, factory) {}
         ExtractValueIns(const ExtractValueIns&) = delete;
 
         Value* result() const override {
@@ -280,9 +280,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class LoadIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::LoadInst> {
+    class LoadIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::LoadInst> {
     public:
-        explicit LoadIns(UnitFactory &factory, const llvm::LoadInst &li): WrappedInstructionClass<UnknownExpr<Domain>, llvm::LoadInst>(li, factory) {}
+        explicit LoadIns(UnitFactory &factory, const llvm::LoadInst &li): WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::LoadInst>(li, factory) {}
         LoadIns(const LoadIns&) = delete;
 
         Value* result() const override {
@@ -292,10 +292,10 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class InsertValueIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertValueInst> {
+    class InsertValueIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::InsertValueInst> {
         public:
             explicit InsertValueIns(UnitFactory &factory, const llvm::InsertValueInst &ivi)
-                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertValueInst>(ivi, factory) {}
+                    : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::InsertValueInst>(ivi, factory) {}
             InsertValueIns(const InsertValueIns&) = delete;
 
             Value* result() const override {
@@ -305,10 +305,10 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class InsertElementIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertElementInst> {
+    class InsertElementIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::InsertElementInst> {
         public:
             explicit InsertElementIns(UnitFactory &factory, const llvm::InsertElementInst &iei)
-                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::InsertElementInst>(iei, factory) {}
+                    : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::InsertElementInst>(iei, factory) {}
             InsertElementIns(const InsertElementIns&) = delete;
 
             Value* result() const override {
@@ -318,9 +318,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class StoreIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::StoreInst> {
+    class StoreIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::StoreInst> {
         public:
-            explicit StoreIns(UnitFactory &factory, const llvm::StoreInst &si) : WrappedInstructionClass<UnknownExpr<Domain>, llvm::StoreInst>(si, factory) {}
+            explicit StoreIns(UnitFactory &factory, const llvm::StoreInst &si) : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::StoreInst>(si, factory) {}
             StoreIns(const StoreIns&) = delete;
 
             Value* result() const override {
@@ -330,10 +330,10 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class ShuffleVectorIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::ShuffleVectorInst> {
+    class ShuffleVectorIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::ShuffleVectorInst> {
         public:
             explicit ShuffleVectorIns(UnitFactory &factory, const llvm::ShuffleVectorInst &svi)
-                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::ShuffleVectorInst>(svi, factory) {}
+                    : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::ShuffleVectorInst>(svi, factory) {}
             ShuffleVectorIns(const ShuffleVectorIns&) = delete;
 
             Value* result() const override {
@@ -343,9 +343,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class AllocaIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::AllocaInst> {
+    class AllocaIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::AllocaInst> {
     public:
-        explicit AllocaIns(UnitFactory &factory, const llvm::AllocaInst &ai): WrappedInstructionClass<UnknownExpr<Domain>, llvm::AllocaInst>(ai, factory) {}
+        explicit AllocaIns(UnitFactory &factory, const llvm::AllocaInst &ai): WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::AllocaInst>(ai, factory) {}
         AllocaIns(const AllocaIns&) = delete;
 
         Value* result() const override {
@@ -355,9 +355,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class PHIIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::PHINode> {
+    class PHIIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::PHINode> {
         public:
-            explicit PHIIns(UnitFactory &factory, const llvm::PHINode &phin) : WrappedInstructionClass<UnknownExpr<Domain>, llvm::PHINode>(phin, factory) {}
+            explicit PHIIns(UnitFactory &factory, const llvm::PHINode &phin) : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::PHINode>(phin, factory) {}
             PHIIns(const PHIIns&) = delete;
 
             Value* result() const override {
@@ -367,10 +367,10 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class GetElementPtrIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::GetElementPtrInst> {
+    class GetElementPtrIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::GetElementPtrInst> {
         public:
             explicit GetElementPtrIns(UnitFactory &factory, const llvm::GetElementPtrInst &gepi)
-                    : WrappedInstructionClass<UnknownExpr<Domain>, llvm::GetElementPtrInst>(gepi, factory) {}
+                    : WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::GetElementPtrInst>(gepi, factory) {}
 
             Value* result() const override {
                 auto* insVar = this->factory.createVal(&this->wrapped);
@@ -379,9 +379,9 @@ namespace vanguard{
     };
 
     template<typename Domain>
-    class FreezeIns: public WrappedInstructionClass<UnknownExpr<Domain>, llvm::FreezeInst> {
+    class FreezeIns: public WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::FreezeInst> {
     public:
-        explicit FreezeIns(UnitFactory &factory, const llvm::FreezeInst &fi): WrappedInstructionClass<UnknownExpr<Domain>, llvm::FreezeInst>(fi, factory) {}
+        explicit FreezeIns(UnitFactory &factory, const llvm::FreezeInst &fi): WrappedInstructionClass<UnknownExpr<Domain>, Domain, llvm::FreezeInst>(fi, factory) {}
         FreezeIns(const FreezeIns&) = delete;
 
         Value* result() const override {

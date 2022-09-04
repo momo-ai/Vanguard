@@ -18,7 +18,7 @@ namespace vanguard {
 
         class Contract : public ObjectType {
         public:
-            Contract(UnitFactory &factory, std::string name, std::vector<BlkFunction<Domain> *> fns, std::vector<Variable *> vars/*, std::vector<BlkType *> inherits,
+            Contract(UnitFactory &factory, std::string name, std::vector<BlkFunction<Blockchain<Domain>> *> fns, std::vector<Variable *> vars/*, std::vector<BlkType *> inherits,
             std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events*/) : contractName(std::move(name)), fns(fns), vars(std::move(vars)), ObjectType(factory) {};
 
             std::string name() const override {
@@ -26,7 +26,7 @@ namespace vanguard {
             }
 
             //const Function *findFunction(vanguard::Function &fn) const;
-            const std::vector<BlkFunction<Domain> *> &functions() const {
+            const std::vector<BlkFunction<Blockchain<Domain>> *> &functions() const {
                 return fns;
             }
 
@@ -36,7 +36,7 @@ namespace vanguard {
             //std::vector<BlkContract *> inherits() const;
         private:
             const std::string contractName;
-            std::vector<BlkFunction<Domain> *> fns;
+            std::vector<BlkFunction<Blockchain<Domain>> *> fns;
             /*std::vector<BlkUserType *> contractInherits;
             std::vector<BlkEvent *> contractEvents;
             std::vector<BlkEnum *> contractEnums;

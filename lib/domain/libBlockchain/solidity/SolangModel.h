@@ -11,7 +11,7 @@
 namespace vanguard {
     class SolangModel : public BlockchainModel {
     public:
-        bool isImplementation(std::string contract, const BlkFunction<Universe> &blockchainFn, const llvm::Function &llvmFn) const override;
+        bool isImplementation(std::string contract, const BlkFunction<Top<Blockchain<Universe>>> &blockchainFn, const llvm::Function &llvmFn) const override;
         //bool isExternalCall(const llvm::Function &llvmFn) override;
         //bool isDelegateCall(const llvm::Function &llvmFn) override;
         /*bool isAnyExternalCall(vanguard::Function &fn) const override;

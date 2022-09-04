@@ -31,8 +31,6 @@ namespace vanguard {
         EXPRESSION_END = UNKNOWN
     };
 
-    class InstructionClassVisitor;
-
     class Universe {
     public:
         class CompilationUnit;
@@ -46,12 +44,12 @@ namespace vanguard {
             CompilationUnit(const CompilationUnit&) = delete;
             std::string name();
             std::string sourceFile();
-            Universe::Function* findFunction(std::string name);
             Value* findGlobalVariable(std::string name);
-            virtual std::list<Universe::Function *> functions();
             virtual std::list<Value*> globalVariables();
             const llvm::Module* unwrap();
         protected:
+            Universe::Function* findFn(std::string name);
+            virtual std::list<Universe::Function *> fns();
             UnitFactory &factory;
         private:
             const llvm::Module* module;
@@ -65,11 +63,11 @@ namespace vanguard {
             virtual std::vector<Variable*> params() const;
             virtual Type* returnType() const;
             virtual bool hasBody() const;
-            virtual Block* body() const;
-            virtual std::vector<Instruction*> instructions() const;
-            virtual std::vector<Block *> blocks() const;
             const llvm::Function *unwrap();
         protected:
+            virtual Block* head() const;
+            virtual std::vector<Instruction*> insts() const;
+            virtual std::vector<Block *> blks() const;
             const llvm::Function *function;
             UnitFactory &factory;
         };
@@ -78,13 +76,14 @@ namespace vanguard {
         public:
             explicit Block(UnitFactory &factory, const llvm::BasicBlock *block);
             Block(const Block&) = delete;
-            std::string name();
-            Function* parent();
-            std::list<Instruction *> instructions();
-            bool isEntry();
-            std::unordered_set<Block *> successors();
-            const llvm::BasicBlock* unwrap();
+            virtual std::string name();
+            virtual bool isEntry();
+            virtual const llvm::BasicBlock* unwrap();
         protected:
+            virtual Function* fn();
+            virtual std::list<Instruction *> insts();
+            virtual std::unordered_set<Block *> succs();
+
             const llvm::BasicBlock* block;
             UnitFactory &factory;
         };
@@ -102,7 +101,6 @@ namespace vanguard {
             virtual Value* operand(unsigned i) const = 0;
             virtual unsigned numOperands() const = 0;
             virtual const llvm::Instruction &unwrap() const = 0;
-            virtual void accept(InstructionClassVisitor &v) const = 0;
         protected:
             UnitFactory &factory;
         };

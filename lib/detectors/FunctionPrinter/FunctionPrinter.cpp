@@ -3,7 +3,7 @@
 //
 
 #include "FunctionPrinter.h"
-#include <program/Function.h>
+#include <program/Function.cpp>
 #include <iostream>
 
 namespace vanguard {
