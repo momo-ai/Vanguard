@@ -10,6 +10,7 @@
 #include <list>
 #include <unordered_set>
 #include "Type.h"
+#include "WrappedType.h"
 
 namespace vanguard {
     class UnitFactory;
@@ -37,6 +38,18 @@ namespace vanguard {
         class Function;
         class Block;
         class Instruction;
+
+        template<typename Base, typename Wrap> class Branch;
+        template<typename Base, typename Wrap> class Return;
+        template<typename Base, typename Wrap> class Error;
+        template<typename Base, typename Wrap> class Assignment;
+        template<typename Base, typename Wrap> class BinaryOpExpr;
+        template<typename Base, typename Wrap> class UnaryOpExpr;
+        template<typename Base, typename Wrap> class CallExpr;
+        template<typename Base, typename Wrap> class CastExpr;
+        template<typename Base, typename Wrap> class TernaryExpr;
+        template<typename Base, typename Wrap> class UnknownExpr;
+
 
         class CompilationUnit {
         public:
@@ -88,22 +101,26 @@ namespace vanguard {
             UnitFactory &factory;
         };
 
-        class Instruction {
+
+        /*class Instruction {
         public:
-            explicit Instruction(UnitFactory &factory) : factory(factory) {};
+            explicit Instruction(UnitFactory &factory, const llvm::Instruction *ins);
             static inline bool classof(const Instruction &) { return true; }
             static inline bool classof(const Instruction *) { return true; }
 
             virtual InstructionClassEnum instructionClass() const = 0;
-            virtual std::string name() const = 0;
-            virtual Block* parent() const = 0;
-            virtual bool willReturn() const = 0;
-            virtual Value* operand(unsigned i) const = 0;
-            virtual unsigned numOperands() const = 0;
-            virtual const llvm::Instruction &unwrap() const = 0;
+            virtual std::string name() const;
+            virtual Block* parent() const;
+            virtual bool willReturn() const;
+            virtual Value* operand(unsigned i) const;
+            virtual unsigned numOperands() const;
+            virtual const llvm::Instruction &unwrap() const;
+            //virtual std::vector<Value *> reads();
+            //virtual std::vector<Value *> writes();
         protected:
+            const llvm::Instruction* ins;
             UnitFactory &factory;
-        };
+        };*/
 
         explicit Universe(UnitFactory &factory, std::vector<CompilationUnit *>  units);
         const std::vector<CompilationUnit *> &units() const;

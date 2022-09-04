@@ -12,12 +12,17 @@ namespace vanguard {
     template<typename Domain>
     class FunctionPrinter : public FunctionDetector<Domain> {
     public:
+        using CompilationUnit = typename Domain::CompilationUnit;
+        using Function = typename Domain::Function;
+        using Block = typename Domain::Block;
+        using Instruction = typename Domain::Instruction;
+
         std::vector<Requirement *> registerAnalyses() override {
             return {};
         }
 
         void startDetection() override {}
-        bool detect(typename Domain::Function &fn) override {
+        bool detect(Function &fn) override {
             std::cout << "Found Function: " << fn.name() << std::endl;
             return false;
         }

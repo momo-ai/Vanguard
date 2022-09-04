@@ -26,8 +26,8 @@ namespace vanguard {
             result = "BinaryIns of BinaryOpClass " + std::to_string(op) + " has LHS: " + getValueString(*varResult) + " and operands: ";
             auto n = inst.numOperands();
             assert(n == 2 && "BinaryIns does not have 2 operands");
-            result += getValueString(*inst.operand(0)) + " and ";
-            result += getValueString(*inst.operand(1));
+            result += getValueString(*inst.operandAt(0)) + " and ";
+            result += getValueString(*inst.operandAt(1));
         }
 
         void visit(const Branch<Domain> &inst) override{
@@ -43,7 +43,7 @@ namespace vanguard {
             if (n != 0) {
                 result += "and operands ";
                 for (int i = 0; i < n; i++) {
-                    result += getValueString(*inst.operand(i)) + " ";
+                    result += getValueString(*inst.operandAt(i)) + " ";
                 }
             }
         }

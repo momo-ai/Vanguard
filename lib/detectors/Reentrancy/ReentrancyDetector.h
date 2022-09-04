@@ -13,6 +13,12 @@ namespace vanguard {
     template <typename Domain>
     class ReentrancyDetector : public UniverseDetector<Domain> {
     public:
+
+        using CompilationUnit = typename Domain::CompilationUnit;
+        using Function = typename Domain::Function;
+        using Block = typename Domain::Block;
+        using Instruction = typename Domain::Instruction;
+
         virtual std::vector<Requirement *> registerAnalyses() override {
             return {};
         }

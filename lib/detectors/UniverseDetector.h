@@ -9,6 +9,7 @@
 #include "program/Universe.h"
 
 namespace vanguard {
+
     template<class Domain>
     class UniverseDetector : public Detector {
     public:

@@ -17,11 +17,11 @@ namespace vanguard {
         /*bool isAnyExternalCall(vanguard::Function &fn) const override;
         bool isCall(vanguard::Function &fn) const override;
         bool isStaticCall(vanguard::Function &fn) const override;
-        bool isDelegateCall(vanguard::Function &fn) const override;
-        bool writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;
-        bool readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;
+        bool isDelegateCall(vanguard::Function &fn) const override;*/
+        /*bool writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;
+        bool readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;*/
 
-        static bool writesStorage(vanguard::Function &fn);
+        /*static bool writesStorage(vanguard::Function &fn);
         static bool readsStorage(vanguard::Function &fn);*/
     private:
     };

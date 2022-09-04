@@ -8,6 +8,7 @@
 #include <utility>
 
 namespace vanguard {
+
     template<typename Base, typename Wrap>
     class Wrapped : public Base {
     public:
