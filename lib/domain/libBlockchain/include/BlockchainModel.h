@@ -6,7 +6,6 @@
 #define LIBBLOCKCHAIN_BLOCKCHAINTOLLVM_H
 
 #include "BlkFunction.h"
-#include <program/Function.cpp>
 
 
 namespace blockchain {

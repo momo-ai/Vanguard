@@ -6,7 +6,6 @@
 #define LIBBLOCKCHAIN_BLKCONTRACT_H
 
 //#include "llvm/IR/Function.h"
-#include <program/Function.cpp>
 #include <domain/Container.h>
 #include "BlkEnum.h"
 #include "BlkStruct.h"

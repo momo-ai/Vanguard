@@ -6,7 +6,6 @@
 #define VANGUARD_ReentrancyEXAMPLE_H
 
 #include "../FunctionDetector.h"
-//#import "../../Vanguard.cpp"
 #include "../../domain/libBlockchain/include/Blockchain.h"
 #include "../../program/InstructionClassVisitor.h"
 #include "../../analysis/alias/AARequirement.h"

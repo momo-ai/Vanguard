@@ -61,8 +61,8 @@ namespace vanguard {
             virtual std::list<Value*> globalVariables();
             const llvm::Module* unwrap();
         protected:
-            Universe::Function* findFn(std::string name);
-            virtual std::list<Universe::Function *> fns();
+            Universe::Function* findFn(std::string name) const;
+            virtual std::list<Universe::Function *> fns() const;
             UnitFactory &factory;
         private:
             const llvm::Module* module;
@@ -76,6 +76,7 @@ namespace vanguard {
             virtual std::vector<Variable*> params() const;
             virtual Type* returnType() const;
             virtual bool hasBody() const;
+            //virtual CompilationUnit* unit() const = 0;
             const llvm::Function *unwrap();
         protected:
             virtual Block* head() const;
@@ -91,36 +92,39 @@ namespace vanguard {
             Block(const Block&) = delete;
             virtual std::string name();
             virtual bool isEntry();
+            virtual Function* function() const = 0;
             virtual const llvm::BasicBlock* unwrap();
         protected:
-            virtual Function* fn();
-            virtual std::list<Instruction *> insts();
-            virtual std::unordered_set<Block *> succs();
+            virtual Function* fn() const;
+            virtual std::list<Instruction *> insts() const ;
+            virtual std::unordered_set<Block *> succs() const;
 
             const llvm::BasicBlock* block;
             UnitFactory &factory;
         };
 
 
-        /*class Instruction {
+        class Instruction {
         public:
-            explicit Instruction(UnitFactory &factory, const llvm::Instruction *ins);
+        public:
+            explicit Instruction(UnitFactory &factory, const llvm::Instruction *ins) : ins(ins), factory(factory) {};
             static inline bool classof(const Instruction &) { return true; }
             static inline bool classof(const Instruction *) { return true; }
 
             virtual InstructionClassEnum instructionClass() const = 0;
             virtual std::string name() const;
-            virtual Block* parent() const;
             virtual bool willReturn() const;
-            virtual Value* operand(unsigned i) const;
+            virtual Value* operandAt(unsigned i) const;
             virtual unsigned numOperands() const;
             virtual const llvm::Instruction &unwrap() const;
             //virtual std::vector<Value *> reads();
             //virtual std::vector<Value *> writes();
+            virtual Block* block() const = 0;
         protected:
+            Universe::Block* blk() const;
             const llvm::Instruction* ins;
             UnitFactory &factory;
-        };*/
+        };
 
         explicit Universe(UnitFactory &factory, std::vector<CompilationUnit *>  units);
         const std::vector<CompilationUnit *> &units() const;

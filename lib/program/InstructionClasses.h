@@ -7,7 +7,6 @@
 
 #include "Value.h"
 #include "Universe.h"
-#include "Instruction.h"
 #include "InstructionClassVisitor.h"
 
 

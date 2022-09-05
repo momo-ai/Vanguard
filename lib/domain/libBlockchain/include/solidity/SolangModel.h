@@ -7,7 +7,6 @@
 
 #include "domain/libBlockchain/include/BlockchainModel.h"
 //#include "llvm/IR/Function.h"
-#include "program/Function.cpp"
 
 namespace blockchain {
     class SolangModel : public BlockchainModel {

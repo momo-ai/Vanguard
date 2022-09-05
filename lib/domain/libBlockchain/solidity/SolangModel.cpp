@@ -50,7 +50,7 @@ namespace vanguard {
         return trans.result;
     }
 
-    bool SolangModel::isImplementation(std::string contract, const BlkFunction<Top<Blockchain<Universe>>> &blockchainFn, const llvm::Function &llvmFn) const {
+    bool SolangModel::isImplementation(std::string contract, const Top<Blockchain<Universe>>::Function &blockchainFn, const llvm::Function &llvmFn) const {
         if(!llvmFn.hasName()) {
             return false;
         }
@@ -81,6 +81,25 @@ namespace vanguard {
 
         std::regex reg(ss.str());
         return regex_match(llvmFn.getName().str(), reg);
+    }
+
+    bool SolangModel::isAnyLowLevelCall(Blockchain<Universe>::Instruction &ins) const {
+        return isLowLevelCall(ins) || isLowLevelStaticCall(ins) || isLowLevelDelegateCall(ins);
+    }
+
+    bool SolangModel::isLowLevelCall(Blockchain<Universe>::Instruction &ins) const {
+        string name = ins.name();
+        return name == "call";
+    }
+
+    bool SolangModel::isLowLevelStaticCall(Blockchain<Universe>::Instruction &ins) const {
+        string name = ins.name();
+        return name == "callStatic";
+    }
+
+    bool SolangModel::isLowLevelDelegateCall(Blockchain<Universe>::Instruction &ins) const {
+        string name = ins.name();
+        return name == "callDelegate";
     }
 
     /*class TypeTrans : public BlkTypeVisitor {

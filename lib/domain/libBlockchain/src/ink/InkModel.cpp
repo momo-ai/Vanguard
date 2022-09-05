@@ -14,7 +14,6 @@
 #include "domain/libBlockchain/include/BlkTypeVisitor.h"
 #include "domain/libBlockchain/include/BlkContract.h"
 #include "llvm/IR/Constants.h"
-#include "program/Instruction.h"
 #include "llvm/IR/Instructions.h"
 #include <iostream>
 #include "llvm/IR/IntrinsicInst.h"

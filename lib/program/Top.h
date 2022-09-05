@@ -5,7 +5,10 @@
 #ifndef VANGUARD_TOP_H
 #define VANGUARD_TOP_H
 
+#include <unordered_set>
+#include <string>
 #include "InstructionClassVisitor.h"
+#include <utility>
 
 namespace vanguard {
     template <typename Domain>
@@ -14,6 +17,23 @@ namespace vanguard {
         class Function;
         class Block;
         class Instruction;
+
+        class Contract : public Domain::Contract {
+        public:
+            template<typename ...Args>
+            explicit Contract(std::vector<Function *> fns, Args&&... args) : fns(fns), Domain::Contract(std::forward<Args>(args)...) {
+                for(auto *fn : fns) {
+                    fn->setContract(this);
+                }
+            };
+
+            const std::vector<Function *> &functions() const {
+                return fns;
+            }
+
+        protected:
+            std::vector<Function *> fns;
+        };
 
         class CompilationUnit : public Domain::CompilationUnit {
         public:
@@ -24,7 +44,7 @@ namespace vanguard {
                 return dynamic_cast<Function *>(this->findFn(name));
             }
 
-            virtual std::vector<Function*> functions()  {
+            virtual std::vector<Function*> functions() const {
                 std::vector<Function *> fns;
                 for(auto fn : this->fns()) {
                     fns.push_back(dynamic_cast<Function *>(fn));
@@ -73,11 +93,8 @@ namespace vanguard {
             template<typename ...Args>
             explicit Block(Args&&... args) : Domain::Block(std::forward<Args>(args)...) {};
 
-            virtual Function* parent()  {
-                return dynamic_cast<Function *>(this->fn());
-            }
 
-            virtual std::unordered_set<Block*> successors()  {
+            virtual std::unordered_set<Block*> successors() const {
                 std::unordered_set<Block *> blks;
                 for(auto blk : this->succs()) {
                     blks.insert(dynamic_cast<Block *>(blk));
@@ -86,13 +103,17 @@ namespace vanguard {
                 return blks;
             }
 
-            virtual std::vector<Instruction*> instructions()  {
+            virtual std::vector<Instruction*> instructions() const {
                 std::vector<Instruction *> ins;
                 for(auto i : this->insts()) {
                     ins.push_back(dynamic_cast<Instruction *>(i));
                 }
 
                 return ins;
+            }
+
+            virtual Function* function() const {
+                return dynamic_cast<Function *>(this->fn());
             }
 
         protected:
@@ -104,6 +125,10 @@ namespace vanguard {
             template<typename ...Args>
             explicit Instruction(Args&&... args) : Domain::Instruction(std::forward<Args>(args)...) {};
             virtual void accept(InstructionClassVisitor<Top<Domain>> &v) const = 0;
+
+            virtual Block* block() const {
+                return dynamic_cast<Block *>(this->blk());
+            }
         protected:
         };
 

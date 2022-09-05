@@ -11,13 +11,13 @@
 namespace vanguard {
     class SolangModel : public BlockchainModel {
     public:
-        bool isImplementation(std::string contract, const BlkFunction<Top<Blockchain<Universe>>> &blockchainFn, const llvm::Function &llvmFn) const override;
+        bool isImplementation(std::string contract, const Top<Blockchain<Universe>>::Function &blockchainFn, const llvm::Function &llvmFn) const override;
         //bool isExternalCall(const llvm::Function &llvmFn) override;
         //bool isDelegateCall(const llvm::Function &llvmFn) override;
-        /*bool isAnyExternalCall(vanguard::Function &fn) const override;
-        bool isCall(vanguard::Function &fn) const override;
-        bool isStaticCall(vanguard::Function &fn) const override;
-        bool isDelegateCall(vanguard::Function &fn) const override;*/
+        bool isAnyLowLevelCall(Blockchain<Universe>::Instruction &ins) const override;
+        bool isLowLevelCall(Blockchain<Universe>::Instruction &ins) const override;
+        bool isLowLevelStaticCall(Blockchain<Universe>::Instruction &ins) const override;
+        bool isLowLevelDelegateCall(Blockchain<Universe>::Instruction &ins) const override;
         /*bool writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;
         bool readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;*/
 

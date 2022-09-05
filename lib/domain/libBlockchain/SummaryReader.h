@@ -10,7 +10,6 @@
 #include "Blockchain.h"
 #include "BlockchainFactory.h"
 #include "BlkValue.h"
-#include "BlkFunction.h"
 #include "rapidjson/document.h"
 
 namespace vanguard {
@@ -34,7 +33,7 @@ namespace vanguard {
         Blockchain<Universe>::Contract *readContract(rapidjson::Value &val);
         BlkStructType<StructType> *readStruct(rapidjson::Value &val);
         /*BlkEnum *readEnum(rapidjson::Value &val);*/
-        BlkFunction<Blockchain<Universe>> *readFunction(std::string contractName, rapidjson::Value &val);
+        Top<Blockchain<Universe>>::Function *readFunction(std::string contractName, rapidjson::Value &val);
         BlkVariable<Variable> *readVariable(rapidjson::Value &val);
         Type *readType(rapidjson::Value &val);
         ArrayType *readArrayType(rapidjson::Value &val);

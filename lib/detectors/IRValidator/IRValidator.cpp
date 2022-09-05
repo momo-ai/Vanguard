@@ -3,9 +3,6 @@
 #include <vector>
 #include <cassert>
 #include <iostream>
-#include "../../program/WrappedInstructions.h"
-#include <program/Function.cpp>
-#include <program/CompilationUnit.h>
 
 namespace vanguard {
     static bool debug_ir_validator = false;

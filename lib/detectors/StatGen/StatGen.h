@@ -28,7 +28,7 @@ namespace vanguard {
                 totFns++;
                 if(fn->hasBody()) {
                     auto body = fn->body();
-                    assert(body->parent() == fn && "Function does not match block function");
+                    assert(body->function() == fn && "Function does not match block function");
 
                     countBody(body);
                 }
@@ -64,7 +64,7 @@ namespace vanguard {
                 totBlks++;
 
                 for(auto ins : curBlk->instructions()) {
-                    assert(curBlk == ins->parent() && "Block does not match instruction block");
+                    assert(curBlk == ins->block() && "Block does not match instruction block");
                     totIns++;
                 }
 

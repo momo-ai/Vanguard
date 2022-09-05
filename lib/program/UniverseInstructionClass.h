@@ -8,6 +8,7 @@
 
 #include "Universe.h"
 #include "InstructionClasses.h"
+#include "llvm/IR/Instructions.h"
 
 namespace vanguard {
 

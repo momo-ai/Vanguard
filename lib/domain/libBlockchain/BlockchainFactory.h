@@ -9,7 +9,6 @@
 #include <unordered_map>
 #include "Blockchain.h"
 #include "BlkType.h"
-#include "BlkFunction.h"
 #include "BlockchainModel.h"
 
 namespace vanguard {
@@ -19,9 +18,9 @@ namespace vanguard {
 
         BlkType<UnknownType> *createBasicType(const llvm::Module &module, BlockchainModel &model, std::string name);
 
-        BlkFunction<Blockchain<Universe>> *createBlkFunction(const llvm::Module &module, BlockchainModel &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods);
+        Top<Blockchain<Universe>>::Function *createBlkFunction(const llvm::Module &module, BlockchainModel &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods);
 
-        Blockchain<Universe>::Contract *createContract(const llvm::Module &module, BlockchainModel &model, std::string& name, std::vector<BlkFunction<Blockchain<Universe>> *>& fns, std::vector<Variable *>& vars);
+        Blockchain<Universe>::Contract *createContract(const llvm::Module &module, BlockchainModel &model, std::string& name, std::vector<Top<Blockchain<Universe>>::Function *>& fns, std::vector<Variable *>& vars);
 
         BlkStructType<StructType> *createStruct(const llvm::Module &mod, BlockchainModel &model, const std::string& name, std::vector<Variable *> fields);
 

@@ -2,7 +2,6 @@
 #define VANGUARD_DOMAIN_DOMAIN_H
 
 #include <list>
-#include "../program/Instruction.h"
 #include "../program/Value.h" // TODO: confirm with Jon that this suffices for valueish
 #include "../program/InstructionClasses.h" // NOTE: file DNE but possesses callInstruction type
 #include "CallEdge.h" 

@@ -14,11 +14,11 @@ namespace vanguard{
     }
 
 
-    Universe::Function* Universe::Block::fn(){
+    Universe::Function* Universe::Block::fn() const {
         return factory.createFn(block->getParent());
     }
 
-    std::list<Universe::Instruction*> Universe::Block::insts(){
+    std::list<Universe::Instruction*> Universe::Block::insts() const{
         if(block == nullptr) {
             return {};
         }
@@ -34,7 +34,7 @@ namespace vanguard{
         return block->isEntryBlock();
     }
 
-    std::unordered_set<Universe::Block* > Universe::Block::succs(){
+    std::unordered_set<Universe::Block* > Universe::Block::succs() const{
         std::unordered_set<Block*> allSuccessors = {};
         for (auto *succ : llvm::successors(block)) {
             allSuccessors.insert(factory.createBlk(succ));

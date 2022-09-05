@@ -7,7 +7,6 @@
 #include <program/WrappedValue.h>
 
 #include <utility>
-#include "HelperFunction.h"
 #include "Blockchain.h"
 #include "SummaryReader.h"
 #include <program/WrappedType.h>
@@ -15,8 +14,8 @@
 #include <program/Top.h>
 
 namespace vanguard {
-    BlkFunction<Blockchain<Universe>> *BlockchainFactory::createBlkFunction(const llvm::Module &module, BlockchainModel &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods) {
-        auto fn = new BlkFunction<Top<Blockchain<Universe>>>(name, selector, isCnstr, vis, mut, std::move(params), std::move(rets), std::move(mods), *this, nullptr);
+    Top<Blockchain<Universe>>::Function *BlockchainFactory::createBlkFunction(const llvm::Module &module, BlockchainModel &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods) {
+        auto fn = new Top<Blockchain<Universe>>::Function(name, selector, isCnstr, vis, mut, std::move(params), std::move(rets), std::move(mods), *this, nullptr);
 
         for(auto &llvmFn : module) {
             if(model.isImplementation(contract, *fn, llvmFn)) {
@@ -26,11 +25,11 @@ namespace vanguard {
             }
         }
 
-        return (BlkFunction<Blockchain<Universe>> *) fn;
+        return fn;
     }
 
-    Blockchain<Universe>::Contract *BlockchainFactory::createContract(const llvm::Module &module, BlockchainModel &model, std::string& name, std::vector<BlkFunction<Blockchain<Universe>> *>& fns, std::vector<Variable *>& vars) {
-        auto *contract = new Blockchain<Universe>::Contract(*this, name, fns, vars);
+    Blockchain<Universe>::Contract *BlockchainFactory::createContract(const llvm::Module &module, BlockchainModel &model, std::string& name, std::vector<Top<Blockchain<Universe>>::Function *>& fns, std::vector<Variable *>& vars) {
+        auto *contract = new Top<Blockchain<Universe>>::Contract(fns, *this, name, vars);
         return contract;
     }
 
@@ -78,7 +77,7 @@ namespace vanguard {
         }
 
         if(functionMap.find(fn) == functionMap.end()) {
-            functionMap[fn] = new HelperFunction<Top<Blockchain<Universe>>>(*this, fn);
+            functionMap[fn] = new Top<Blockchain<Universe>>::Function(*this, fn);
         }
         return functionMap[fn];
     }
@@ -104,7 +103,7 @@ namespace vanguard {
             else if (opcode >= 38 && opcode <= 50) instructionMap[ins] = new Universe::CastExpr<Top<Blockchain<Universe>>, llvm::CastInst>(llvm::dyn_cast<llvm::CastInst>(ins), *this);
             else if (opcode == 53 || opcode == 54) instructionMap[ins] = new Universe::BinaryOpExpr<Top<Blockchain<Universe>>, llvm::CmpInst>(llvm::dyn_cast<llvm::CmpInst>(ins), *this);
             else if (opcode == 55) instructionMap[ins] = new Universe::UnknownExpr<Top<Blockchain<Universe>>, llvm::PHINode>(llvm::dyn_cast<llvm::PHINode>(ins), *this);
-            else if (opcode == 56) instructionMap[ins] = new Universe::CallExpr<Top<Blockchain<Universe>>, llvm::CallBase>(llvm::dyn_cast<llvm::CallBase>(ins), *this);
+            else if (opcode == 56) instructionMap[ins] = new Blockchain<Universe>::CallExpr<Top<Blockchain<Universe>>, llvm::CallBase>(llvm::dyn_cast<llvm::CallBase>(ins), *this);
             else if (opcode == 57) instructionMap[ins] = new Universe::TernaryExpr<Top<Blockchain<Universe>>, llvm::SelectInst>(llvm::dyn_cast<llvm::SelectInst>(ins), *this);
             else if (opcode == 61) instructionMap[ins] = new Universe::UnknownExpr<Top<Blockchain<Universe>>, llvm::ExtractElementInst>(llvm::dyn_cast<llvm::ExtractElementInst>(ins), *this);
             else if (opcode == 62) instructionMap[ins] = new Universe::UnknownExpr<Top<Blockchain<Universe>>, llvm::InsertElementInst>(llvm::dyn_cast<llvm::InsertElementInst>(ins), *this);

@@ -5,15 +5,19 @@
 #ifndef LIBBLOCKCHAIN_BLOCKCHAINTOLLVM_H
 #define LIBBLOCKCHAIN_BLOCKCHAINTOLLVM_H
 
-#include "BlkFunction.h"
 #include "program/Top.h"
+#include "Blockchain.h"
 
 
 namespace vanguard {
     class BlockchainModel {
         public:
             virtual ~BlockchainModel() = default;
-            virtual bool isImplementation(std::string contract, const BlkFunction<Top<Blockchain<Universe>>> &blockchainFn, const llvm::Function &llvmFn) const = 0;
+            virtual bool isImplementation(std::string contract, const Top<Blockchain<Universe>>::Function &blockchainFn, const llvm::Function &llvmFn) const = 0;
+            virtual bool isAnyLowLevelCall(Blockchain<Universe>::Instruction &ins) const = 0;
+            virtual bool isLowLevelCall(Blockchain<Universe>::Instruction &ins) const = 0;
+            virtual bool isLowLevelStaticCall(Blockchain<Universe>::Instruction &ins) const = 0;
+            virtual bool isLowLevelDelegateCall(Blockchain<Universe>::Instruction &ins) const = 0;
             //virtual bool isExternalCall(const llvm::Function &llvmFn) = 0;
             //virtual bool isDelegateCall(const llvm::Function &llvmFn) = 0;
             //virtual bool isAnyExternalCall(vanguard::Function &llvmFn) const = 0;

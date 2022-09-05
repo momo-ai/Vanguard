@@ -5,8 +5,6 @@
 #ifndef LIBBLOCKCHAIN_BLOCKCHAIN_H
 #define LIBBLOCKCHAIN_BLOCKCHAIN_H
 
-#include <program/Function.cpp>
-#include <program/Instruction.h>
 #include <program/LLVMFactory.h>
 #include <analysis/alias/AAWrapper.h>
 #include <domain/Domain.h>
