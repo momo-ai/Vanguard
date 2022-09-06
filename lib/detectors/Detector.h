@@ -12,8 +12,11 @@ namespace vanguard {
     public:
         enum DetectorDomain { BASIC, BLOCKCHAIN };
 
-        virtual std::vector<Requirement *> registerAnalyses() = 0;
-        virtual void startDetection() = 0;
+        virtual std::vector<Requirement *> registerAnalyses() {
+            return {};
+        }
+
+        virtual void startDetection() {};
         virtual void report() = 0;
     };
 }

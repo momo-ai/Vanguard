@@ -9,15 +9,9 @@
 #include <domain/libBlockchain/BlockchainModel.h>
 #include <detectors/UniverseDetector.h>
 #include <iostream>
+#include <unordered_map>
 
 namespace vanguard {
-    template <typename Domain>
-    struct StateModifiedReachability : public Reachable<Domain> {
-        bool condition(typename Domain::Instruction &ins) {
-            return ins.template writesStorage<Domain>();
-        }
-    };
-
     template <typename Domain>
     class ReentrancyDetector : public UniverseDetector<Domain> {
     public:
@@ -26,30 +20,58 @@ namespace vanguard {
         using Block = typename Domain::Block;
         using Instruction = typename Domain::Instruction;
 
+        struct CallTargetResolver : public InstructionClassVisitor<Domain> {
+            typename Domain::Function *tgt = nullptr;
+            void visit(const CallExpr<Domain> &v) override{
+                tgt = v.target();
+            }
+        };
 
-        virtual std::vector<Requirement *> registerAnalyses() override {
-            return {};
-        }
+        struct StateModifiedReachability : public Reachable<Domain> {
+            StateModifiedReachability(std::unordered_set<Function *>& writesStorage) : writesStorage(writesStorage) {};
 
-        virtual void startDetection() override {}
+            bool condition(Instruction &ins) {
+                CallTargetResolver resolver;
+                ins.accept(resolver);
+                return ins.template writesStorage<Domain>() || writesStorage.find(resolver.tgt) != writesStorage.end();
+            }
 
-        virtual void detect(Domain &universe) override {
-            StateModifiedReachability<Domain> reach;
-            auto contracts = universe.template contracts<Domain>();
-            for(auto contract : contracts) {
-                std::cout << "Found " << contract->name() << std::endl;
-                for(auto fn : contract->functions()) {
-                    std::cout << "  Has Function " << fn->name() << std::endl;
+            std::unordered_set<Function *>& writesStorage;
+        };
 
-                    for(auto blk : fn->blocks()) {
-                        for(auto ins : blk->instructions()) {
-                            if(ins->isAnyLowLevelCall() && reach.reachable(*ins)) {
-                                std::cout << "    vulnerable" << std::endl;
-                            }
+        void process(Function *fn) {
+            processed.insert(fn);
+            StateModifiedReachability reach(writesStorage);
+
+            for(auto blk : fn->blocks()) {
+                for(auto ins : blk->instructions()) {
+                    CallTargetResolver resolver;
+                    ins->accept(resolver);
+
+                    if(resolver.tgt != nullptr && processed.find(resolver.tgt) == processed.end()) {
+                        process(resolver.tgt);
+                    }
+
+                    if(ins->isAnyLowLevelCall() || writesStorage.find(resolver.tgt) != writesStorage.end()) {
+                        writesStorage.insert(fn);
+                        if(reach.reachable(*ins)) {
+                            std::cout << "vulnerable" << std::endl;
                         }
                     }
-                }
 
+                    if(ins->template writesStorage<Domain>() || writesStorage.find(resolver.tgt) != writesStorage.end()) {
+                        calls.insert(fn);
+                    }
+                }
+            }
+        }
+
+        void detect(Domain &universe) override {
+            auto contracts = universe.template contracts<Domain>();
+            for(auto contract : contracts) {
+                for(auto fn : contract->functions()) {
+                    process(fn);
+                }
             }
         }
 
@@ -64,6 +86,10 @@ namespace vanguard {
         static Detector::DetectorDomain domain() {
             return Detector::BLOCKCHAIN;
         }
+    private:
+        std::unordered_set<Function *> processed;
+        std::unordered_set<Function *> writesStorage;
+        std::unordered_set<Function *> calls;
     };
 }
 
