@@ -36,8 +36,8 @@ namespace vanguard {
 
         class Contract : public ObjectType {
         public:
-            Contract(UnitFactory &factory, std::string name, std::vector<Variable *> vars/*, std::vector<BlkType *> inherits,
-            std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events*/) : contractName(std::move(name)), vars(std::move(vars)), ObjectType(factory) {};
+            Contract(BlockchainModel &model, UnitFactory &factory, std::string name, std::vector<Variable *> vars/*, std::vector<BlkType *> inherits,
+            std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events*/) : model(model), contractName(std::move(name)), vars(std::move(vars)), ObjectType(factory) {};
 
             std::string name() const override {
                 return contractName;
@@ -48,10 +48,14 @@ namespace vanguard {
             const std::vector<Variable *> &variables() const {
                 return vars;
             }
+
+            BlockchainModel &blockchainModel() {
+                return model;
+            }
             //std::vector<BlkContract *> inherits() const;
         private:
             const std::string contractName;
-            BlockchainModel *model;
+            BlockchainModel &model;
             /*std::vector<BlkUserType *> contractInherits;
             std::vector<BlkEvent *> contractEvents;
             std::vector<BlkEnum *> contractEnums;
@@ -161,24 +165,45 @@ namespace vanguard {
             template<typename ...Args>
             explicit Instruction(Args&&... args) : Domain::Instruction(std::forward<Args>(args)...) {};
 
-            virtual bool isAnyLowLevelCall() const {
+            virtual bool isAnyLowLevelCall()  {
                 return false;
             }
 
-            virtual bool isLowLevelCall() const {
+            virtual bool isLowLevelCall()  {
                 return false;
             }
 
-            virtual bool isLowLevelStaticCall() const {
+            virtual bool isLowLevelStaticCall()  {
                 return false;
             }
 
-            virtual bool isLowLevelDelegateCall() const {
+            virtual bool isLowLevelDelegateCall()  {
+                return false;
+            }
+
+            template<typename IDomain>
+            bool writesStorage()  {
+                auto ins = dynamic_cast<typename IDomain::Instruction *>(this);
+                auto contract = ins->block()->function()->template contract<Blockchain<Domain>>();
+                if(contract != nullptr) {
+                    auto &model = contract->blockchainModel();
+                    return model.writesStorage(*ins);
+                }
+                return false;
+            }
+
+            template<typename IDomain>
+            bool readsStorage()  {
+                auto ins = dynamic_cast<typename IDomain::Instruction *>(this);
+                auto contract = ins->block()->function()->template contract<Blockchain<Domain>>();
+                if(contract != nullptr) {
+                    auto &model = contract->blockchainModel();
+                    return model.readsStorage(*ins);
+                }
                 return false;
             }
 
             virtual Block* block() const = 0;
-
         };
 
         template<typename InsDomain, typename Wrap>
@@ -187,9 +212,42 @@ namespace vanguard {
             template<typename ...Args>
             explicit CallExpr(Args&&... args) : Domain::template CallExpr<InsDomain, Wrap>(std::forward<Args>(args)...) {};
 
-            virtual bool isAnyLowLevelCall() const override {
-                return true;
+            bool isAnyLowLevelCall()  override {
+                auto contract = this->block()->function()->template contract<Blockchain<Domain>>();
+                if(contract != nullptr) {
+                    auto &model = contract->blockchainModel();
+                    return model.isAnyLowLevelCall(*this);
+                }
+                return false;
             }
+
+            bool isLowLevelCall()  override {
+                auto contract = this->block()->function()->template contract<Blockchain<Domain>>();
+                if(contract != nullptr) {
+                    auto &model = contract->blockchainModel();
+                    return model.isLowLevelCall(*this);
+                }
+                return false;
+            }
+
+            bool isLowLevelStaticCall()  override {
+                auto contract = this->block()->function()->template contract<Blockchain<Domain>>();
+                if(contract != nullptr) {
+                    auto &model = contract->blockchainModel();
+                    return model.isLowLevelStaticCall(*this);
+                }
+                return false;
+            }
+
+            bool isLowLevelDelegateCall()  override {
+                auto contract = this->block()->function()->template contract<Blockchain<Domain>>();
+                if(contract != nullptr) {
+                    auto &model = contract->blockchainModel();
+                    return model.isLowLevelDelegateCall(*this);
+                }
+                return false;
+            }
+
         };
 
         template<typename ...Args>

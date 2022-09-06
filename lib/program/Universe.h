@@ -11,6 +11,7 @@
 #include <unordered_set>
 #include "Type.h"
 #include "WrappedType.h"
+#include "InstructionClassVisitor.h"
 
 namespace vanguard {
     class UnitFactory;

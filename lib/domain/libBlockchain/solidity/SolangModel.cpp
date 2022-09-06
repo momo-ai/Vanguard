@@ -7,6 +7,7 @@
 #include <regex>
 #include <sstream>
 #include <stdexcept>
+#include <program/InstructionClasses.h>
 using namespace std;
 
 namespace vanguard {
@@ -83,23 +84,67 @@ namespace vanguard {
         return regex_match(llvmFn.getName().str(), reg);
     }
 
-    bool SolangModel::isAnyLowLevelCall(Blockchain<Universe>::Instruction &ins) const {
-        return isLowLevelCall(ins) || isLowLevelStaticCall(ins) || isLowLevelDelegateCall(ins);
+    bool SolangModel::isAnyLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+        return isLowLevelCall(call) || isLowLevelStaticCall(call) || isLowLevelDelegateCall(call);
     }
 
-    bool SolangModel::isLowLevelCall(Blockchain<Universe>::Instruction &ins) const {
-        string name = ins.name();
+    bool SolangModel::isLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+        string name = call.target()->name();
         return name == "call";
     }
 
-    bool SolangModel::isLowLevelStaticCall(Blockchain<Universe>::Instruction &ins) const {
-        string name = ins.name();
+    bool SolangModel::isLowLevelStaticCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+        string name = call.target()->name();
         return name == "callStatic";
     }
 
-    bool SolangModel::isLowLevelDelegateCall(Blockchain<Universe>::Instruction &ins) const {
-        string name = ins.name();
+    bool SolangModel::isLowLevelDelegateCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+        string name = call.target()->name();
         return name == "callDelegate";
+    }
+
+    class CallTargetResolver : public InstructionClassVisitor<Top<Blockchain<Universe>>> {
+    public:
+        bool isCall = false;
+        const Blockchain<Universe>::Function *tgt;
+        void visit(const CallExpr<Top<Blockchain<Universe>>> &v) override{
+            isCall = true;
+            tgt = v.target();
+        }
+    };
+
+    bool SolangModel::writesStorage(Top<Blockchain<Universe>>::Instruction &ins) {
+        CallTargetResolver tgtResolver;
+        ins.accept(tgtResolver);
+
+        if(!tgtResolver.isCall) {
+            return false;
+        }
+
+        string fnName = tgtResolver.tgt->name();
+
+        stringstream ss;
+        ss << ".*::function::" << "v?__set_.*";
+
+        std::regex reg(ss.str());
+        return regex_match(fnName, reg);
+    }
+
+    bool SolangModel::readsStorage(Top<Blockchain<Universe>>::Instruction &ins) {
+        CallTargetResolver tgtResolver;
+        ins.accept(tgtResolver);
+
+        if(!tgtResolver.isCall) {
+            return false;
+        }
+
+        string fnName = tgtResolver.tgt->name();
+
+        stringstream ss;
+        ss << ".*::function::" << "v?__get_.*";
+
+        std::regex reg(ss.str());
+        return regex_match(fnName, reg);
     }
 
     /*class TypeTrans : public BlkTypeVisitor {

@@ -29,7 +29,7 @@ namespace vanguard {
     }
 
     Blockchain<Universe>::Contract *BlockchainFactory::createContract(const llvm::Module &module, BlockchainModel &model, std::string& name, std::vector<Top<Blockchain<Universe>>::Function *>& fns, std::vector<Variable *>& vars) {
-        auto *contract = new Top<Blockchain<Universe>>::Contract(fns, *this, name, vars);
+        auto *contract = new Top<Blockchain<Universe>>::Contract(fns, model, *this, name, vars);
         return contract;
     }
 
