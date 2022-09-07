@@ -42,7 +42,7 @@ namespace vanguard{
         return allSuccessors;
     }
 
-    const llvm::BasicBlock &Block::unwrap(){
+    const llvm::BasicBlock &Block::unwrap() const{
         return block;
     }
 

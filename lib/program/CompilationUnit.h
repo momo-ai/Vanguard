@@ -26,7 +26,7 @@ namespace vanguard{
 
         std::list<Value*> globalVariables();
 
-        const llvm::Module& unwrap();
+        const llvm::Module& unwrap() const;
     };
 }
 

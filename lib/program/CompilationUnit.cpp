@@ -49,7 +49,7 @@ namespace vanguard{
         return allGlobalVariables;
     }
 
-    const llvm::Module& CompilationUnit::unwrap() {
+    const llvm::Module& CompilationUnit::unwrap() const {
         return module;
     }
 

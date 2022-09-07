@@ -5,6 +5,8 @@ target_sources(Vanguard PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/DetectorRegistry.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/AAWrapper.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/AARequirement.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/DAWrapper.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/DARequirement.cpp
     )
 
 add_subdirectory(FunctionPrinter)

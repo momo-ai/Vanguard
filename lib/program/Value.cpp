@@ -211,6 +211,10 @@ namespace vanguard{
         return v.visit(*this);
     }
 
+    const llvm::Constant &Constant::unwrap() const {
+        return constant;
+    }
+
     Location::Location(const llvm::BasicBlock &blk): Value(LOCATION), location(blk) {}
 
     Type *Location::type() const {
@@ -225,5 +229,9 @@ namespace vanguard{
     vanguard::Block &Location::loc() const {
         auto &llvmToVanguard = LLVMtoVanguard::getInstance();
         return *llvmToVanguard.translateBlock(&location);
+    }
+
+    const llvm::BasicBlock &Location::unwrap() const {
+        return location;
     }
 }

@@ -8,7 +8,7 @@
 
 namespace blockchain {
     // TODO: Confirm with Jon that this is all that is needed to set
-    BlkVariable::BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type) : BlkNode(VARIABLE, blk2llvm, name), vanguard::Variable(vanguard::BLKVARIABLE), varTy(type) {
+    BlkVariable::BlkVariable(BlockchainToLLVM *blk2llvm, string &name, BlkType *type) : BlkNode(VARIABLE, blk2llvm, name), varTy(type) {
         type->parent(this);
         // or do we do type->getType()
     }
@@ -41,7 +41,7 @@ namespace blockchain {
         return blkTollvm->readsVariable(*this, ins);
     }
 
-    void BlkVariable::accept(vanguard::ValueClassVisitor &v) const {
-        return v.visit(*this);
-    }
+//    void BlkVariable::accept(vanguard::ValueClassVisitor &v) const {
+//        return v.visit(*this);
+//    }
 }

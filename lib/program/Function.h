@@ -33,7 +33,7 @@ namespace vanguard {
 
         std::list<Block *> blocks();
 
-        const llvm::Function &unwrap();
+        const llvm::Function &unwrap() const;
 
     private:
         const llvm::Function &function;

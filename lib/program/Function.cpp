@@ -55,7 +55,7 @@ namespace vanguard{
         return blocks;
     }
 
-    const llvm::Function &Function::unwrap(){
+    const llvm::Function &Function::unwrap() const{
         return function;
     }
 

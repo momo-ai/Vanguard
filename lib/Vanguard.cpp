@@ -22,10 +22,12 @@
 #include <llvm/CodeGen/CommandFlags.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Analysis/AliasAnalysis.h>
+#include <llvm/Analysis/DependenceAnalysis.h>
 #include <llvm/Demangle/Demangle.h>
 #include "program/Program.h"
 #include "program/LLVMtoVanguard.h"
 #include "detectors/DetectorRegistry.h"
+#include "domain/libBlockchain/include/SummaryReader.h"
 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
@@ -86,6 +88,7 @@ void initializeLLVM(int argc, char **argv) {
     llvm::initializeHardwareLoopsPass(registry);
     llvm::initializeTypePromotionPass(registry);
     llvm::initializeReplaceWithVeclibLegacyPass(registry);
+    //llvm::initializeDependenceAnalysisPass(registry);
 
     llvm::cl::ParseCommandLineOptions(argc, argv, "Vanguard Static Analyzer\n");
 }
@@ -159,7 +162,7 @@ int main(int argc, char **argv) {
     std::vector<std::unique_ptr<llvm::Module>> modules;
     std::vector<vanguard::CompilationUnit *> units;
     for (auto inFile: inputFiles) {
-        auto module = parseIRFile(inputFiles[0], Err, ctxt, setDataLayout);
+        auto module = parseIRFile(inFile, Err, ctxt, setDataLayout);
         if (!module) {
             Err.print(argv[0], llvm::errs());
             return 1;

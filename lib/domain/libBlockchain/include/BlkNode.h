@@ -14,6 +14,7 @@ namespace blockchain {
         BLOCKCHAIN_BEGIN,
         SOLIDITY = BLOCKCHAIN_BEGIN,
         INK,
+        NEAR,
         BLOCKCHAIN_END = INK,
         //storage
         STORAGE_BEGIN,

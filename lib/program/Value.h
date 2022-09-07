@@ -9,6 +9,7 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/Instruction.h"
+#include "llvm/IR/BasicBlock.h"
 //#include "LLVMtoVanguard.h"
 
 namespace vanguard{
@@ -50,6 +51,8 @@ namespace vanguard{
 
         virtual void accept(ValueClassVisitor &v) const = 0;
 
+        virtual const llvm::Value& unwrap() const = 0;
+
     private:
         ValueClassEnum valClass;
     };
@@ -81,7 +84,7 @@ namespace vanguard{
 
         std::string name() const override;
 
-        const llvm::GlobalVariable &unwrap() const;
+        const llvm::GlobalVariable &unwrap() const override;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -109,7 +112,7 @@ namespace vanguard{
 
         std::string name() const override;
 
-        const llvm::Argument &unwrap() const;
+        const llvm::Argument &unwrap() const override;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -137,7 +140,7 @@ namespace vanguard{
 
         std::string name() const override;
 
-        const llvm::Instruction &unwrap() const;
+        const llvm::Instruction &unwrap() const override;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -170,7 +173,7 @@ namespace vanguard{
 
         Type* type() const override;
 
-        const llvm::ConstantInt &unwrap() const;
+        const llvm::ConstantInt &unwrap() const override;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -196,7 +199,7 @@ namespace vanguard{
 
         Type* type() const override;
 
-        const llvm::ConstantDataSequential &unwrap() const;
+        const llvm::ConstantDataSequential &unwrap() const override;
 
         void accept(ValueClassVisitor &v) const override;
 
@@ -301,6 +304,8 @@ namespace vanguard{
         unsigned getLLVMValueID() const;
 
         void accept(ValueClassVisitor &v) const override;
+
+        const llvm::Constant &unwrap() const override;
     };
 
     class Location: public Value{
@@ -321,6 +326,8 @@ namespace vanguard{
         Type* type() const override;
         void accept(ValueClassVisitor &v) const override;
         vanguard::Block &loc() const;
+
+        const llvm::BasicBlock &unwrap() const override;
     };
 
     class ValueClassVisitor{

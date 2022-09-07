@@ -37,6 +37,10 @@ namespace blockchain {
         const vector<BlkFunction *> &functions() const;
         const vector<BlkVariable *> &variables() const;
         vector<BlkContract *> inherits() const;
+
+        void setExternal() { external = true; }
+
+        bool isExternal() { return this->external; }
     private:
         vector<BlkUserType *> *contractInherits;
         vector<BlkEvent *> *contractEvents;
@@ -44,6 +48,7 @@ namespace blockchain {
         vector<BlkStruct *> *contractStructs;
         vector<BlkVariable *> *contractVars;
         vector<BlkFunction *> *contractFns;
+        bool external = false;
     };
 }
 

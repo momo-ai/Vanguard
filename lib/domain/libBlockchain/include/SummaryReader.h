@@ -21,12 +21,14 @@
 #include "BlkStorage.h"
 #include "BlkEvent.h"
 
+#include "../../../detectors/DAWrapper.h"
+
 #include "../rapidjson/document.h"
 
 namespace blockchain {
     class SummaryReader{
     public:
-        SummaryReader(std::string projectFile, vanguard::AAWrapper *alias);
+        SummaryReader(const std::string& projectFile, vanguard::AAWrapper *alias);
         Blockchain *blockchain();
     private:
         std::map<int, BlkStorage *> storageDecls;

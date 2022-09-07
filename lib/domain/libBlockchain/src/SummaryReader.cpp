@@ -12,6 +12,8 @@
 #include "../include/SolangToLLVM.h"
 #include "../include/InkToLLVM.h"
 #include "../include/Ink.h"
+#include "../include/NearToLLVM.h"
+#include "../include/Near.h"
 #include "../include/BlkEvent.h"
 
 using namespace std;
@@ -19,7 +21,7 @@ using namespace std;
 namespace blockchain {
 
 
-    SummaryReader::SummaryReader(std::string projectFile, vanguard::AAWrapper *alias) : alias(alias) {
+    SummaryReader::SummaryReader(const std::string& projectFile, vanguard::AAWrapper *alias) : alias(alias) {
         ifstream inStream(projectFile);
         rapidjson::IStreamWrapper jsonStream(inStream);
         cout << "starting" << endl;
@@ -33,17 +35,18 @@ namespace blockchain {
         return summary;
     }
 
-    void error(string msg) {
+    void error(const string& msg) {
         throw std::runtime_error(msg);
     }
 
-    void require(bool cond, string msg = "") {
+    void require(bool cond, const string& msg = "") {
         if(!cond) {
             error(msg);
         }
     }
 
     Blockchain *SummaryReader::readSummary(rapidjson::Value &val) {
+        require(val.IsObject(), "Invalid JSON input");
         require(val.HasMember("compiler") && val["compiler"].IsString(), "Summary must declare compiler");
         require(val.HasMember("version") && val["version"].IsString(), "Summary must declare version");
 
@@ -59,6 +62,20 @@ namespace blockchain {
         else if(compiler == "cargo-contract") {
             llvmTrans = new InkToLLVM(*alias);
             blockchain = new Ink(llvmTrans, compiler, version, contracts, *alias);
+        }
+        else if(compiler == "rustc") {
+            require(val.HasMember("blockchain") && val["blockchain"].IsString(), "Missing blockchain for rustc compiler");
+            string blockchainStr = val["blockchain"].GetString();
+            if (blockchainStr == "near"){
+                auto nearToLLVM = new NearToLLVM(*alias);
+                llvmTrans = nearToLLVM;
+                blockchain = new Near(llvmTrans, compiler, version, contracts, *alias);
+
+                nearToLLVM->setNear((Near*)blockchain);
+            }
+            else {
+                error( string("Unknown blockchain for rustc"));
+            }
         }
         else {
             error(string("Unknown compiler: ") + compiler);
@@ -87,6 +104,7 @@ namespace blockchain {
         int id = val["id"].GetInt();
         string name = val["name"].GetString();
 
+        // TODO: I think these must be deleted or have an auto-prt (or whatever is called now in C++)
         auto inherits = new vector<BlkUserType *>();
         if(val.HasMember("inherits")) {
             require(val["inherits"].IsArray(), "contract inherits must be an array of UserType");
@@ -142,6 +160,14 @@ namespace blockchain {
 
         auto contract = new BlkContract(llvmTrans, name, functions, variables, inherits, enums, structs, events);
         storageDecls[id] = contract;
+
+        // TODO: Fix this temp hack: this is for NEAR contracts
+
+        if (val.HasMember("external")) {
+            require(val["external"].IsBool(), "external must be boolean");
+            if (val["external"].GetBool())
+                contract->setExternal();
+        }
         return contract;
     }
 

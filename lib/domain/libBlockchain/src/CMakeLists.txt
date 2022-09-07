@@ -16,6 +16,8 @@ target_sources(Vanguard PRIVATE
         ${CMAKE_CURRENT_SOURCE_DIR}/Ink.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/InkToLLVM.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/BlkEvent.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/NearToLLVM.cpp
+        ${CMAKE_CURRENT_SOURCE_DIR}/Near.cpp
         )
 
 include_directories(../include)

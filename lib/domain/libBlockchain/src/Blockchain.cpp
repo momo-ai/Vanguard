@@ -75,38 +75,38 @@ namespace blockchain {
         return true;
     }
 
-    std::list<vanguard::Value*> Blockchain::getAdditionalStorage() {
-        std::list<vanguard::Value*> res;
-        for(auto contract : *allContracts) {
-            for(auto var : contract->variables()) {
-                res.push_back(var);
-            }
-        }
-        return res;
-    }
-
-    std::list<vanguard::Value*> Blockchain::getStorageReads(vanguard::Instruction& ins) {
-        std::list<vanguard::Value*> res;
-        for(auto contract: *allContracts) {
-            for(auto var : contract->variables()) {
-                if(var->readBy(ins)) {
-                    res.push_back(var);
-                }
-            }
-        }
-        return res;
-    }
-
-    std::list<vanguard::Value*> Blockchain::getStorageWrites(vanguard::Instruction& ins) {
-        std::list<vanguard::Value*> res;
-        for(auto contract: *allContracts) {
-            for(auto var : contract->variables()) {
-                if(var->writtenBy(ins)) {
-                    res.push_back(var);
-                }
-            }
-        }
-        return res;
-    }
+//    std::list<vanguard::Value*> Blockchain::getAdditionalStorage() {
+//        std::list<vanguard::Value*> res;
+//        for(auto contract : *allContracts) {
+//            for(auto var : contract->variables()) {
+//                res.push_back(var);
+//            }
+//        }
+//        return res;
+//    }
+//
+//    std::list<vanguard::Value*> Blockchain::getStorageReads(vanguard::Instruction& ins) {
+//        std::list<vanguard::Value*> res;
+//        for(auto contract: *allContracts) {
+//            for(auto var : contract->variables()) {
+//                if(var->readBy(ins)) {
+//                    res.push_back(var);
+//                }
+//            }
+//        }
+//        return res;
+//    }
+//
+//    std::list<vanguard::Value*> Blockchain::getStorageWrites(vanguard::Instruction& ins) {
+//        std::list<vanguard::Value*> res;
+//        for(auto contract: *allContracts) {
+//            for(auto var : contract->variables()) {
+//                if(var->writtenBy(ins)) {
+//                    res.push_back(var);
+//                }
+//            }
+//        }
+//        return res;
+//    }
 
 }

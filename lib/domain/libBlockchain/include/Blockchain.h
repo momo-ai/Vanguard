@@ -51,9 +51,9 @@ class Blockchain : public BlkNode, public vanguard::Domain {
         virtual bool resolvesCalls() override;
         virtual std::list<vanguard::CallEdge*> getCallees(vanguard::Context context, vanguard::CallExpr &ins) override;
         virtual bool hasAdditionalStorage() override;
-        virtual std::list<vanguard::Value*> getAdditionalStorage() override;
-        virtual std::list<vanguard::Value*> getStorageReads(vanguard::Instruction& ins) override;
-        virtual std::list<vanguard::Value*> getStorageWrites(vanguard::Instruction& ins) override;
+//        virtual std::list<vanguard::Value*> getAdditionalStorage() override;
+//        virtual std::list<vanguard::Value*> getStorageReads(vanguard::Instruction& ins) override;
+//        virtual std::list<vanguard::Value*> getStorageWrites(vanguard::Instruction& ins) override;
 
     protected:
         string srcVersion;
