@@ -1,0 +1,91 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "UserType",
+                "name": "hello_near::Contract",
+                "refId": 111
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": true,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "<hello_near::Contract as core::default::Default>::default"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "std::string::String"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "hello_near::Contract::get_greeting"
+        },
+        {
+          "params": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "String"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "hello_near::Contract::set_greeting"
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "u128"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "hello_near::Contract::set_int"
+        }
+      ],
+      "variables": [
+        {
+          "name": "message",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "String"
+            }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 111,
+      "name": "hello_near::Contract"
+    }
+  ],
+  "compiler": "rustc",
+  "version": "1.56.0",
+  "blockchain": "near"
+}
