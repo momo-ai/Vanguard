@@ -9,38 +9,40 @@
 #include <map>
 #include <set>
 
-#include "../../program/CompilationUnit.h"
-#include "../../program/LLVMtoVanguard.h"
-#include "../../detectors/DAWrapper.h"
+#include "../../program/Universe.h"
+#include "../../program/WrappedValue.h"
+#include "../../program/UnitFactory.h"
 
 namespace analysis {
 
     class LLVMUtils {
     public:
 
-        static const std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>>& getMetadata(vanguard::CompilationUnit const *cUnit);
+        static const std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>>& getMetadata(const vanguard::Universe::CompilationUnit *cUnit);
 
         static std::set<llvm::Metadata*> findNodesUnder(llvm::Metadata *root, std::function<bool(llvm::Metadata*)> &cond);
 
-        static vanguard::Value* getFunctionArg(vanguard::Function *fun, int i);
+        static vanguard::Value* getFunctionArg(vanguard::Universe::Function *fun, int i);
 
-        static const vanguard::Value* getNamedFunctionArg(vanguard::Function *fun, const std::string &name);
+        static const vanguard::Value* getNamedFunctionArg(vanguard::Universe::Function *fun, const std::string &name);
 
-        static bool readsMemFrom(const vanguard::Instruction *instr, const vanguard::Value *obj);
+        template<typename Base, typename Wrap>
+        static bool readsMemFrom(const vanguard::Universe::Instruction *instr, const vanguard::WrappedValue<Base, Wrap> *obj);
 
-        static bool writesMemTo(const vanguard::Instruction *instr, const vanguard::Value *obj);
+        template<typename Base, typename Wrap>
+        static bool writesMemTo(const vanguard::Universe::Instruction *instr, const vanguard::WrappedValue<Base, Wrap> *obj);
 
-        static const llvm::Value* isMemRead(const vanguard::Instruction *inst);
+        static const llvm::Value* isMemRead(const vanguard::Universe::Instruction *inst);
 
-        static const llvm::Value* isMemWrite(const vanguard::Instruction *inst);
+        static const llvm::Value* isMemWrite(const vanguard::Universe::Instruction *inst);
 
-        static std::string demangleFunction(const vanguard::Function *fun);
+        static std::string demangleFunction(const vanguard::Universe::Function *fun);
 
     private:
 
         static std::map<llvm::Module const *, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>> mdnMap;
 
-        static vanguard::LLVMtoVanguard *llvmToVanguard;
+        static vanguard::UnitFactory *factory;
     };
 
 } // analysis

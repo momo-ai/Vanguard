@@ -15,7 +15,7 @@ namespace analysis {
 
     std::map<llvm::Module const *, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>> LLVMUtils::mdnMap;
 
-    vanguard::LLVMtoVanguard *LLVMUtils::llvmToVanguard = &vanguard::LLVMtoVanguard::getInstance();
+    vanguard::UnitFactory *LLVMUtils::factory = vanguard::UnitFactory::getInstance();
 
     // For debugging purposes.
     std::string printLLVMValue(const llvm::Value *v) {
@@ -63,7 +63,7 @@ namespace analysis {
     }
 
     // The following two are logic extracted from legacy detectors, not used at the moment.
-    llvm::MemoryLocation getReadLocation(const vanguard::Instruction& ins) {
+    llvm::MemoryLocation getReadLocation(const vanguard::Universe::Instruction& ins) {
         const llvm::Instruction& llvmIns = ins.unwrap();
         if(auto load = llvm::dyn_cast<llvm::LoadInst>(&llvmIns)) {
             llvm::MemoryLocation loadLoc = llvm::MemoryLocation::get(load);
@@ -77,7 +77,7 @@ namespace analysis {
         throw std::runtime_error("error");
     }
 
-    llvm::MemoryLocation getWriteLocation(const vanguard::Instruction& instr) {
+    llvm::MemoryLocation getWriteLocation(const vanguard::Universe::Instruction& instr) {
         const llvm::Instruction& llvmIns = instr.unwrap();
         if(auto store = llvm::dyn_cast<llvm::StoreInst>(&llvmIns)) {
             llvm::MemoryLocation storeLoc = llvm::MemoryLocation::get(store);
@@ -162,40 +162,40 @@ namespace analysis {
         return std::move(found);
     }
 
-    std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>> const & LLVMUtils::getMetadata(vanguard::CompilationUnit const *cUnit) {
+    std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>> const & LLVMUtils::getMetadata(const vanguard::Universe::CompilationUnit *cUnit) {
 
-        auto &module = cUnit->unwrap();
-        if (mdnMap.find(&module) == mdnMap.end()) {
+        auto module = cUnit->unwrap();
+        if (mdnMap.find(module) == mdnMap.end()) {
             std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>> mdMap;
 
-            for (auto &fun : module) {
+            for (auto &fun : *module) {
                 collectMedataForFunction(&fun, mdMap);
             }
 
-            mdnMap[&module] = std::move(mdMap);
+            mdnMap[module] = std::move(mdMap);
         }
 
-        return mdnMap[&module];
+        return mdnMap[module];
     }
 
-    vanguard::Value* LLVMUtils::getFunctionArg(vanguard::Function *fun, int i) {
-        assert(("Invalid argument index.", i < fun->params().size()));
+    vanguard::Value* LLVMUtils::getFunctionArg(vanguard::Universe::Function *fun, int i) {
+        assert("Invalid argument index." && i < fun->params().size());
 
-        return llvmToVanguard->translateValue(fun->unwrap().getArg(i));
+        return factory->createVal(fun->unwrap()->getArg(i));
     }
 
-    const vanguard::Value* LLVMUtils::getNamedFunctionArg(vanguard::Function *fun, const std::string &name) {
-        auto &llFun = fun->unwrap();
+    const vanguard::Value* LLVMUtils::getNamedFunctionArg(vanguard::Universe::Function *fun, const std::string &name) {
+        auto llFun = fun->unwrap();
 
-        for (auto &a : llFun.args()) {
+        for (auto &a : llFun->args()) {
             if (a.hasName() && a.getName() == name)
-                return llvmToVanguard->translateValue(&a);
+                return factory->createVal(&a);
         }
 
         return nullptr;
     }
 
-    const llvm::Value* LLVMUtils::isMemRead(vanguard::Instruction const * inst) {
+    const llvm::Value* LLVMUtils::isMemRead(vanguard::Universe::Instruction const * inst) {
         auto &llvmIns = inst->unwrap();
 
         if (auto loadInst = llvm::dyn_cast<llvm::LoadInst>(&llvmIns)) {
@@ -207,7 +207,7 @@ namespace analysis {
         return nullptr;
     }
 
-    const llvm::Value* LLVMUtils::isMemWrite(vanguard::Instruction const * inst) {
+    const llvm::Value* LLVMUtils::isMemWrite(vanguard::Universe::Instruction const * inst) {
         auto &llvmIns = inst->unwrap();
         if (auto store = llvm::dyn_cast<llvm::StoreInst>(&llvmIns)) {
             return store->getPointerOperand();
@@ -218,23 +218,25 @@ namespace analysis {
         return nullptr;
     }
 
-    bool LLVMUtils::readsMemFrom(const vanguard::Instruction * instr, const vanguard::Value * obj) {
+    template<typename Base, typename Wrap>
+    bool LLVMUtils::readsMemFrom(const vanguard::Universe::Instruction *instr, const vanguard::WrappedValue<Base, Wrap> *obj) {
         if (auto src = isMemRead(instr))
             return dependsOnValue(src, &obj->unwrap());
         return false;
     }
 
-    bool LLVMUtils::writesMemTo(vanguard::Instruction const * instr, vanguard::Value const * obj) {
+    template<typename Base, typename Wrap>
+    bool LLVMUtils::writesMemTo(const vanguard::Universe::Instruction *instr, const vanguard::WrappedValue<Base, Wrap> *obj) {
         if (auto dest = isMemWrite(instr))
             return dependsOnValue(dest, &obj->unwrap());
         return false;
     }
 
-    std::string LLVMUtils::demangleFunction(const vanguard::Function *fun){
-        auto &llvmFun = fun->unwrap();
+    std::string LLVMUtils::demangleFunction(const vanguard::Universe::Function *fun){
+        auto llvmFun = fun->unwrap();
 
-        assert(("Function does not have name", llvmFun.hasName()));
+        assert("Function does not have name" && llvmFun->hasName());
 
-        return llvm::demangle(llvmFun.getName().str());
+        return llvm::demangle(llvmFun->getName().str());
     }
 } // analysis
