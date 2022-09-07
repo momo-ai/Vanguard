@@ -170,4 +170,28 @@ namespace vanguard{
 
         return llvm::dyn_cast<InstructionVariable>(valueMap[ins]);
     }
+
+    Block* LLVMtoVanguard::getInstructionBlock(Instruction const * instr) {
+        return translateBlock(instr->unwrap().getParent());
+    }
+
+    Function* LLVMtoVanguard::getInstructionFunction(Instruction const * instr) {
+        return translateFunction(instr->unwrap().getFunction());
+    }
+
+    CompilationUnit* LLVMtoVanguard::getInstructionCompUnit(Instruction const * instr){
+        return translateModule(instr->unwrap().getModule());
+    }
+
+    Function* LLVMtoVanguard::getBlockFunction(Block const * block){
+        return translateFunction(block->unwrap().getParent());
+    }
+
+    CompilationUnit* LLVMtoVanguard::getBlockCompUnit(Block const * block) {
+        return translateModule(block->unwrap().getModule());
+    }
+
+    CompilationUnit* LLVMtoVanguard::getFunctionCompUnit(Function const * fun) {
+        return translateModule(fun->unwrap().getParent());
+    }
 }

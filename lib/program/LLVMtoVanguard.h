@@ -36,6 +36,20 @@ namespace vanguard{
 
             InstructionVariable *translateInsVar(const llvm::Instruction *ins);
 
+            // Helper Functions
+
+            Block* getInstructionBlock(Instruction const * instr);
+
+            Function* getInstructionFunction(Instruction const * instr);
+
+            CompilationUnit* getInstructionCompUnit(Instruction const * instr);
+
+            Function* getBlockFunction(Block const * block);
+
+            CompilationUnit* getBlockCompUnit(Block const * block);
+
+            CompilationUnit* getFunctionCompUnit(Function const * fun);
+
         private:
             static LLVMtoVanguard* singletonLLVMtoVanguard;
             LLVMtoVanguard();
@@ -45,7 +59,6 @@ namespace vanguard{
             std::unordered_map<const llvm::Instruction*, Instruction*> instructionMap;
             std::unordered_map<const llvm::Type*, Type*> typeMap;
             std::unordered_map<const llvm::Value*, Value*> valueMap;
-
     };
 }
 
