@@ -40,25 +40,19 @@ namespace blockchain {
 
         bool isSelfDestruct(vanguard::Instruction &ins) const override;
 
+        static std::string demangleRustName(const vanguard::Function& fun);
+
     // Private Methods
-    // TODO: make public
-    //private:
+    private:
 
         size_t findVarOffset(BlkVariable &var, BlkContract &contract, vanguard::CompilationUnit &cu);
 
-//        void createMetadataSlot(llvm::Module const *mod, llvm::MDNode *n, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>> &mdMap);
-
-//        void collectMedataForFunction(llvm::Function const *fun, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>> &mdMap);
-
-        // Private State
+    // Private State
     private:
 
         vanguard::AAWrapper &alias;
 
         std::map<BlkContract*, std::map<std::string, size_t>> varOffsets;
-
-        // Metadata stuff
-
     };
 
 }

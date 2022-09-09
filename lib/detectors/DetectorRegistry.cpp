@@ -7,6 +7,7 @@
 #include "IRValidator/IRValidator.h"
 #include "FunctionPrinter/FunctionPrinter.h"
 #include "Reentrancy/ReentrancyDetector.h"
+#include "near-detectors/PublicCallbacks.h"
 #include <llvm/Support/CommandLine.h>
 
 /* This is how you can add additional detectors from external sources. Essentially add them in at compile time and
@@ -39,6 +40,7 @@ namespace vanguard {
         add(FunctionPrinter::name(), new FunctionPrinter());
         add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
         add(IRValidator::name(), new IRValidator());
+        add(PublicCallbacks::name(), new PublicCallbacks(summary.getValue()));
     }
 
     DetectorRegistry::~DetectorRegistry() {

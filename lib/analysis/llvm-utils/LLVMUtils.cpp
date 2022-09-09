@@ -13,6 +13,8 @@
 
 namespace analysis {
 
+    std::map<const llvm::Function *, const llvm::PostDominatorTree*> LLVMUtils::postDomTrees;
+
     std::map<llvm::Module const *, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>> LLVMUtils::mdnMap;
 
     vanguard::LLVMtoVanguard *LLVMUtils::llvmToVanguard = &vanguard::LLVMtoVanguard::getInstance();
@@ -236,5 +238,34 @@ namespace analysis {
         assert(("Function does not have name", llvmFun.hasName()));
 
         return llvm::demangle(llvmFun.getName().str());
+    }
+
+    void LLVMUtils::getPostDominatedBlocks(const vanguard::Block *block, llvm::SmallVector<vanguard::Block*> &dominated) {
+        auto &llvmBlock = block->unwrap();
+        auto domTree = getPostDomTree(llvmBlock.getParent());
+        llvm::SmallVector<llvm::BasicBlock*> descendants;
+        domTree->getDescendants(const_cast<llvm::BasicBlock*>(&llvmBlock), descendants);
+
+        for (auto & descendant : descendants)
+            dominated.push_back(llvmToVanguard->translateBlock(descendant));
+    }
+
+    const llvm::PostDominatorTree* LLVMUtils::getPostDomTree(const llvm::Function *fun) {
+        if (postDomTrees.find(fun) == postDomTrees.end()) {
+            postDomTrees[fun] = new llvm::PostDominatorTree(const_cast<llvm::Function&>(*fun));
+        }
+
+        return postDomTrees[fun];
+    }
+
+    bool LLVMUtils::postDominates(const vanguard::Instruction *i1, const vanguard::Instruction *i2) {
+        auto i1BB = i1->parent(), i2BB = i2->parent();
+
+        assert(i1BB->parent() == i2BB->parent() && "Invalid instructions: i1 & i2 must belong to the same function");
+        auto domTree = getPostDomTree(&i1BB->parent()->unwrap());
+
+        auto &llvmI1 = i1->unwrap(), &llvmI2 = i2->unwrap();
+        if (i1->parent() == i2->parent()) return domTree->dominates(&llvmI1, &llvmI2);
+        else return domTree->dominates(llvmI1.getParent(), llvmI2.getParent());
     }
 } // analysis
