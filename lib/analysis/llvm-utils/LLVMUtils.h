@@ -6,6 +6,7 @@
 #define VANGUARD_LLVMUTILS_H
 
 #include <llvm/IR/Module.h>
+#include <llvm/Analysis/PostDominators.h>
 #include <map>
 #include <set>
 
@@ -38,11 +39,20 @@ namespace analysis {
 
         static std::string demangleFunction(const vanguard::Universe::Function *fun);
 
+        static void getPostDominatedBlocks(const vanguard::Universe::Block *block, llvm::SmallVector<vanguard::Universe::Block*> &dominated);
+
+        static bool postDominates(const vanguard::Universe::Instruction *i1, const vanguard::Universe::Instruction *i2);
+
     private:
+
+        static std::map<const llvm::Function *, const llvm::PostDominatorTree*> postDomTrees;
 
         static std::map<llvm::Module const *, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>> mdnMap;
 
         static vanguard::UnitFactory *factory;
+
+    private:
+        static const llvm::PostDominatorTree* getPostDomTree(const llvm::Function *fun);
     };
 
 } // analysis

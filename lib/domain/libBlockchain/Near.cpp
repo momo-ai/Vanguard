@@ -103,4 +103,45 @@ namespace blockchain {
 
         return contractVars[var.name()];
     }
+
+    void replace_all(std::string &s, const std::string &toRepl, const std::string &replStr) {
+        std::string buf;
+        std::size_t pos = 0;
+        std::size_t prevPos = 0;
+        std::size_t toReplSize = toRepl.size();
+
+        buf.reserve(s.size());
+
+        while ((pos = s.find(toRepl, pos)) != std::string::npos) {
+            buf.append(s, prevPos, pos - prevPos);
+            buf += replStr;
+            prevPos = (pos += toReplSize);
+        }
+
+        buf.append(s, prevPos, s.size() - prevPos);
+        s.swap(buf);
+    }
+
+    void fixDemangler(std::string &funcDemName) {
+        replace_all(funcDemName, "$LT$", "<");
+        replace_all(funcDemName, "$GT$", ">");
+        replace_all(funcDemName, "..", "::");
+        replace_all(funcDemName, "$u20$", " ");
+
+        if (funcDemName[0] == '_')
+            funcDemName.replace(0, 1, "");
+    }
+
+    std::string clipRustHash(const std::string& funcName) {
+        return funcName.substr(0, funcName.size() - 19);
+    }
+
+    std::string Near::demangleRustName(const vanguard::Function& fun) {
+        auto demangledName = clipRustHash(analysis::LLVMUtils::demangleFunction(&fun));
+
+        if (demangledName.find('$') != std::string::npos)
+            fixDemangler(demangledName);
+
+        return demangledName;
+    }
 }

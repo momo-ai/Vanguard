@@ -32,7 +32,7 @@
           ],
           "modifiers": [],
           "isConstructor": false,
-          "visibility": "private",
+          "visibility": "public",
           "mutability": "nonpayable",
           "name": "cross_contract_call::Contract::query_greeting"
         },
@@ -48,7 +48,7 @@
           "returns": [],
           "modifiers": [],
           "isConstructor": false,
-          "visibility": "public",
+          "visibility": "private",
           "mutability": "nonpayable",
           "name": "cross_contract_call::Contract::query_greeting_callback"
         }
