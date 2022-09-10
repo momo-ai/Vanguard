@@ -27,7 +27,6 @@
 #include "program/Program.h"
 #include "program/LLVMtoVanguard.h"
 #include "detectors/DetectorRegistry.h"
-#include "domain/libBlockchain/include/SummaryReader.h"
 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);

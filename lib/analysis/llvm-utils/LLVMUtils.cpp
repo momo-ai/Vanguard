@@ -42,6 +42,9 @@ namespace analysis {
         while (!toVisit.empty()) {
             auto currVal = toVisit.front();
 
+            if (currVal == destVal)
+                return true;
+
             if (auto user = llvm::dyn_cast<llvm::User>(currVal)) {
                 for (auto &use: user->operands()) {
                     auto useAsVal = llvm::dyn_cast<llvm::Value>(&use);
@@ -267,5 +270,48 @@ namespace analysis {
         auto &llvmI1 = i1->unwrap(), &llvmI2 = i2->unwrap();
         if (i1->parent() == i2->parent()) return domTree->dominates(&llvmI1, &llvmI2);
         else return domTree->dominates(llvmI1.getParent(), llvmI2.getParent());
+    }
+
+    LLVMUtils::LocationInfo LLVMUtils::getLocInfo(const vanguard::Instruction *instr){
+        auto &llvmInstr = instr->unwrap();
+        auto &dbLoc = llvmInstr.getDebugLoc();
+        return {dbLoc->getFilename().str(), static_cast<int>(dbLoc->getLine()), static_cast<int>(dbLoc->getColumn())};
+    }
+
+    LLVMUtils::LocationInfo LLVMUtils::getLocInfo(const vanguard::Function *fun){
+        auto &llvmFun = fun->unwrap();
+        llvm::SmallVector<std::pair<unsigned int, llvm::MDNode*>> metadata;
+        llvmFun.getAllMetadata(metadata);
+        for (auto md : metadata) {
+            if (auto diSub = llvm::dyn_cast<llvm::DISubprogram>(metadata[0].second)) {
+                return {diSub->getFilename().str(), static_cast<int>(diSub->getLine()), -1};
+            }
+        }
+        return {"Unknown Location", -1, -1};
+    }
+
+    bool LLVMUtils::returnDependsOnVal(const vanguard::Function *fun, const vanguard::Instruction *val) {
+        auto &llvmFun = fun->unwrap();
+
+        llvm::SmallVector<const llvm::Value*> rvs;
+        for (auto &bb : llvmFun)
+            for (auto &inst : bb)
+                if (auto retInst = llvm::dyn_cast<llvm::ReturnInst>(&inst))
+                    if (auto retVal = retInst->getReturnValue())
+                        rvs.push_back(retVal);
+
+        return llvm::any_of(rvs, [&val](const llvm::Value *retVal) -> bool {return dependsOnValue(retVal, &val->unwrap()); });
+    }
+
+    bool LLVMUtils::valueDependsOn(const vanguard::Value *src, const vanguard::Instruction *instr) {
+        return dependsOnValue(&src->unwrap(), &instr->unwrap());
+    }
+
+    std::string LLVMUtils::print(const vanguard::Value *val) {
+        return printLLVMValue(&val->unwrap());
+    }
+
+    std::string LLVMUtils::print(const vanguard::Instruction *val) {
+        return printLLVMValue(&val->unwrap());
     }
 } // analysis

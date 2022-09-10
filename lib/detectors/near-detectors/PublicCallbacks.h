@@ -9,7 +9,6 @@
 
 #include "../../domain/libBlockchain/include/Near.h"
 #include "../FunctionDetector.h"
-#include "../../program/InstructionClassVisitor.h"
 #include "../AARequirement.h"
 
 

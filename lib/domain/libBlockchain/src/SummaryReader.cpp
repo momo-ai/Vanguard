@@ -24,7 +24,6 @@ namespace blockchain {
     SummaryReader::SummaryReader(const std::string& projectFile, vanguard::AAWrapper *alias) : alias(alias) {
         ifstream inStream(projectFile);
         rapidjson::IStreamWrapper jsonStream(inStream);
-        cout << "starting" << endl;
 
         rapidjson::Document doc;
         doc.ParseStream(jsonStream);

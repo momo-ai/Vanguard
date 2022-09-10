@@ -9,6 +9,8 @@
 #include <llvm/Analysis/PostDominators.h>
 #include <map>
 #include <set>
+#include <utility>
+#include <sstream>
 
 #include "../../program/CompilationUnit.h"
 #include "../../program/LLVMtoVanguard.h"
@@ -18,6 +20,27 @@ namespace analysis {
 
     class LLVMUtils {
     public:
+
+        struct LocationInfo {
+            std::string filename;
+
+            int line;
+
+            int column;
+
+            LocationInfo(std::string filename, int line, int column)
+            : filename(std::move(filename)), line(line), column(column) {
+
+            }
+
+            std::string toStr() {
+                std::ostringstream ost;
+                ost << filename;
+                if (line != -1) ost << ":" << line;
+                if (column != -1) ost << ":" << column;
+                return ost.str();
+            }
+        };
 
         static const std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>>& getMetadata(vanguard::CompilationUnit const *cUnit);
 
@@ -40,6 +63,18 @@ namespace analysis {
         static void getPostDominatedBlocks(const vanguard::Block *block, llvm::SmallVector<vanguard::Block*> &dominated);
 
         static bool postDominates(const vanguard::Instruction *i1, const vanguard::Instruction *i2);
+
+        static bool returnDependsOnVal(const vanguard::Function *fun, const vanguard::Instruction *val);
+
+        static bool valueDependsOn(const vanguard::Value *src, const vanguard::Instruction *instr);
+
+        static LocationInfo getLocInfo(const vanguard::Instruction *instr);
+
+        static LocationInfo getLocInfo(const vanguard::Function *fun);
+
+        static std::string print(const vanguard::Value *val);
+
+        static std::string print(const vanguard::Instruction *val);
 
     private:
 
