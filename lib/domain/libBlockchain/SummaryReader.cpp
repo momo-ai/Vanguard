@@ -26,7 +26,6 @@ namespace vanguard {
         model = nullptr;
         ifstream inStream(projectFile);
         rapidjson::IStreamWrapper jsonStream(inStream);
-        cout << "starting" << endl;
 
         rapidjson::Document doc;
         doc.ParseStream(jsonStream);

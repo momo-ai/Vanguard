@@ -62,11 +62,11 @@ namespace vanguard {
                 if (callBack->visibility() == blockchain::Visibility::PRIVATE)
                     continue;
 
-                llvm::SmallVector<vanguard::Block*> postDoms;
+                llvm::SmallVector<vanguard::Block*> doms;
                 auto currBB = (vanguard::Block*)instr->parent();
-                analysis::LLVMUtils::getPostDominatedBlocks(currBB, postDoms);
+                analysis::LLVMUtils::getPostDominatedBlocks(currBB, doms);
 
-                for (auto postDom : postDoms) {
+                for (auto postDom : doms) {
                     for (auto postInstr : postDom->instructions()) {
                         // Skip instructions prior to the callback.
                         if (postDom == currBB && analysis::LLVMUtils::postDominates(instr, postInstr))
@@ -92,7 +92,7 @@ namespace vanguard {
 
     void PublicCallbacks::report() {
         for (auto pubCallback : publicCallbacks)
-            cout << "WARNING: Callback function " << pubCallback->blkName() << " has public visibility.\n";
+            cerr << "WARNING: Callback function " << pubCallback->blkName() << " has public visibility.\n";
     }
 
     string PublicCallbacks::name() {
