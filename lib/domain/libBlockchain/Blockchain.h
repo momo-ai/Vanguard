@@ -208,10 +208,10 @@ namespace vanguard {
         };
 
         template<typename InsDomain, typename Wrap>
-        class CallExpr : public Domain::template CallExpr<InsDomain, Wrap> {
+        class CallIns : public Domain::template CallIns<InsDomain, Wrap> {
         public:
             template<typename ...Args>
-            explicit CallExpr(Args&&... args) : Domain::template CallExpr<InsDomain, Wrap>(std::forward<Args>(args)...) {};
+            explicit CallIns(Args&&... args) : Domain::template CallIns<InsDomain, Wrap>(std::forward<Args>(args)...) {};
 
             bool isAnyLowLevelCall()  override {
                 auto contract = this->block()->function()->template contract<Blockchain<Domain>>();
@@ -256,13 +256,13 @@ namespace vanguard {
                     auto &model = contract->blockchainModel();
                     auto callResolver = model.callResolver();
                     if(callResolver != nullptr) {
-                        auto tgts = callResolver->resolve(*static_cast<const vanguard::CallExpr<InsDomain> *>(this), *universe);
+                        auto tgts = callResolver->resolve(*static_cast<const vanguard::CallIns<InsDomain> *>(this), *universe);
                         if(!tgts.empty()) {
                             return tgts;
                         }
                     }
                 }
-                return Domain::template CallExpr<InsDomain, Wrap>::targets();
+                return Domain::template CallIns<InsDomain, Wrap>::targets();
             }
         };
 

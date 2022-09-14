@@ -17,13 +17,13 @@ namespace vanguard {
 
     // Branch Instruction
     template<typename Base>
-    class Branch : public Base::Instruction {
+    class BranchIns : public Base::Instruction {
     public:
         template<typename ...Args>
-        explicit Branch(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+        explicit BranchIns(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const Branch &) { return true; }
-        static inline bool classof(const Branch *) { return true; }
+        static inline bool classof(const BranchIns &) { return true; }
+        static inline bool classof(const BranchIns *) { return true; }
         static inline bool classof(const Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const Universe::Instruction &inst) {
             if (inst.instructionClass() == BRANCH){ return true; }
@@ -45,13 +45,13 @@ namespace vanguard {
 
     //Return Instruction
     template<typename Base>
-    class Return : public Base::Instruction {
+    class ReturnIns : public Base::Instruction {
     public:
         template<typename ...Args>
-        explicit Return(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+        explicit ReturnIns(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const Return &) { return true; }
-        static inline bool classof(const Return *) { return true; }
+        static inline bool classof(const ReturnIns &) { return true; }
+        static inline bool classof(const ReturnIns *) { return true; }
         static inline bool classof(const Universe::Instruction *inst) { return classof(*inst); }
         static inline bool cslassof(const Universe::Instruction &inst) {
             if (inst.instructionClass() == RETURN){ return true; }
@@ -71,13 +71,13 @@ namespace vanguard {
     };
 
     template<typename Base>
-    class Error : public Base::Instruction {
+    class ErrorIns : public Base::Instruction {
     public:
         template<typename ...Args>
-        explicit Error(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+        explicit ErrorIns(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const Error &) { return true; }
-        static inline bool classof(const Error *) { return true; }
+        static inline bool classof(const ErrorIns &) { return true; }
+        static inline bool classof(const ErrorIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == ERROR){ return true; }
@@ -117,13 +117,13 @@ namespace vanguard {
 
     // Assign Instruction
     template<typename Base>
-    class Assignment : public Expression<Base> {
+    class AssignIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit Assignment(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        explicit AssignIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const Assignment &) { return true; }
-        static inline bool classof(const Assignment *) { return true; }
+        static inline bool classof(const AssignIns &) { return true; }
+        static inline bool classof(const AssignIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == ASSIGNMENT){ return true; }
@@ -141,12 +141,12 @@ namespace vanguard {
 
     //BinaryOpInstruction
     template<typename Base>
-    class BinaryOpExpr : public Expression<Base> {
+    class BinaryOpIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit BinaryOpExpr(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
-        static inline bool classof(const BinaryOpExpr &) { return true; }
-        static inline bool classof(const BinaryOpExpr *) { return true; }
+        explicit BinaryOpIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        static inline bool classof(const BinaryOpIns &) { return true; }
+        static inline bool classof(const BinaryOpIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == BIN_OP){ return true; }
@@ -166,13 +166,13 @@ namespace vanguard {
 
     //Unary Operation Instruction
     template<typename Base>
-    class  UnaryOpExpr : public Expression<Base> {
+    class  UnaryOpIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit UnaryOpExpr(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        explicit UnaryOpIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const UnaryOpExpr &) { return true; }
-        static inline bool classof(const UnaryOpExpr *) { return true; }
+        static inline bool classof(const UnaryOpIns &) { return true; }
+        static inline bool classof(const UnaryOpIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == UN_OP){ return true; }
@@ -192,13 +192,13 @@ namespace vanguard {
     };
 
     template<typename Base>
-    class CallExpr : public Expression<Base> {
+    class CallIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit CallExpr(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        explicit CallIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const CallExpr &) { return true; }
-        static inline bool classof(const CallExpr *) { return true; }
+        static inline bool classof(const CallIns &) { return true; }
+        static inline bool classof(const CallIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == CALL){ return true; }
@@ -219,13 +219,13 @@ namespace vanguard {
     };
 
     template<typename Base>
-    class CastExpr : public Expression<Base> {
+    class CastIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit CastExpr(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        explicit CastIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const CastExpr &) { return true; }
-        static inline bool classof(const CastExpr *) { return true; }
+        static inline bool classof(const CastIns &) { return true; }
+        static inline bool classof(const CastIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == CAST){ return true; }
@@ -244,13 +244,13 @@ namespace vanguard {
     };
 
     template<typename Base>
-    class TernaryExpr : public Expression<Base> {
+    class TernaryIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit TernaryExpr(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        explicit TernaryIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const TernaryExpr &) { return true; }
-        static inline bool classof(const TernaryExpr *) { return true; }
+        static inline bool classof(const TernaryIns &) { return true; }
+        static inline bool classof(const TernaryIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == TERNARY){ return true; }
@@ -271,13 +271,13 @@ namespace vanguard {
     };
 
     template<typename Base>
-    class UnknownExpr : public Expression<Base> {
+    class UnknownIns : public Expression<Base> {
     public:
         template<typename ...Args>
-        explicit UnknownExpr(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        explicit UnknownIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
 
-        static inline bool classof(const UnknownExpr &) { return true; }
-        static inline bool classof(const UnknownExpr *) { return true; }
+        static inline bool classof(const UnknownIns &) { return true; }
+        static inline bool classof(const UnknownIns *) { return true; }
         static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
         static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == UNKNOWN){ return true; }
@@ -292,21 +292,6 @@ namespace vanguard {
             v.visit(*this);
         }
     };
-
-    /*class MemoryReadInstruction: public AssignInstruction{
-    public:
-        virtual InstructionVariable* getLHS() const = 0;
-    };
-
-    class MemoryWriteInstruction: public AssignInstruction{
-    public:
-        virtual MemoryRegion* getMemoryAddress() const = 0;
-    };
-
-    class AssignInst: public AssignInstruction{
-    public:
-        virtual InstructionVariable* getLHS() const = 0;
-    };*/
 }
 
 #endif //VANGUARD_INSTRUCTIONCLASSES_H

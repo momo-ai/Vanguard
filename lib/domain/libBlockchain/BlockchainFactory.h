@@ -14,6 +14,14 @@
 namespace vanguard {
     class BlockchainFactory : public LLVMFactory {
     public:
+        static UnitFactory *getInstance() {
+            if(instance == nullptr) {
+                instance = new LLVMFactory();
+            }
+
+            return instance;
+        }
+
         BlockchainFactory() = default;
 
         BlkType<UnknownType> *createBasicType(const llvm::Module &module, BlockchainModel &model, std::string name);

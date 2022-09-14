@@ -22,7 +22,7 @@ namespace vanguard {
 
         struct CallTargetResolver : public InstructionClassVisitor<Domain> {
             std::vector<typename Domain::Function *> tgts;
-            void visit(const CallExpr<Domain> &v) override{
+            void visit(const CallIns<Domain> &v) override{
                 tgts = v.targets();
             }
         };

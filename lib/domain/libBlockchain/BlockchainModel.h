@@ -15,10 +15,10 @@ namespace vanguard {
         public:
             virtual ~BlockchainModel() = default;
             virtual bool isImplementation(std::string contract, const Top<Blockchain<Universe>>::Function &blockchainFn, const llvm::Function &llvmFn) const = 0;
-            virtual bool isAnyLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  = 0;
-            virtual bool isLowLevelCall(CallExpr<Top<Blockchain<Universe>>>&call)  = 0;
-            virtual bool isLowLevelStaticCall(CallExpr<Top<Blockchain<Universe>>> &call)  = 0;
-            virtual bool isLowLevelDelegateCall(CallExpr<Top<Blockchain<Universe>>> &call)  = 0;
+            virtual bool isAnyLowLevelCall(CallIns<Top<Blockchain<Universe>>> &call)  = 0;
+            virtual bool isLowLevelCall(CallIns<Top<Blockchain<Universe>>>&call)  = 0;
+            virtual bool isLowLevelStaticCall(CallIns<Top<Blockchain<Universe>>> &call)  = 0;
+            virtual bool isLowLevelDelegateCall(CallIns<Top<Blockchain<Universe>>> &call)  = 0;
             virtual bool writesStorage(Top<Blockchain<Universe>>::Instruction &ins) = 0;
             virtual bool readsStorage(Top<Blockchain<Universe>>::Instruction &ins) = 0;
             virtual CallResolver<Top<Blockchain<Universe>>> *callResolver() = 0;

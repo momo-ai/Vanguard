@@ -40,16 +40,16 @@ namespace vanguard {
         class Block;
         class Instruction;
 
-        template<typename Base, typename Wrap> class Branch;
-        template<typename Base, typename Wrap> class Return;
-        template<typename Base, typename Wrap> class Error;
-        template<typename Base, typename Wrap> class Assignment;
-        template<typename Base, typename Wrap> class BinaryOpExpr;
-        template<typename Base, typename Wrap> class UnaryOpExpr;
-        template<typename Base, typename Wrap> class CallExpr;
-        template<typename Base, typename Wrap> class CastExpr;
-        template<typename Base, typename Wrap> class TernaryExpr;
-        template<typename Base, typename Wrap> class UnknownExpr;
+        template<typename Base, typename Wrap> class BranchIns;
+        template<typename Base, typename Wrap> class ReturnIns;
+        template<typename Base, typename Wrap> class ErrorIns;
+        template<typename Base, typename Wrap> class AssignIns;
+        template<typename Base, typename Wrap> class BinaryOpIns;
+        template<typename Base, typename Wrap> class UnaryOpIns;
+        template<typename Base, typename Wrap> class CallIns;
+        template<typename Base, typename Wrap> class CastIns;
+        template<typename Base, typename Wrap> class TernaryIns;
+        template<typename Base, typename Wrap> class UnknownIns;
 
 
         class CompilationUnit {

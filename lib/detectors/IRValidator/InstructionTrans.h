@@ -20,7 +20,7 @@ namespace vanguard {
         }
 
         std::string result;
-        void visit(const BinaryOpExpr<Domain> &inst) override{
+        void visit(const BinaryOpIns<Domain> &inst) override{
             auto op = inst.op();
             auto varResult = inst.result();
             result = "BinaryIns of BinaryOpClass " + std::to_string(op) + " has LHS: " + getValueString(*varResult) + " and operands: ";
@@ -30,7 +30,7 @@ namespace vanguard {
             result += getValueString(*inst.operandAt(1));
         }
 
-        void visit(const Branch<Domain> &inst) override{
+        void visit(const BranchIns<Domain> &inst) override{
             result = "BranchIns ";
             if (inst.isConditional()){
                 result+= "with condition " + getValueString(*inst.condition()) + ", ";
@@ -48,16 +48,16 @@ namespace vanguard {
             }
         }
 
-        void visit(const UnaryOpExpr<Domain> &inst) override{
+        void visit(const UnaryOpIns<Domain> &inst) override{
             result = "UnaryIns of UnaryOpClass " + std::to_string(inst.op()) + " has operand " +
                      getValueString(*inst.operand());
         }
 
-        void visit(const CastExpr<Domain> &inst) override{
+        void visit(const CastIns<Domain> &inst) override{
             result = "CastIns casts to " + inst.castTo()->name() ;
         }
 
-        void visit(const CallExpr<Domain> &inst) override{
+        void visit(const CallIns<Domain> &inst) override{
             auto tgts = inst.targets();
             assert(tgts.size() > 0);
 
@@ -71,11 +71,11 @@ namespace vanguard {
 
         }
 
-        void visit(const Error<Domain> &inst) override {
+        void visit(const ErrorIns<Domain> &inst) override {
             result = "UnreachableIns: " + inst.msg() ;
         }
 
-        void visit(const Return<Domain> &inst) override {
+        void visit(const ReturnIns<Domain> &inst) override {
             result = "ReturnIns ";
             if (inst.returnsValue()){
                 result += "returns value " + getValueString(*inst.value());
@@ -85,16 +85,16 @@ namespace vanguard {
             }
         }
 
-        void visit(const TernaryExpr<Domain> &inst) override{
+        void visit(const TernaryIns<Domain> &inst) override{
             result = "SelectIns with condition " + getValueString(*inst.condition()) + " has true Value " +
                      getValueString(*inst.trueValue()) + " and false value " + getValueString(*inst.falseValue());
         }
 
-        void visit(const Assignment<Domain> &inst) override {
+        void visit(const AssignIns<Domain> &inst) override {
             result = "assigns " + getValueString(*inst.result());
         }
 
-        void visit(const UnknownExpr<Domain> &inst) override {
+        void visit(const UnknownIns<Domain> &inst) override {
             result = "Unknown expression";
         }
     };

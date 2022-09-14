@@ -84,11 +84,11 @@ namespace vanguard {
         return regex_match(llvmFn.getName().str(), reg);
     }
 
-    bool SolangModel::isAnyLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+    bool SolangModel::isAnyLowLevelCall(CallIns<Top<Blockchain<Universe>>> &call)  {
         return isLowLevelCall(call) || isLowLevelStaticCall(call) || isLowLevelDelegateCall(call);
     }
 
-    bool SolangModel::isLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+    bool SolangModel::isLowLevelCall(CallIns<Top<Blockchain<Universe>>> &call)  {
         for(auto tgt : call.targets()) {
             if(tgt->name() == "call") {
                 return true;
@@ -98,7 +98,7 @@ namespace vanguard {
         return false;
     }
 
-    bool SolangModel::isLowLevelStaticCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+    bool SolangModel::isLowLevelStaticCall(CallIns<Top<Blockchain<Universe>>> &call)  {
         for(auto tgt : call.targets()) {
             if(tgt->name() == "callStatic") {
                 return true;
@@ -108,7 +108,7 @@ namespace vanguard {
         return false;
     }
 
-    bool SolangModel::isLowLevelDelegateCall(CallExpr<Top<Blockchain<Universe>>> &call)  {
+    bool SolangModel::isLowLevelDelegateCall(CallIns<Top<Blockchain<Universe>>> &call)  {
         for(auto tgt : call.targets()) {
             if(tgt->name() == "callDelegate") {
                 return true;
@@ -122,7 +122,7 @@ namespace vanguard {
     public:
         bool isCall = false;
         std::vector<Top<Blockchain<Universe>>::Function *> tgts;
-        void visit(const CallExpr<Top<Blockchain<Universe>>> &v) override{
+        void visit(const CallIns<Top<Blockchain<Universe>>> &v) override{
             isCall = true;
             tgts = v.targets();
         }

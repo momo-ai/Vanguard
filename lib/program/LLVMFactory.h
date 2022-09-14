@@ -15,6 +15,14 @@ namespace vanguard{
 
     class LLVMFactory : public UnitFactory {
         public:
+            static UnitFactory *getInstance() {
+                if(instance == nullptr) {
+                    instance = new LLVMFactory();
+                }
+
+                return instance;
+            }
+
             LLVMFactory();
 
             Universe::CompilationUnit *createUnit(const llvm::Module *module) override;

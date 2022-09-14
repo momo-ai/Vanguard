@@ -7,31 +7,30 @@
 
 
 namespace vanguard {
-    template<typename Base> class Branch;
-    template<typename Base> class Return;
-    template<typename Base> class Error;
-    template<typename Base> class Expression;
-    template<typename Base> class Assignment;
-    template<typename Base> class BinaryOpExpr;
-    template<typename Base> class UnaryOpExpr;
-    template<typename Base> class CallExpr;
-    template<typename Base> class CastExpr;
-    template<typename Base> class TernaryExpr;
-    template<typename Base> class UnknownExpr;
+    template<typename Base> class BranchIns;
+    template<typename Base> class ReturnIns;
+    template<typename Base> class ErrorIns;
+    template<typename Base> class AssignIns;
+    template<typename Base> class BinaryOpIns;
+    template<typename Base> class UnaryOpIns;
+    template<typename Base> class CallIns;
+    template<typename Base> class CastIns;
+    template<typename Base> class TernaryIns;
+    template<typename Base> class UnknownIns;
 
     template<typename Base>
     class InstructionClassVisitor{
     public:
-        virtual void visit(const Branch<Base> &v) {};
-        virtual void visit(const Return<Base> &v) {};
-        virtual void visit(const Error<Base> &v) {};
-        virtual void visit(const BinaryOpExpr<Base> &v) {};
-        virtual void visit(const UnaryOpExpr<Base> &v) {};
-        virtual void visit(const CallExpr<Base> &v) {};
-        virtual void visit(const CastExpr<Base> &v) {};
-        virtual void visit(const TernaryExpr<Base> &v) {};
-        virtual void visit(const Assignment<Base> &v) {};
-        virtual void visit(const UnknownExpr<Base> &v) {};
+        virtual void visit(const BranchIns<Base> &v) {};
+        virtual void visit(const ReturnIns<Base> &v) {};
+        virtual void visit(const ErrorIns<Base> &v) {};
+        virtual void visit(const BinaryOpIns<Base> &v) {};
+        virtual void visit(const UnaryOpIns<Base> &v) {};
+        virtual void visit(const CallIns<Base> &v) {};
+        virtual void visit(const CastIns<Base> &v) {};
+        virtual void visit(const TernaryIns<Base> &v) {};
+        virtual void visit(const AssignIns<Base> &v) {};
+        virtual void visit(const UnknownIns<Base> &v) {};
     };
 }
 

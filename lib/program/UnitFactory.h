@@ -14,6 +14,10 @@ namespace vanguard{
 
     class UnitFactory {
     public:
+        static UnitFactory *getInstance() {
+            return instance;
+        }
+
         virtual Universe::CompilationUnit *createUnit(const llvm::Module *module) = 0;
 
         virtual Universe::Function *createFn(const llvm::Function *function) = 0;
@@ -25,7 +29,8 @@ namespace vanguard{
         virtual Type *createType(const llvm::Type *t) = 0;
 
         virtual Value *createVal(const llvm::Value *val) = 0;
-
+    protected:
+        static UnitFactory *instance;
     };
 }
 

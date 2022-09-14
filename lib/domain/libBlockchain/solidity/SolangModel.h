@@ -14,10 +14,10 @@ namespace vanguard {
         bool isImplementation(std::string contract, const Top<Blockchain<Universe>>::Function &blockchainFn, const llvm::Function &llvmFn) const override;
         //bool isExternalCall(const llvm::Function &llvmFn) override;
         //bool isDelegateCall(const llvm::Function &llvmFn) override;
-        bool isAnyLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  override;
-        bool isLowLevelCall(CallExpr<Top<Blockchain<Universe>>> &call)  override;
-        bool isLowLevelStaticCall(CallExpr<Top<Blockchain<Universe>>> &call)  override;
-        bool isLowLevelDelegateCall(CallExpr<Top<Blockchain<Universe>>> &call)  override;
+        bool isAnyLowLevelCall(CallIns<Top<Blockchain<Universe>>> &call)  override;
+        bool isLowLevelCall(CallIns<Top<Blockchain<Universe>>> &call)  override;
+        bool isLowLevelStaticCall(CallIns<Top<Blockchain<Universe>>> &call)  override;
+        bool isLowLevelDelegateCall(CallIns<Top<Blockchain<Universe>>> &call)  override;
         bool writesStorage(Top<Blockchain<Universe>>::Instruction &ins) override;
         bool readsStorage(Top<Blockchain<Universe>>::Instruction &ins) override;
         CallResolver<Top<Blockchain<Universe>>> *callResolver() override;
