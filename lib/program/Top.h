@@ -8,6 +8,7 @@
 #include <unordered_set>
 #include <string>
 #include "InstructionClassVisitor.h"
+#include <vector>
 #include <utility>
 
 namespace vanguard {

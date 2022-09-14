@@ -10,8 +10,6 @@
 #include "LLVMFactory.h"
 #include <string>
 #include <list>
-#include "InstructionClassVisitor.h"
-#include "Block.h"
 #include "Wrapped.h"
 
 namespace vanguard {
