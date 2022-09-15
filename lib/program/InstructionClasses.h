@@ -6,7 +6,9 @@
 #define VANGUARD_INSTRUCTIONCLASSES_H
 
 #include "Value.h"
-#include "Instruction.h"
+#include "Universe.h"
+#include "InstructionClassVisitor.h"
+
 
 namespace vanguard {
     enum BinOp{Add, Sub, Mul, Div, Mod, Shl, Shr, And, Or, Xor, IFCmpInst};
@@ -14,32 +16,44 @@ namespace vanguard {
     enum UnOp{Neg, Not};
 
     // Branch Instruction
-    class Branch : public Instruction {
+    template<typename Base>
+    class BranchIns : public Base::Instruction {
     public:
-        static inline bool classof(const Branch &) { return true; }
-        static inline bool classof(const Branch *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit BranchIns(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const BranchIns &) { return true; }
+        static inline bool classof(const BranchIns *) { return true; }
+        static inline bool classof(const Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const Universe::Instruction &inst) {
             if (inst.instructionClass() == BRANCH){ return true; }
             return false;
         }
 
         virtual bool isConditional() const = 0;
         virtual Value* condition() const = 0;
-        virtual std::list<Block*> targets() const = 0;
+        virtual std::list<typename Base::Block*> targets() const = 0;
 
         InstructionClassEnum instructionClass() const override {
             return BRANCH;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
     //Return Instruction
-    class Return : public Instruction {
+    template<typename Base>
+    class ReturnIns : public Base::Instruction {
     public:
-        static inline bool classof(const Return &) { return true; }
-        static inline bool classof(const Return *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit ReturnIns(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const ReturnIns &) { return true; }
+        static inline bool classof(const ReturnIns *) { return true; }
+        static inline bool classof(const Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool cslassof(const Universe::Instruction &inst) {
             if (inst.instructionClass() == RETURN){ return true; }
             return false;
         }
@@ -50,14 +64,22 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return RETURN;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
-    class Error : public Instruction {
+    template<typename Base>
+    class ErrorIns : public Base::Instruction {
     public:
-        static inline bool classof(const Error &) { return true; }
-        static inline bool classof(const Error *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit ErrorIns(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const ErrorIns &) { return true; }
+        static inline bool classof(const ErrorIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == ERROR){ return true; }
             return false;
         }
@@ -67,28 +89,43 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return ERROR;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
-    class Expression : public Instruction {
+    template<typename Base>
+    class Expression : public Base::Instruction {
     public:
+        template<typename ...Args>
+        explicit Expression(Args&&... args) : Base::Instruction(std::forward<Args>(args)...) {};
+
         static inline bool classof(const Expression &) { return true; }
         static inline bool classof(const Expression *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        static inline bool classof(const Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() >= EXPRESSION_BEGIN && inst.instructionClass() <= EXPRESSION_END){ return true; }
             return false;
         }
 
-        virtual Variable* result() const = 0;
+        virtual Value* result() const {
+            auto* insVar = this->factory.createVal(this->ins);
+            return insVar;
+        }
     };
 
     // Assign Instruction
-    class Assignment : public Expression {
+    template<typename Base>
+    class AssignIns : public Expression<Base> {
     public:
-        static inline bool classof(const Assignment &) { return true; }
-        static inline bool classof(const Assignment *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit AssignIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const AssignIns &) { return true; }
+        static inline bool classof(const AssignIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == ASSIGNMENT){ return true; }
             return false;
         }
@@ -96,32 +133,48 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return ASSIGNMENT;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
     //BinaryOpInstruction
-    class BinaryOpExpr : public Expression {
+    template<typename Base>
+    class BinaryOpIns : public Expression<Base> {
     public:
-        static inline bool classof(const BinaryOpExpr &) { return true; }
-        static inline bool classof(const BinaryOpExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit BinaryOpIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+        static inline bool classof(const BinaryOpIns &) { return true; }
+        static inline bool classof(const BinaryOpIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == BIN_OP){ return true; }
             return false;
         }
 
-        virtual BinOp op() const = 0;
+        virtual BinOp op() const  = 0;
+
         InstructionClassEnum instructionClass() const override {
             return BIN_OP;
+        }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
         }
     };
 
     //Unary Operation Instruction
-    class  UnaryOpExpr : public Expression {
+    template<typename Base>
+    class  UnaryOpIns : public Expression<Base> {
     public:
-        static inline bool classof(const UnaryOpExpr &) { return true; }
-        static inline bool classof(const UnaryOpExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit UnaryOpIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const UnaryOpIns &) { return true; }
+        static inline bool classof(const UnaryOpIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == UN_OP){ return true; }
             return false;
         }
@@ -132,33 +185,49 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return UN_OP;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
-    class CallExpr : public Expression {
+    template<typename Base>
+    class CallIns : public Expression<Base> {
     public:
-        static inline bool classof(const CallExpr &) { return true; }
-        static inline bool classof(const CallExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit CallIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const CallIns &) { return true; }
+        static inline bool classof(const CallIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == CALL){ return true; }
             return false;
         }
 
         virtual bool hasReturn() const = 0;
-        virtual Function* target() const = 0;
+        virtual std::vector<typename Base::Function *> targets() const = 0;
         virtual std::list<Value*> args() const = 0;
 
         InstructionClassEnum instructionClass() const override {
             return CALL;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
-    class CastExpr : public Expression {
+    template<typename Base>
+    class CastIns : public Expression<Base> {
     public:
-        static inline bool classof(const CastExpr &) { return true; }
-        static inline bool classof(const CastExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit CastIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const CastIns &) { return true; }
+        static inline bool classof(const CastIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == CAST){ return true; }
             return false;
         }
@@ -168,14 +237,22 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return CAST;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
-    class TernaryExpr : public Expression {
+    template<typename Base>
+    class TernaryIns : public Expression<Base> {
     public:
-        static inline bool classof(const TernaryExpr &) { return true; }
-        static inline bool classof(const TernaryExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit TernaryIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const TernaryIns &) { return true; }
+        static inline bool classof(const TernaryIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == TERNARY){ return true; }
             return false;
         }
@@ -187,14 +264,22 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return TERNARY;
         }
+
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
 
-    class UnknownExpr : public Expression {
+    template<typename Base>
+    class UnknownIns : public Expression<Base> {
     public:
-        static inline bool classof(const UnknownExpr &) { return true; }
-        static inline bool classof(const UnknownExpr *) { return true; }
-        static inline bool classof(const Instruction *inst) { return classof(*inst); }
-        static inline bool classof(const Instruction &inst) {
+        template<typename ...Args>
+        explicit UnknownIns(Args&&... args) : Expression<Base>(std::forward<Args>(args)...) {};
+
+        static inline bool classof(const UnknownIns &) { return true; }
+        static inline bool classof(const UnknownIns *) { return true; }
+        static inline bool classof(const typename Universe::Instruction *inst) { return classof(*inst); }
+        static inline bool classof(const typename Universe::Instruction &inst) {
             if (inst.instructionClass() == UNKNOWN){ return true; }
             return false;
         }
@@ -202,22 +287,11 @@ namespace vanguard {
         InstructionClassEnum instructionClass() const override {
             return UNKNOWN;
         }
-    };
 
-    /*class MemoryReadInstruction: public AssignInstruction{
-    public:
-        virtual InstructionVariable* getLHS() const = 0;
+        void accept(InstructionClassVisitor<Base> &v) const override {
+            v.visit(*this);
+        }
     };
-
-    class MemoryWriteInstruction: public AssignInstruction{
-    public:
-        virtual MemoryRegion* getMemoryAddress() const = 0;
-    };
-
-    class AssignInst: public AssignInstruction{
-    public:
-        virtual InstructionVariable* getLHS() const = 0;
-    };*/
 }
 
 #endif //VANGUARD_INSTRUCTIONCLASSES_H

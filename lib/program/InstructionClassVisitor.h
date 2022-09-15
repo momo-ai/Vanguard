@@ -5,21 +5,32 @@
 #ifndef VANGUARD_INSTRUCTIONCLASSVISITOR_H
 #define VANGUARD_INSTRUCTIONCLASSVISITOR_H
 
-#include "InstructionClasses.h"
 
 namespace vanguard {
+    template<typename Base> class BranchIns;
+    template<typename Base> class ReturnIns;
+    template<typename Base> class ErrorIns;
+    template<typename Base> class AssignIns;
+    template<typename Base> class BinaryOpIns;
+    template<typename Base> class UnaryOpIns;
+    template<typename Base> class CallIns;
+    template<typename Base> class CastIns;
+    template<typename Base> class TernaryIns;
+    template<typename Base> class UnknownIns;
+
+    template<typename Base>
     class InstructionClassVisitor{
     public:
-        virtual void visit(const Branch &v) {};
-        virtual void visit(const Return &v) {};
-        virtual void visit(const Error &v) {};
-        virtual void visit(const BinaryOpExpr &v) {};
-        virtual void visit(const UnaryOpExpr &v) {};
-        virtual void visit(const CallExpr &v) {};
-        virtual void visit(const CastExpr &v) {};
-        virtual void visit(const TernaryExpr &v) {};
-        virtual void visit(const Assignment &v) {};
-        virtual void visit(const UnknownExpr &v) {};
+        virtual void visit(const BranchIns<Base> &v) {};
+        virtual void visit(const ReturnIns<Base> &v) {};
+        virtual void visit(const ErrorIns<Base> &v) {};
+        virtual void visit(const BinaryOpIns<Base> &v) {};
+        virtual void visit(const UnaryOpIns<Base> &v) {};
+        virtual void visit(const CallIns<Base> &v) {};
+        virtual void visit(const CastIns<Base> &v) {};
+        virtual void visit(const TernaryIns<Base> &v) {};
+        virtual void visit(const AssignIns<Base> &v) {};
+        virtual void visit(const UnknownIns<Base> &v) {};
     };
 }
 

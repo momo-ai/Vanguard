@@ -7,15 +7,15 @@
 
 namespace vanguard {
 
-    void FunctionDetector::detect(CompilationUnit &unit) {
-        std::unordered_set<Function *> processed;
-        std::deque<Function *> fnWorklist;
+    void FunctionDetector::detect(Universe::CompilationUnit &unit) {
+        std::unordered_set<Universe::Function *> processed;
+        std::deque<Universe::Function *> fnWorklist;
         for(auto f : unit.functions()) {
             fnWorklist.push_back(f);
         }
 
         while(!fnWorklist.empty()) {
-            Function *curFn = fnWorklist.front();
+            Universe::Function *curFn = fnWorklist.front();
             fnWorklist.pop_front();
             processed.insert(curFn);
 

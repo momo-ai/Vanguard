@@ -1,62 +1,60 @@
-#include "Function.h"
-#include "Block.h"
-#include "LLVMtoVanguard.h"
+#include "Universe.h"
+#include "LLVMFactory.h"
 #include "llvm/IR/InstIterator.h"
+#include <iostream>
 
 namespace vanguard{
     
-    Function::Function(const llvm::Function& func): function(func){
+    Universe::Function::Function(UnitFactory &factory, const llvm::Function* func): factory(factory), function(func){
     }
 
-    std::string Function::name(){
-        return function.getName().str();
+    std::string Universe::Function::name() const {
+        return function->getName().str();
     }
 
-    std::list<Argument*> Function::params(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        std::list<Argument*> params = {};
-        for (auto itr = function.arg_begin(); itr != function.arg_end(); itr++){
-            params.push_back((Argument *)llvmToVanguard.translateValue(llvm::dyn_cast<llvm::Value>(itr)));
+    std::vector<Variable*> Universe::Function::params() const {
+        std::vector<Variable*> params = {};
+        for (auto itr = function->arg_begin(); itr != function->arg_end(); itr++){
+            params.push_back((Variable *) factory.createVal(itr));
         }
         return params;
     }
 
-    Type* Function::returnType(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateType(function.getReturnType());
+    Type* Universe::Function::returnType() const {
+        return factory.createType(function->getReturnType());
     }
 
-    bool Function::hasBody(){
-        return !function.isDeclaration();
+    bool Universe::Function::hasBody() const {
+        return !function->isDeclaration();
     }
 
-    Block* Function::body(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateBlock(&function.getEntryBlock());
+    Universe::Block* Universe::Function::head() const {
+        return factory.createBlk(&function->getEntryBlock());
     }
 
-    std::list<Instruction*> Function::instructions(){
-        std::list<Instruction*> instructionsList = {};
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        for (auto &blk : function){
+    std::vector<Universe::Instruction*> Universe::Function::insts() const {
+        std::vector<Instruction*> instructionsList = {};
+        for (auto &blk : *function){
             for(auto &ins : blk) {
-                instructionsList.push_back(llvmToVanguard.translateInstruction(&ins));
+                instructionsList.push_back(factory.createIns(&ins));
             }
         }
         return instructionsList;
     }
 
-    std::list<Block *> Function::blocks(){
-        std::list<Block *> blocks = {};
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        for (auto &blk : function){
-            blocks.push_back(llvmToVanguard.translateBlock(&blk));
+    std::vector<Universe::Block *> Universe::Function::blks() const {
+        std::vector<Block *> blocks = {};
+        for (auto &blk : *function){
+            blocks.push_back(factory.createBlk(&blk));
         }
         return blocks;
     }
 
-    const llvm::Function &Function::unwrap(){
+    const llvm::Function *Universe::Function::unwrap(){
         return function;
     }
 
+    Universe::CompilationUnit *Universe::Function::compilationUnit() const {
+        return factory.createUnit(function->getParent());
+    }
 }

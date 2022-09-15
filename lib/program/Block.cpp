@@ -1,48 +1,48 @@
-#include "Block.h"
+#include "Universe.h"
 #include "llvm/IR/CFG.h"
-#include "LLVMtoVanguard.h"
+#include "UnitFactory.h"
 
 namespace vanguard{
 
-    Block::Block(const llvm::BasicBlock &blk): block(blk) {
-    }
+    Universe::Block::Block(UnitFactory &factory, const llvm::BasicBlock *blk): factory(factory), block(blk) {}
 
-    std::string Block::name(){
-        if (block.hasName()) {
-            return block.getName().str();
+    std::string Universe::Block::name(){
+        if (block->hasName()) {
+            return block->getName().str();
         }
         else return "unnamed_block";
     }
 
 
-    Function* Block::parent(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-        return llvmToVanguard.translateFunction(block.getParent());
+    Universe::Function* Universe::Block::fn() const {
+        return factory.createFn(block->getParent());
     }
 
-    std::list<Instruction*> Block::instructions(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+    std::list<Universe::Instruction*> Universe::Block::insts() const{
+        if(block == nullptr) {
+            return {};
+        }
+
         std::list<Instruction*> instructions = {};
-        for (auto &I : block){
-            instructions.push_back(llvmToVanguard.translateInstruction(&I));
+        for (auto &I : *block){
+            instructions.push_back(factory.createIns(&I));
         }
         return instructions;
     }
 
-    bool Block::isEntry(){
-        return block.isEntryBlock();
+    bool Universe::Block::isEntry(){
+        return block->isEntryBlock();
     }
 
-    std::unordered_set< Block* > Block::successors(){
-        auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+    std::unordered_set<Universe::Block* > Universe::Block::succs() const{
         std::unordered_set<Block*> allSuccessors = {};
-        for (auto *succ : llvm::successors(&block)) {
-            allSuccessors.insert(llvmToVanguard.translateBlock(succ));
+        for (auto *succ : llvm::successors(block)) {
+            allSuccessors.insert(factory.createBlk(succ));
         }
         return allSuccessors;
     }
 
-    const llvm::BasicBlock &Block::unwrap(){
+    const llvm::BasicBlock *Universe::Block::unwrap(){
         return block;
     }
 

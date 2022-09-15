@@ -1,7 +1,7 @@
 #ifndef VANGUARD_PROGRAM_VALUE_H
 #define VANGUARD_PROGRAM_VALUE_H
 
-#include "Type.h"
+#include "Universe.h"
 #include <string>
 #include "llvm/IR/Value.h"
 #include "llvm/IR/GlobalVariable.h"
@@ -9,61 +9,155 @@
 #include "llvm/IR/Constants.h"
 #include "llvm/IR/Argument.h"
 #include "llvm/IR/Instruction.h"
-//#include "LLVMtoVanguard.h"
 
 namespace vanguard{
-    class Block;
-
     enum ValueClassEnum{
-        VARIABLE_BEGIN,
-        GLOBAL_VARIABLE = VARIABLE_BEGIN,
-        ARGUMENT,
-        BLKVARIABLE,
-        INSTRUCTION_VARIABLE,
-        VARIABLE_END = INSTRUCTION_VARIABLE,
-        LITERAL_BEGIN,
-        INTEGER_LITERAL = LITERAL_BEGIN,
-        STRING_LITERAL,
-        BOOLEAN_LITERAL,
-        LITERAL_END = BOOLEAN_LITERAL,
+        VARIABLE,
+        CONSTANT,
+        LITERAL,
         POINTER,
         MEMORY_REGION,
-        CONSTANT_BEGIN,
-        CONSTANT = CONSTANT_BEGIN,
-        CONSTANT_END = CONSTANT,
-        LOCATION_BEGIN,
-        LOCATION = LOCATION_BEGIN,
-        BLOCK_END = LOCATION
+        LOCATION,
     };
 
+    class UnitFactory;
     class ValueClassVisitor;
+
     class Value{
     public:
-        explicit Value(ValueClassEnum vc);
+        explicit Value(UnitFactory &factory, ValueClassEnum vc);
 
         static inline bool classof(const Value &) { return true; }
         static inline bool classof(const Value *) { return true; }
 
-        virtual Type* type() const= 0;
+        virtual Type* type() const = 0;
 
         ValueClassEnum valueClass() const;
 
         virtual void accept(ValueClassVisitor &v) const = 0;
 
-    private:
+    protected:
         ValueClassEnum valClass;
+        UnitFactory &factory;
     };
 
-    class Variable : public Value{
+    class Variable : public Value {
     public:
-        explicit Variable(ValueClassEnum vc) : Value(vc) {};
+        explicit Variable(UnitFactory &factory) : Value(factory, VARIABLE) {};
+
+        static inline bool classof(const Variable &) { return true; }
+        static inline bool classof(const Variable *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == VARIABLE){ return true; }
+            return false;
+        }
+
         virtual bool hasName() const = 0;
         virtual std::string name() const = 0;
+        void accept(ValueClassVisitor &v) const override;
     };
 
-    class GlobalVariable: public Variable{
+    class Constant : public Value {
     public:
-        explicit GlobalVariable(const llvm::GlobalVariable &);
+        explicit Constant(UnitFactory &factory) : Value(factory, CONSTANT) {};
+        static inline bool classof(const Constant &) { return true; }
+        static inline bool classof(const Constant *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == CONSTANT){ return true; }
+            return false;
+        }
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    //template<typename LitType>
+    class Literal : public Value {
+    public:
+        explicit Literal(UnitFactory &factory) : Value(factory, LITERAL) {};
+        static inline bool classof(const Literal &) { return true; }
+        static inline bool classof(const Literal *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == LITERAL){ return true; }
+            return false;
+        }
+
+        //virtual LitType value() const = 0;
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class Pointer : public Value {
+    public:
+        explicit Pointer(UnitFactory &factory) : Value(factory, POINTER) {};
+        static inline bool classof(const Pointer &) { return true; }
+        static inline bool classof(const Pointer *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == POINTER){ return true; }
+            return false;
+        }
+
+        virtual Value *base() const = 0;
+        virtual Value *offset() const = 0;
+        //virtual Type *refType() const = 0;
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class MemoryRegion : public Value {
+    public:
+        explicit MemoryRegion(UnitFactory &factory) : Value(factory, MEMORY_REGION) {};
+        static inline bool classof(const MemoryRegion &) { return true; }
+        static inline bool classof(const MemoryRegion *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == MEMORY_REGION){ return true; }
+            return false;
+        }
+
+        /*virtual const Pointer *pointer() const = 0;
+        virtual unsigned long size() const = 0;*/
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class Location : public Value {
+    public:
+        explicit Location(UnitFactory &factory) : Value(factory, LOCATION) {};
+        static inline bool classof(const Location &) { return true; }
+        static inline bool classof(const Location *) { return true; }
+        static inline bool classof(const Value *value) { return classof(*value); }
+        static inline bool classof(const Value &value) {
+            if (value.valueClass() == LOCATION){ return true; }
+            return false;
+        }
+
+        virtual Universe::Block &loc() const = 0;
+        void accept(ValueClassVisitor &v) const override;
+    };
+
+    class ValueClassVisitor{
+    public:
+        virtual void visit(const Variable &v) = 0;
+        virtual void visit(const Constant &v) = 0;
+        virtual void visit(const Literal &v) = 0;
+        virtual void visit(const Pointer &v) = 0;
+        virtual void visit(const MemoryRegion &v) = 0;
+        virtual void visit(const Location &v) = 0;
+    };
+
+
+
+
+
+
+
+
+
+
+
+    /*class GlobalVariable: public Variable{
+    public:
+        explicit GlobalVariable(UnitFactory &factory, const llvm::GlobalVariable &);
 
         static inline bool classof(const GlobalVariable &) { return true; }
         static inline bool classof(const GlobalVariable *) { return true; }
@@ -91,7 +185,7 @@ namespace vanguard{
 
     class Argument: public Variable{
     public:
-        explicit Argument(const llvm::Argument&);
+        explicit Argument(UnitFactory &factory, const llvm::Argument&);
 
         static inline bool classof(const Argument &) { return true; }
         static inline bool classof(const Argument *) { return true; }
@@ -119,7 +213,7 @@ namespace vanguard{
 
     class InstructionVariable: public Variable{
     public:
-        explicit InstructionVariable(const llvm::Instruction &);
+        explicit InstructionVariable(UnitFactory &factory, const llvm::Instruction &);
 
         static inline bool classof(const InstructionVariable &) { return true; }
         static inline bool classof(const InstructionVariable *) { return true; }
@@ -148,13 +242,13 @@ namespace vanguard{
     template <class T>
     class Literal : public Value {
     public:
-        Literal(ValueClassEnum vc) : Value(vc) {};
+        Literal(UnitFactory &factory, ValueClassEnum vc) : Value(factory, vc) {};
         virtual T value() const = 0;
     };
 
     class IntegerLiteral: public Literal<int>{
     public:
-        explicit IntegerLiteral(const llvm::ConstantInt &);
+        explicit IntegerLiteral(UnitFactory &factory, const llvm::ConstantInt &);
 
         static inline bool classof(const IntegerLiteral &) { return true; }
         static inline bool classof(const IntegerLiteral *) { return true; }
@@ -180,7 +274,7 @@ namespace vanguard{
 
     class StringLiteral: public Literal<std::string>{
     public:
-        explicit StringLiteral(const llvm::ConstantDataSequential &);
+        explicit StringLiteral(UnitFactory &factory, const llvm::ConstantDataSequential &);
 
         static inline bool classof(const StringLiteral &) { return true; }
         static inline bool classof(const StringLiteral *) { return true; }
@@ -206,7 +300,7 @@ namespace vanguard{
 
     class BooleanLiteral: public Literal<bool>{
     public:
-        explicit BooleanLiteral(bool);
+        explicit BooleanLiteral(UnitFactory &factory, bool b);
 
         static inline bool classof(const BooleanLiteral &) { return true; }
         static inline bool classof(const BooleanLiteral *) { return true; }
@@ -226,7 +320,7 @@ namespace vanguard{
 
     class Pointer : public Value {
     public:
-        Pointer(const llvm::Value *base, const llvm::Value *offset, const llvm::Type *type);
+        Pointer(UnitFactory &factory, const llvm::Value *base, const llvm::Value *offset, const llvm::Type *type);
 
         static inline bool classof(const Pointer &) { return true; }
         static inline bool classof(const Pointer *) { return true; }
@@ -250,7 +344,7 @@ namespace vanguard{
 
     class MemoryRegion: public Value{
     public:
-        MemoryRegion(const Pointer *ptr, unsigned long size);
+        MemoryRegion(UnitFactory &factory, const Pointer *ptr, unsigned long size);
 
         static inline bool classof(const MemoryRegion &) { return true; }
         static inline bool classof(const MemoryRegion *) { return true; }
@@ -286,7 +380,7 @@ namespace vanguard{
         const llvm::Constant &constant;
 
     public:
-        explicit Constant(const llvm::Constant &);
+        explicit Constant(UnitFactory &factory, const llvm::Constant &);
 
         static inline bool classof(const Constant &) { return true; }
         static inline bool classof(const Constant *) { return true; }
@@ -308,7 +402,7 @@ namespace vanguard{
         const llvm::BasicBlock &location;
 
     public:
-        explicit Location(const llvm::BasicBlock &);
+        explicit Location(UnitFactory &factory, const llvm::BasicBlock &);
 
         static inline bool classof(const Location &) { return true; }
         static inline bool classof(const Location *) { return true; }
@@ -320,7 +414,7 @@ namespace vanguard{
 
         Type* type() const override;
         void accept(ValueClassVisitor &v) const override;
-        vanguard::Block &loc() const;
+        Universe::Block &loc() const;
     };
 
     class ValueClassVisitor{
@@ -335,7 +429,7 @@ namespace vanguard{
         virtual void visit(const MemoryRegion &v) = 0;
         virtual void visit(const Constant &v) = 0;
         virtual void visit(const Location &v) = 0;
-    };
+    };*/
 }
 
 #endif

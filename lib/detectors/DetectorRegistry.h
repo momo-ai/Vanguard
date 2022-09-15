@@ -6,21 +6,53 @@
 #define VANGUARD_REGISTRY_H
 
 #include <unordered_map>
-#include "ProgramDetector.h"
+#include "FunctionPrinter/FunctionPrinter.h"
+#include "Reentrancy/ReentrancyDetector.h"
+#include "StatGen/StatGen.h"
+#include "IRValidator/IRValidator.h"
 
 namespace vanguard {
     class DetectorRegistry {
     public:
-        ~DetectorRegistry();
         static DetectorRegistry &getInstance();
-        bool add(const std::string& name, ProgramDetector *detect);
-        ProgramDetector *get(const std::string& name);
-        std::vector<ProgramDetector *> all();
+
+        template<typename Domain>
+        UniverseDetector<Domain> *get(const std::string& name) {
+            /*if(name == FunctionPrinter<Domain>::name()) {
+                return new FunctionPrinter<Domain>();
+            }
+            else if(name == StatGen<Domain>::name()) {
+                return new StatGen<Domain>();
+            }
+            else if(name == IRValidator<Domain>::name()) {
+                return new IRValidator<Domain>();
+            }
+            else if(name == ReentrancyDetector<Domain>::name()) {
+                return new ReentrancyDetector<Domain>();
+            }*/
+
+            return nullptr;
+        };
+
+        bool add(const std::string& name, Detector::DetectorDomain domain);
+
+        Detector::DetectorDomain domain(const std::vector<std::string>& detectorNames);
+
+        std::vector<std::string> all();
 
     private:
         static DetectorRegistry *instance;
-        std::unordered_map<std::string, ProgramDetector *> registry;
-        DetectorRegistry();
+        std::unordered_map<std::string, Detector::DetectorDomain> registry;
+
+        DetectorRegistry() {
+            //assert(add(StatGen::name(), StatGen::domain()));
+            add(FunctionPrinter<Universe>::name(), FunctionPrinter<Universe>::domain());
+            add(StatGen<Universe>::name(), StatGen<Universe>::domain());
+            add(IRValidator<Universe>::name(), IRValidator<Universe>::domain());
+            add(ReentrancyDetector<Universe>::name(), ReentrancyDetector<Universe>::domain());
+            //add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
+            // add(IRValidator::name(), new IRValidator());
+        }
     };
 }
 

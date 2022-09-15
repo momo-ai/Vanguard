@@ -5,13 +5,19 @@
 #ifndef VANGUARD_DETECTOR_H
 #define VANGUARD_DETECTOR_H
 
-#include "Requirement.h"
+#include "../analysis/Requirement.h"
 
 namespace vanguard {
     class Detector {
     public:
-        virtual std::vector<Requirement *> registerAnalyses() = 0;
-        virtual void startDetection() = 0;
+        enum DetectorDomain { BASIC, BLOCKCHAIN };
+
+        virtual std::vector<Requirement *> registerAnalyses() {
+            return {};
+        }
+
+        virtual void startDetection() {};
+        //list of thing with base class for warning. Needs to have an operator for returning a string
         virtual void report() = 0;
     };
 }

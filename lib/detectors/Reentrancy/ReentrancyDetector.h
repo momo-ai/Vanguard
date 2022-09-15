@@ -1,52 +1,101 @@
 //
-// Created by Jon Stephens on 3/19/22.
+// Created by Jon Stephens on 9/3/22.
 //
 
-#ifndef VANGUARD_ReentrancyEXAMPLE_H
-#define VANGUARD_ReentrancyEXAMPLE_H
+#ifndef VANGUARD_REENTRANCYDETECTOR_H
+#define VANGUARD_REENTRANCYDETECTOR_H
 
-#include "../FunctionDetector.h"
-//#import "../../Vanguard.cpp"
-#include "../../domain/libBlockchain/include/Blockchain.h"
-#include "../../program/InstructionClassVisitor.h"
-#include "../AARequirement.h"
+#include <analysis/reachability/Reachable.h>
+#include <domain/libBlockchain/BlockchainModel.h>
+#include <detectors/UniverseDetector.h>
+#include <iostream>
+#include <unordered_map>
 
 namespace vanguard {
-    class ReentrancyDetector : public FunctionDetector, public vanguard::InstructionClassVisitor {
+    template <typename Domain>
+    class ReentrancyDetector : public UniverseDetector<Domain> {
     public:
-        explicit ReentrancyDetector(const std::string& summaryFile);
-        bool shouldAnalyze(Function &fn);
-        bool beginFn(Function &fn);
-        bool transfer(Instruction &ins);
-        bool endFn(Function &fn);
-        std::string vulnerabilityReport();
-        vector<Block *> findReachable(Block &blk, unordered_set<Block *> *exclude);
+        using CompilationUnit = typename Domain::CompilationUnit;
+        using Function = typename Domain::Function;
+        using Block = typename Domain::Block;
+        using Instruction = typename Domain::Instruction;
 
-        // OG
-        std::vector<Requirement *> registerAnalyses() override;
-        void startDetection() override;
-        bool detect(vanguard::Function &fn) override;
-        void report() override;
+        struct CallTargetResolver : public InstructionClassVisitor<Domain> {
+            std::vector<typename Domain::Function *> tgts;
+            void visit(const CallIns<Domain> &v) override{
+                tgts = v.targets();
+            }
+        };
 
-        static std::string name();
-        void visit(const CallExpr &v) override;
+        struct StateModifiedReachability : public Reachable<Domain> {
+            StateModifiedReachability(std::unordered_set<Function *>& writesStorage) : storageWriteFns(writesStorage) {};
 
-        static char ID;
+            bool condition(Instruction &ins) {
+                CallTargetResolver resolver;
+                ins.accept(resolver);
 
+                return ins.template writesStorage<Domain>() || std::any_of(resolver.tgts.begin(), resolver.tgts.end(),
+                        [&](auto tgt){return storageWriteFns.find(tgt) != storageWriteFns.end();});
+            }
+
+            std::unordered_set<Function *>& storageWriteFns;
+        };
+
+        void process(Function *fn) {
+            processed.insert(fn);
+            StateModifiedReachability reach(writesStorage);
+
+            for(auto blk : fn->blocks()) {
+                for(auto ins : blk->instructions()) {
+                    CallTargetResolver resolver;
+                    ins->accept(resolver);
+
+                    for(auto tgt : resolver.tgts) {
+                        if(processed.find(tgt) == processed.end()) {
+                            process(tgt);
+                        }
+
+                        if(ins->isAnyLowLevelCall() || calls.find(tgt) != calls.end()) {
+                            calls.insert(fn);
+                            if(reach.reachable(*ins)) {
+                                std::cout << "vulnerable" << std::endl;
+                            }
+                        }
+
+                        if(ins->template writesStorage<Domain>() || writesStorage.find(tgt) != writesStorage.end()) {
+                            writesStorage.insert(fn);
+                        }
+                    }
+                }
+            }
+        }
+
+        void detect(Domain &universe) override {
+            auto contracts = universe.template contracts<Domain>();
+            for(auto contract : contracts) {
+                for(auto fn : contract->functions()) {
+                    process(fn);
+                }
+            }
+        }
+
+        virtual void report() override {
+            std::cout << "Done!" << std::endl;
+        }
+
+        static std::string name() {
+            return "Reentrancy";
+        }
+
+        static Detector::DetectorDomain domain() {
+            return Detector::BLOCKCHAIN;
+        }
     private:
-        AARequirement *aa = nullptr;
-        blockchain::Blockchain *chain = nullptr;
-        // taken from ReentrancyAnalysis
-        Function *lastExternalCall = nullptr; // Tracks last external call
-        Function *curFn = nullptr; // Current function name
-        std::map<Function *,Function *> potentialReentrancies; // Tracks potential reentrant funcs and external call
-        std::map<Function *,std::tuple<bool,bool>> fnInfo; // Tracks for each func if it (1) has extern call or (2) has store
-        bool modified = false; // Tracks if current function being analyzed has been updated in fnInfo on this pass
-        string summary;
-        // OG
-//        ReentrancyAnalysis *analyzer;
+        std::unordered_set<Function *> processed;
+        std::unordered_set<Function *> writesStorage;
+        std::unordered_set<Function *> calls;
     };
 }
 
 
-#endif //VANGUARD_ReentrancyEXAMPLE_H
+#endif //VANGUARD_REENTRANCYDETECTOR_H

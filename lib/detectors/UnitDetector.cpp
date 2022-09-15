@@ -6,8 +6,8 @@
 #include <iostream>
 
 namespace vanguard {
-    void UnitDetector::detect(Program &prog) {
-        for(auto unit : prog.units()) {
+    void UnitDetector::detect(Universe &universe) {
+        for(auto unit : universe.units()) {
             detect(*unit);
         }
     }

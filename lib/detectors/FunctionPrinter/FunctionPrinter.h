@@ -6,16 +6,37 @@
 #define VANGUARD_FUNCTIONPRINTER_H
 
 #include "../FunctionDetector.h"
+#include <iostream>
 
 namespace vanguard {
-    class FunctionPrinter : public FunctionDetector {
+    template<typename Domain>
+    class FunctionPrinter : public FunctionDetector<Domain> {
     public:
-        std::vector<Requirement *> registerAnalyses() override;
-        void startDetection() override;
-        bool detect(Function &fn) override;
-        void report() override;
+        using CompilationUnit = typename Domain::CompilationUnit;
+        using Function = typename Domain::Function;
+        using Block = typename Domain::Block;
+        using Instruction = typename Domain::Instruction;
 
-        static std::string name();
+        std::vector<Requirement *> registerAnalyses() override {
+            return {};
+        }
+
+        void startDetection() override {}
+        bool detect(Function &fn) override {
+            std::cout << "Found Function: " << fn.name() << std::endl;
+            return false;
+        }
+        void report() override {
+            std::cout << "Done!" << std::endl;
+        }
+
+        static Detector::DetectorDomain domain() {
+            return Detector::BASIC;
+        }
+
+        static std::string name() {
+            return "fnPrinter";
+        }
     private:
     };
 }

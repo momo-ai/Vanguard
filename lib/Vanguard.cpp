@@ -23,22 +23,45 @@
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Analysis/AliasAnalysis.h>
 #include <llvm/Demangle/Demangle.h>
-#include "program/Program.h"
-#include "program/LLVMtoVanguard.h"
+#include "program/Universe.h"
+#include "program/LLVMFactory.h"
 #include "detectors/DetectorRegistry.h"
+#include "program/Universe.h"
+#include "program/LLVMFactory.h"
+#include "domain/libBlockchain/BlockchainFactory.h"
+#include "domain/libBlockchain/Blockchain.h"
+#include "program/Top.h"
 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
 
-void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::ProgramDetector *detector, vanguard::Program &prog) {
+template<typename Domain>
+void performDetection(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::UniverseDetector<Domain> *detector, Domain &universe) {
     auto requirements = detector->registerAnalyses();
     for(auto req : requirements) {
         req->fetch(mam, fam);
     }
 
     detector->startDetection();
-    detector->detect(prog);
+    detector->detect(universe);
     detector->report();
+}
+
+template<typename Domain>
+void runDetectors(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam, vanguard::DetectorRegistry &registry, const std::vector<std::string>& detectorNames, Domain &universe) {
+    for(auto name : detectorNames) {
+        auto detector = registry.get<Domain>(name);
+        if(detector == nullptr) {
+            llvm::errs() << "Unknown pass: " << name << "\n";
+        }
+    }
+
+    for(auto name : detectorNames) {
+        auto detector = registry.get<Domain>(name);
+        if(detector != nullptr) {
+            performDetection(mam, fam, detector, universe);
+        }
+    }
 }
 
 void initializeLLVM(int argc, char **argv) {
@@ -154,10 +177,8 @@ int main(int argc, char **argv) {
         return llvm::None;
     };
 
-    auto &llvmTrans = vanguard::LLVMtoVanguard::getInstance();
-
+    std::unordered_map<llvm::Module *, std::string> filenames;
     std::vector<std::unique_ptr<llvm::Module>> modules;
-    std::vector<vanguard::CompilationUnit *> units;
     for (auto inFile: inputFiles) {
         auto module = parseIRFile(inputFiles[0], Err, ctxt, setDataLayout);
         if (!module) {
@@ -165,33 +186,40 @@ int main(int argc, char **argv) {
             return 1;
         }
 
+        filenames[module.get()] = inFile;
         modules.push_back(move(module));
-        units.push_back(llvmTrans.translateModule(modules.back().get()));
         MPM.run(*module, MAM);
     }
 
     vanguard::DetectorRegistry &detectorRegistry = vanguard::DetectorRegistry::getInstance();
-    vanguard::Program prog(units);
 
-    if(detectors.empty()) {
-        for(auto detector : detectorRegistry.all()) {
-            performDetection(MAM, FAM, detector, prog);
+    auto detectorNames = detectors.empty() ? detectorRegistry.all() : detectors;
+    auto domain = detectorRegistry.domain(detectorNames);
+
+    if(domain == vanguard::Detector::BASIC) {
+        vanguard::LLVMFactory factory;
+        std::vector<vanguard::Universe::CompilationUnit *> units;
+        units.reserve(modules.size());
+for(auto &mod : modules) {
+            units.push_back(factory.createUnit(modules.back().get()));
         }
+        vanguard::Top<vanguard::Universe> universe(factory, units);
+        runDetectors<vanguard::Top<vanguard::Universe>>(MAM, FAM, detectorRegistry, detectorNames, universe);
+    }
+    else if(domain == vanguard::Detector::BLOCKCHAIN) {
+        vanguard::BlockchainFactory factory;
+        std::vector<vanguard::Universe::CompilationUnit *> units;
+        units.reserve(modules.size());
+        for(auto &mod : modules) {
+            std::string filename = filenames[mod.get()];
+            std::string summary = filename.substr(0, filename.length() - 2) + "json";
+            units.push_back(factory.createUnit(modules.back().get(), summary));
+        }
+        vanguard::Top<vanguard::Blockchain<vanguard::Universe>> universe(factory, units);
+        runDetectors<vanguard::Top<vanguard::Blockchain<vanguard::Universe>>>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else {
-        for(auto name : detectors) {
-            auto detector = detectorRegistry.get(name);
-            if(detector == nullptr) {
-                llvm::errs() << "Unknown pass: " << name << "\n";
-            }
-        }
-
-        for(auto name : detectors) {
-            auto detector = detectorRegistry.get(name);
-            if(detector != nullptr) {
-                performDetection(MAM, FAM, detector, prog);
-            }
-        }
+        throw std::runtime_error("Unknown domain");
     }
 
     /* Example of how to fetch results from the opt passes
