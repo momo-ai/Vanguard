@@ -22,7 +22,7 @@ jobs:
           fetch-depth: ${{ env.PR_FETCH_DEPTH }}
       - name: Set merge base
         run: |
-          echo "BASE_COMMIT=$(git rev-parse ${{ github.head_ref }})" >> "${GITHUB_ENV}"
+          echo "BASE_COMMIT=$(git rev-parse ${{ github.base_ref }})" >> "${GITHUB_ENV}"
       - name: Download git-clang-format
         run: |
           curl 'https://raw.githubusercontent.com/llvm/llvm-project/c94a02e0e223bcce3b2c88741fae35d31a2d4f1d/clang/tools/clang-format/git-clang-format' -o ./git-clang-format
