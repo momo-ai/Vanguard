@@ -132,4 +132,78 @@ namespace vanguard {
     }
 
 
+    Type *BlockchainFactory::createType(const llvm::Type *t) {
+        if(t == nullptr) {
+            return nullptr;
+        }
+
+        if (typeMap.find(t) == typeMap.end()){
+            if (auto integer = llvm::dyn_cast<llvm::IntegerType>(t)){
+                //typeMap[t] = (new IntegerType(*this,*integer));
+                typeMap[t] = new WrappedIntegerType<IntegerType>(*integer, *this);
+            }
+            else if (auto array = llvm::dyn_cast<llvm::ArrayType>(t)){
+                //typeMap[t] = new ArrayType(*this,*array);
+                typeMap[t] = new WrappedArrayType<ArrayType, llvm::ArrayType>(*array, *this);
+            }
+                // else if (auto function = llvm::dyn_cast<llvm::FunctionType>(&t)){
+                //     typeMap[&t] = new FunctionT(*function);
+                // }
+            else if (auto pointer = llvm::dyn_cast<llvm::PointerType>(t)){
+                //typeMap[t] = new PointerType(*this,*pointer);
+                typeMap[t] = new WrappedPointerType<PointerType, llvm::PointerType>(*pointer, *this);
+            }
+            else if (auto structT = llvm::dyn_cast<llvm::StructType>(t)){
+                typeMap[t] = new WrappedStructType<StructType, llvm::StructType>(*structT, *this);
+            }
+            else if (auto vector = llvm::dyn_cast<llvm::VectorType>(t)){
+                typeMap[t] = new WrappedVectorType<ArrayType>(*vector, *this);
+            }
+            else if (t->isVoidTy()){
+                //typeMap[t] = new VoidType(*this,*t);
+                typeMap[t] = new WrappedVoidType<VoidType, llvm::Type>(*t, *this);
+            }
+            else if (t->isLabelTy()){
+                typeMap[t] = new WrappedLocationType<LocationType, llvm::Type>(*t, *this);
+            }
+            else {
+                throw std::runtime_error("Given type cannot be translated since it does not exist in vanguard yet.");
+            }
+        }
+        return typeMap[t];
+    }
+
+    Value *BlockchainFactory::createVal(const llvm::Value *val) {
+        if(val == nullptr) {
+            return nullptr;
+        }
+
+        if (valueMap.find(val) == valueMap.end()){
+            if (auto globalVariable = llvm::dyn_cast<llvm::GlobalVariable>(val)){
+                valueMap[val] = new WrappedVariable<Variable, llvm::GlobalVariable>(*globalVariable, *this);
+            }
+            else if (auto argument = llvm::dyn_cast<llvm::Argument>(val)){
+                valueMap[val] = new WrappedVariable<Variable, llvm::Argument>(*argument, *this);
+            }
+            else if (auto instVar = llvm::dyn_cast<llvm::Instruction>(val)){
+                valueMap[val] = new WrappedVariable<Variable, llvm::Instruction>(*instVar, *this);
+            }
+            else if (auto integer = llvm::dyn_cast<llvm::ConstantInt>(val)){
+                valueMap[val] = new WrappedLiteral<Literal, llvm::ConstantInt>(*integer, *this);
+            }
+            else if (auto string = llvm::dyn_cast<llvm::ConstantDataSequential>(val)){
+                valueMap[val] = new WrappedLiteral<Literal, llvm::ConstantDataSequential>(*string, *this);
+            }
+            else if(auto constant = llvm::dyn_cast<llvm::Constant>(val)){
+                valueMap[val] = new WrappedConstant<Constant, llvm::Constant>(*constant, *this);
+            }
+            else if(auto loc = llvm::dyn_cast<llvm::BasicBlock>(val)) {
+                valueMap[val] = new WrappedLocation<Location, llvm::BasicBlock>(*loc, *this);
+            }
+            else{
+                throw std::runtime_error("Given value cannot be translated since it does not exist in vanguard yet.");
+            }
+        }
+        return valueMap[val];
+    }
 }
