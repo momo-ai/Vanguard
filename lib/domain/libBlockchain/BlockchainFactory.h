@@ -12,17 +12,15 @@
 #include "BlockchainModel.h"
 
 namespace vanguard {
-    class BlockchainFactory : public LLVMFactory {
+    class BlockchainFactory : public UnitFactory {
     public:
-        static UnitFactory *getInstance() {
+        static BlockchainFactory *getInstance() {
             if(instance == nullptr) {
-                instance = new LLVMFactory();
+                instance = new BlockchainFactory();
             }
 
-            return instance;
+            return dynamic_cast<BlockchainFactory *>(instance);
         }
-
-        BlockchainFactory() = default;
 
         BlkType<UnknownType> *createBasicType(const llvm::Module &module, BlockchainModel &model, std::string name);
 
@@ -48,18 +46,20 @@ namespace vanguard {
 
         Universe::Block *createBlk(const llvm::BasicBlock *block) override;
 
-        /*Type *createType(const llvm::Type *t) override;
+        Type *createType(const llvm::Type *t) override;
 
-        Value *createVal(const llvm::Value *val) override;*/
+        Value *createVal(const llvm::Value *val) override;
 
-    private:
+    protected:
+
+        BlockchainFactory() = default;
 
         std::unordered_map<const llvm::Module*, Blockchain<Universe>::CompilationUnit*> moduleMap;
         std::unordered_map<const llvm::Function*, Universe::Function*> functionMap;
         std::unordered_map<const llvm::BasicBlock*, Universe::Block*> blockMap;
         std::unordered_map<const llvm::Instruction*, Universe::Instruction*> instructionMap;
-        //std::unordered_map<const llvm::Type*, Type*> typeMap;
-        //std::unordered_map<const llvm::Value*, Value*> valueMap;
+        std::unordered_map<const llvm::Type*, Type*> typeMap;
+        std::unordered_map<const llvm::Value*, Value*> valueMap;
     };
 }
 

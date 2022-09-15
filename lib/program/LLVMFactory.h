@@ -15,15 +15,13 @@ namespace vanguard{
 
     class LLVMFactory : public UnitFactory {
         public:
-            static UnitFactory *getInstance() {
+            static LLVMFactory *getInstance() {
                 if(instance == nullptr) {
                     instance = new LLVMFactory();
                 }
 
-                return instance;
+                return dynamic_cast<LLVMFactory *>(instance);
             }
-
-            LLVMFactory();
 
             Universe::CompilationUnit *createUnit(const llvm::Module *module) override;
 
@@ -37,7 +35,8 @@ namespace vanguard{
 
             Value *createVal(const llvm::Value *val) override;
 
-        private:
+        protected:
+            LLVMFactory();
 
             std::unordered_map<const llvm::Module*, Universe::CompilationUnit*> moduleMap;
             std::unordered_map<const llvm::Function*, Universe::Function*> functionMap;
