@@ -57,7 +57,7 @@ namespace vanguard {
             return wrapped->isConditional();
         }
 
-        virtual Value* condition() const {
+        virtual typename Domain::Value* condition() const {
             return this->factory.createVal(wrapped->getCondition());
         }
 
@@ -83,7 +83,7 @@ namespace vanguard {
         virtual bool isConditional() const override {
             return true;
         }
-        virtual Value* condition() const override {
+        virtual typename Domain::Value* condition() const override {
             return this->factory.createVal(wrapped->getCondition());
         }
         virtual std::list<typename Domain::Block*> targets() const override {
@@ -109,7 +109,7 @@ namespace vanguard {
         virtual bool isConditional() const override {
             return false;
         }
-        virtual Value* condition() const override {
+        virtual typename Domain::Value* condition() const override {
             throw std::runtime_error("Indirect Branch Instruction does not have a condition.");
         }
         virtual std::list<typename Domain::Block*> targets() const override {
@@ -136,7 +136,7 @@ namespace vanguard {
         bool returnsValue() const override {
             return wrapped->getReturnValue() != nullptr;
         }
-        Value* value() const override {
+        typename Domain::Value* value() const override {
             return this->factory.createVal(wrapped->getReturnValue());
         }
 
@@ -273,7 +273,7 @@ namespace vanguard {
             return unaryOpClass;
         }
 
-        Value* operand() const override {
+        typename Domain::Value* operand() const override {
             return this->factory.createVal(wrapped->getOperand(0));
         }
 
@@ -296,8 +296,8 @@ namespace vanguard {
             return {dynamic_cast<typename Domain::Function*>(this->factory.createFn(wrapped->getCalledFunction()))};
         }
 
-        std::list<Value*> args() const override{
-            std::list<Value*> args = {};
+        std::list<typename Domain::Value*> args() const override{
+            std::list<typename Domain::Value*> args = {};
             for(auto itr = wrapped->arg_begin(); itr != wrapped->arg_end(); itr++){
                 args.push_back(this->factory.createVal(*itr));
             }
@@ -315,7 +315,7 @@ namespace vanguard {
         template<typename ...Args>
         explicit CastIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CastIns<Domain>(std::forward<Args>(args)..., ins) {};
 
-        Type *castTo() const override {
+        typename Domain::Type *castTo() const override {
             return this->factory.createType(wrapped->getDestTy());
         }
 
@@ -331,15 +331,15 @@ namespace vanguard {
         template<typename ...Args>
         explicit TernaryIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::TernaryIns<Domain>(std::forward<Args>(args)..., ins) {};
 
-        Value *condition() const override {
+        typename Domain::Value *condition() const override {
             return this->factory.createVal(wrapped->getCondition());
         }
 
-        Value *trueValue() const override {
+        typename Domain::Value *trueValue() const override {
             return this->factory.createVal(wrapped->getTrueValue());
         }
 
-        Value *falseValue() const override {
+        typename Domain::Value *falseValue() const override {
             return this->factory.createVal(wrapped->getFalseValue());
         }
 

@@ -6,7 +6,6 @@
 #define VANGUARD_BLOCKCHAIN_H
 
 #include <utility>
-#include "BlkValue.h"
 #include <iostream>
 
 enum Mutability {
@@ -25,19 +24,29 @@ enum Visibility {
 };
 
 namespace vanguard {
-    class BlockchainModel;
-
-    template<class Domain>
-    class Blockchain : public Domain {
+    template<class Base, class Domain>
+    class Blockchain : public Base {
     public:
+        class Universe;
+        class Factory;
+        class Contract;
+        class CompilationUnit;
         class Function;
-        class Block;
-        class Instruction;
 
-        class Contract : public ObjectType {
+        class Instruction;
+        template<typename Wrap, typename D = void> class CallIns;
+
+        class Type;
+        template<typename Wrap, typename D = void> class BlkArrayType;
+        template<typename Wrap, typename D = void> class BlkMapType;
+        template<typename Wrap, typename D = void> class BlkStructType;
+
+        class Value;
+        template<typename Wrap, typename D = void> class BlkVariable;
+
+        /*class Contract : public ObjectType {
         public:
-            Contract(BlockchainModel &model, UnitFactory &factory, std::string name, std::vector<Variable *> vars/*, std::vector<BlkType *> inherits,
-            std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events*/) : model(model), contractName(std::move(name)), vars(std::move(vars)), ObjectType(factory) {
+            Contract(BlockchainModel &model, UnitFactory &factory, std::string name, std::vector<Variable *> vars) : model(model), contractName(std::move(name)), vars(std::move(vars)), ObjectType(factory) {
             };
 
             std::string name() const override {
@@ -57,10 +66,6 @@ namespace vanguard {
         private:
             const std::string contractName;
             BlockchainModel &model;
-            /*std::vector<BlkUserType *> contractInherits;
-            std::vector<BlkEvent *> contractEvents;
-            std::vector<BlkEnum *> contractEnums;
-            std::vector<BlkStruct *> contractStructs;*/
             std::vector<Variable *> vars;
         };
 
@@ -73,9 +78,9 @@ namespace vanguard {
             }
         private:
             std::vector<Contract *> unitContracts;
-        };
+        };*/
 
-        class Function : public Domain::Function {
+        /*class Function : public Domain::Function {
         public:
             template<typename ...Args>
             explicit Function(std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<Variable *> params, std::vector<Variable *> rets, std::vector<std::string> mods, Args&&... args) : helper(false), parentContract(nullptr), fnParams(std::move(params)), rets(std::move(rets)), mods(std::move(mods)), fnName(std::move(name)), isCnstr(isCnstr), vis(vis), mut(mut), sel(std::move(selector)), Domain::Function(std::forward<Args>(args)...) {};
@@ -159,9 +164,9 @@ namespace vanguard {
             //virtual std::unordered_set<Block*> successors() const = 0;
             //virtual std::vector<Instruction *> instructions() const = 0;
             virtual Function* function() const = 0;
-        };
+        };*/
 
-        class Instruction : public Domain::Instruction {
+        /*class Instruction : public Domain::Instruction {
         public:
             template<typename ...Args>
             explicit Instruction(Args&&... args) : Domain::Instruction(std::forward<Args>(args)...) {};
@@ -205,9 +210,9 @@ namespace vanguard {
             }
 
             virtual Block* block() const = 0;
-        };
+        };*/
 
-        template<typename InsDomain, typename Wrap>
+        /*template<typename InsDomain, typename Wrap>
         class CallIns : public Domain::template CallIns<InsDomain, Wrap> {
         public:
             template<typename ...Args>
@@ -264,9 +269,9 @@ namespace vanguard {
                 }
                 return Domain::template CallIns<InsDomain, Wrap>::targets();
             }
-        };
+        };*/
 
-        template<typename ...Args>
+        /*template<typename ...Args>
         explicit Blockchain(Args&&... args) : Domain(std::forward<Args>(args)...) {};
 
         template<typename CDomain>
@@ -280,7 +285,7 @@ namespace vanguard {
             }
 
             return contracts;
-        }
+        }*/
     };
 }
 

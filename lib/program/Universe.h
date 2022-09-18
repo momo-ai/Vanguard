@@ -11,14 +11,18 @@ namespace vanguard {
     template<typename Domain>
     class Base<Domain>::Universe {
     public:
-        Universe(typename Domain::Factory &factory, std::vector<typename Domain::CompilationUnit *>  units) : fact(factory), programUnits(std::move(units)) {}
+        Universe(typename Domain::Factory &factory, std::vector<typename Domain::CompilationUnit *>  units) : fact(factory), programUnits(std::move(units)) {
+            for(auto unit : programUnits) {
+                unit->setUniverse(*((typename Domain::Universe *) this));
+            }
+        }
 
         const std::vector<typename Domain::CompilationUnit *> &units() const {
             return programUnits;
         }
 
-        decltype(auto) factory() {
-            return static_cast<typename Domain::Factory &>(fact);
+        typename Domain::Factory &factory() {
+            return fact;
         }
 
     protected:

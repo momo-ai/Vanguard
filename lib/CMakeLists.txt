@@ -25,8 +25,8 @@ include(AddLLVM)
 #list(APPEND VANGUARD_SOURCES Driver.cpp)
 
 add_subdirectory(detectors)
-#add_subdirectory(analysis)
-#add_subdirectory(domain)
+add_subdirectory(analysis)
+add_subdirectory(domain)
 add_subdirectory(program)
 
 #message(STATUS "Z3_FOUND: ${Z3_FOUND}")

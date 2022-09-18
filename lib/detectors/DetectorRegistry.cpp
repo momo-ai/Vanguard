@@ -19,7 +19,7 @@ void addToRegistry(vanguard::DetectorRegistry *registry) {
 }
  */
 
-static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain Summary"), llvm::cl::value_desc("filename"), llvm::cl::Optional);
+//static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain Summary"), llvm::cl::value_desc("filename"), llvm::cl::Optional);
 
 
 //extern "C" __attribute__((__weak__))
@@ -46,23 +46,23 @@ namespace vanguard {
         return nullptr;
     };
 
-    /*template<>
-    UniverseDetector<Top<Blockchain<Universe>>> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
-        if(name == FunctionPrinter<Blockchain<Universe>>::name()) {
-            return new FunctionPrinter<Top<Blockchain<Universe>>>();
+    template<>
+    UniverseDetector<BlockchainDomain> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
+        if(name == FunctionPrinter<BlockchainDomain>::name()) {
+            return new FunctionPrinter<BlockchainDomain>();
         }
-        else if(name == StatGen<Blockchain<Universe>>::name()) {
-            return new StatGen<Top<Blockchain<Universe>>>();
+        else if(name == StatGen<BlockchainDomain>::name()) {
+            return new StatGen<BlockchainDomain>();
         }
-        else if(name == IRValidator<Blockchain<Universe>>::name()) {
-            return new IRValidator<Top<Blockchain<Universe>>>();
+        else if(name == IRValidator<BlockchainDomain>::name()) {
+            return new IRValidator<BlockchainDomain>();
         }
-        else if(name == ReentrancyDetector<Blockchain<Universe>>::name()) {
-            return new ReentrancyDetector<Top<Blockchain<Universe>>>();
+        else if(name == ReentrancyDetector<BlockchainDomain>::name()) {
+            return new ReentrancyDetector<BlockchainDomain>();
         }
 
         return nullptr;
-    };*/
+    };
 
     DetectorRegistry &DetectorRegistry::getInstance() {
         if(instance == nullptr) {

@@ -34,7 +34,7 @@ namespace vanguard{
                 return {};
             }
 
-            std::list<Instruction*> instructions = {};
+            std::list<typename Domain::Instruction*> instructions = {};
             for (auto &I : *block){
                 instructions.push_back(factory.createIns(&I));
             }
@@ -49,61 +49,9 @@ namespace vanguard{
             return allSuccessors;
         }
     protected:
-        //virtual std::list<typename Domain::Instruction *> insts() const ;
-        //virtual std::unordered_set<typename Domain::Block *> succs() const;
-
         const llvm::BasicBlock* block;
         typename Domain::Factory &factory;
     };
-
-    /*template<typename Domain>
-    Universe<Domain>::Block::Block(Factory &factory, const llvm::BasicBlock *blk): factory(factory), block(blk) {}
-
-    template<typename Domain>
-    std::string Universe<Domain>::Block::name(){
-        if (block->hasName()) {
-            return block->getName().str();
-        }
-        else return "unnamed_block";
-    }
-
-
-    template<typename Domain>
-    typename Domain::Function* Universe<Domain>::Block::function() const {
-        return factory.createFn(block->getParent());
-    }
-
-    template<typename Domain>
-    std::list<typename Domain::Instruction*> Universe<Domain>::Block::instructions() const{
-        if(block == nullptr) {
-            return {};
-        }
-
-        std::list<Instruction*> instructions = {};
-        for (auto &I : *block){
-            instructions.push_back(factory.createIns(&I));
-        }
-        return instructions;
-    }
-
-    template<typename Domain>
-    bool Universe<Domain>::Block::isEntry(){
-        return block->isEntryBlock();
-    }
-
-    template<typename Domain>
-    std::unordered_set<typename Domain::Block* > Universe<Domain>::Block::successors() const{
-        std::unordered_set<Block*> allSuccessors = {};
-        for (auto *succ : llvm::successors(block)) {
-            allSuccessors.insert(factory.createBlk(succ));
-        }
-        return allSuccessors;
-    }
-
-    template<typename Domain>
-    const llvm::BasicBlock *Universe<Domain>::Block::unwrap(){
-        return block;
-    }*/
 
 }
 

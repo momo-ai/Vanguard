@@ -45,7 +45,7 @@ namespace vanguard{
         }
 
         virtual std::vector<typename Domain::Instruction*> instructions() const {
-            std::vector<Instruction*> instructionsList = {};
+            std::vector<typename Domain::Instruction*> instructionsList = {};
             for (auto &blk : *function){
                 for(auto &ins : blk) {
                     instructionsList.push_back(factory.createIns(&ins));

@@ -29,7 +29,7 @@ namespace vanguard{
 
         virtual std::list<typename Domain::Value*> globalVariables() {
             //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
-            std::list<Value*> allGlobalVariables = {};
+            std::list<typename Domain::Value*> allGlobalVariables = {};
             for (auto gv= module->global_begin(); gv != module->global_end(); gv++){
                 allGlobalVariables.push_back(factory.createVal(&*gv));
             }
@@ -39,10 +39,17 @@ namespace vanguard{
         virtual typename Domain::Function* findFunction(std::string name) const {
             //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
             auto function = module->getFunction(llvm::StringRef(name));
-            if (function == nullptr) {
-                return nullptr;
+            if (function != nullptr) {
+                return factory.createFn(function);
             }
-            return factory.createFn(function);
+
+            for (auto fn : this->functions()){
+                if (fn->name() == name){
+                    return fn;
+                }
+            }
+
+            return nullptr;
         }
 
         virtual std::list<typename Domain::Function *> functions() const {
@@ -58,10 +65,21 @@ namespace vanguard{
             return module;
         }
 
+        typename Domain::Universe *universe() {
+            return uni;
+        }
+
+        void setUniverse(typename Domain::Universe &universe) {
+            if(uni == nullptr) {
+                uni = &universe;
+            }
+        }
+
     protected:
         //typename Domain::Function* findFn(std::string name) const;
         //virtual std::list<typename Domain::Function *> fns() const;
         typename Domain::Factory &factory;
+        typename Domain::Universe *uni;
     private:
         const llvm::Module* module;
     };

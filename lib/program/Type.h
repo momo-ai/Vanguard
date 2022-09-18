@@ -58,7 +58,7 @@ namespace vanguard{
             return false;
         }
 
-        Type* baseType() const override {
+        typename Domain::Type* baseType() const override {
             return this->factory.createType(this->wrapped->getElementType());
         }
 
@@ -88,7 +88,7 @@ namespace vanguard{
             return false;
         }
 
-        Type* baseType() const override {
+        typename Domain::Type* baseType() const override {
             return this->factory.createType(this->wrapped->getElementType());
         }
 
@@ -114,6 +114,32 @@ namespace vanguard{
 
     template<typename Domain>
     template<typename Wrap, typename D>
+    class Base<Domain>::MapType : public vanguard::MapType<Domain> {
+    public:
+        template<typename ...Args>
+        explicit MapType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::MapType<Domain>(std::forward<Args>(args)...) {};
+
+        std::string name() const override {
+            return valueType()->name() + "[" + keyType()->name() + "]";
+        }
+
+        typename Domain::Type* keyType() const override {
+            return nullptr;
+        }
+
+        typename Domain::Type* valueType() const override {
+            return nullptr;
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
+    };
+
+    template<typename Domain>
+    template<typename Wrap, typename D>
     class Base<Domain>::PointerType : public vanguard::PointerType<Domain> {
     public:
         template<typename ...Args>
@@ -123,7 +149,7 @@ namespace vanguard{
             return this->referencedType()->name() + " *";
         }
 
-        Type* referencedType() const override {
+        typename Domain::Type* referencedType() const override {
             return this->factory.createType(this->wrapped->getElementType());
         }
 
@@ -149,8 +175,8 @@ namespace vanguard{
             return this->wrapped->getStructNumElements();
         }
 
-        std::list<Type*> fieldTypes() override {
-            std::list<Type*> fieldTypesList = {};
+        std::list<typename Domain::Type*> fieldTypes() override {
+            std::list<typename Domain::Type*> fieldTypesList = {};
             unsigned numFields = this->wrapped->getStructNumElements();
             for(unsigned n = 0; n < numFields; n++){
                 fieldTypesList.push_back(this->factory.createType(this->wrapped->getStructElementType(n)));
