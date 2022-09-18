@@ -9,7 +9,6 @@
 #include <llvm/IR/Module.h>
 #include <list>
 #include <unordered_set>
-#include "InstructionClassVisitor.h"
 
 namespace vanguard {
     enum InstructionClassEnum {

@@ -6,13 +6,14 @@
 #define VANGUARD_INSTRUCTIONCLASSES_H
 
 #include "Base.h"
-#include "InstructionClassVisitor.h"
 
 
 namespace vanguard {
     enum BinOp{Add, Sub, Mul, Div, Mod, Shl, Shr, And, Or, Xor, IFCmpInst};
 
     enum UnOp{Neg, Not};
+
+    template<typename Domain> class InstructionClassVisitor;
 
     // Branch Instruction
     template<typename Domain>
@@ -287,6 +288,21 @@ namespace vanguard {
         void accept(InstructionClassVisitor<Domain> &v) const override {
             v.visit(*this);
         }
+    };
+
+    template<typename Domain>
+    class InstructionClassVisitor{
+    public:
+        virtual void visit(const BranchIns<Domain> &v) {};
+        virtual void visit(const ReturnIns<Domain> &v) {};
+        virtual void visit(const ErrorIns<Domain> &v) {};
+        virtual void visit(const BinaryOpIns<Domain> &v) {};
+        virtual void visit(const UnaryOpIns<Domain> &v) {};
+        virtual void visit(const CallIns<Domain> &v) {};
+        virtual void visit(const CastIns<Domain> &v) {};
+        virtual void visit(const TernaryIns<Domain> &v) {};
+        virtual void visit(const AssignIns<Domain> &v) {};
+        virtual void visit(const UnknownIns<Domain> &v) {};
     };
 }
 

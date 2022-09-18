@@ -71,9 +71,6 @@ namespace vanguard {
             }
         }
 
-        //virtual std::vector<Instruction*> instructions() const = 0;
-        //virtual std::vector<Block *> blocks() const = 0;
-
     private:
         bool helper;
         std::string sel;

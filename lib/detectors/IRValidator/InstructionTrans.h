@@ -6,7 +6,6 @@
 #define VANGUARD_INSTRUCTIONTRANS_H
 
 #include <program/InstructionClasses.h>
-#include <program/InstructionClassVisitor.h>
 #include <string>
 #include "ValueTrans.h"
 

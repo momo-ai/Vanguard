@@ -19,27 +19,6 @@ namespace vanguard{
 
     template<typename Domain> class ValueClassVisitor;
 
-
-    /*class Value{
-    public:
-        explicit Value(UnitFactory &factory, ValueClassEnum vc) : factory(factory), valClass(vc) {};
-
-        static inline bool classof(const Value &) { return true; }
-        static inline bool classof(const Value *) { return true; }
-
-        virtual Type* type() const = 0;
-
-        ValueClassEnum valueClass() const {
-            return valClass;
-        }
-
-        virtual void accept(ValueClassVisitor<Domain> &v) const = 0;
-
-    protected:
-        ValueClassEnum valClass;
-        UnitFactory &factory;
-    };*/
-
     template<typename Domain>
     class Variable : public Domain::Value {
     public:

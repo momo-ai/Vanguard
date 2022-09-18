@@ -19,9 +19,6 @@ namespace vanguard {
     template<typename Base, typename Domain>
     class Blockchain<Base, Domain>::Factory : public Base::Factory {
     public:
-
-        //Type<UnknownType> *createBasicType(const llvm::Module &module, BlockchainModel &model, std::string name);
-
         typename Domain::Function *createBlkFn(const llvm::Module &module, BlockchainModel<Domain> &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<vanguard::Variable<Domain> *> params, std::vector<vanguard::Variable<Domain> *> rets, std::vector<std::string> mods) {
             auto factory = (typename Domain::Factory *) this;
             auto fn = new typename Domain::Function(name, selector, isCnstr, vis, mut, std::move(params), std::move(rets), std::move(mods), *factory, nullptr);
