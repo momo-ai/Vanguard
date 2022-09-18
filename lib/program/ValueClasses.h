@@ -22,7 +22,8 @@ namespace vanguard{
     template<typename Domain>
     class Variable : public Domain::Value {
     public:
-        explicit Variable(typename Domain::Factory &factory) : Domain::Value(factory, VARIABLE) {};
+        template<typename ...Args>
+        explicit Variable(Args&&... args) : Domain::Value(std::forward<Args>(args)..., VARIABLE) {};
 
         static inline bool classof(const Variable &) { return true; }
         static inline bool classof(const Variable *) { return true; }
@@ -42,7 +43,8 @@ namespace vanguard{
     template<typename Domain>
     class Constant : public Domain::Value {
     public:
-        explicit Constant(typename Domain::Factory &factory) : Domain::Value(factory, CONSTANT) {};
+        template<typename ...Args>
+        explicit Constant(Args&&... args) : Domain::Value(std::forward<Args>(args)..., CONSTANT) {};
         static inline bool classof(const Constant &) { return true; }
         static inline bool classof(const Constant *) { return true; }
         static inline bool classof(const typename Domain::Value *value) { return classof(*value); }
@@ -58,7 +60,8 @@ namespace vanguard{
     template<typename Domain>
     class Literal : public Domain::Value {
     public:
-        explicit Literal(typename Domain::Factory &factory) : Domain::Value(factory, LITERAL) {};
+        template<typename ...Args>
+        explicit Literal(Args&&... args) : Domain::Value(std::forward<Args>(args)..., LITERAL) {};
         static inline bool classof(const Literal &) { return true; }
         static inline bool classof(const Literal *) { return true; }
         static inline bool classof(const typename Domain::Value *value) { return classof(*value); }
@@ -76,7 +79,8 @@ namespace vanguard{
     template<typename Domain>
     class Pointer : public Domain::Value {
     public:
-        explicit Pointer(typename Domain::Factory &factory) : Domain::Value(factory, POINTER) {};
+        template<typename ...Args>
+        explicit Pointer(Args&&... args) : Domain::Value(std::forward<Args>(args)..., POINTER) {};
         static inline bool classof(const Pointer &) { return true; }
         static inline bool classof(const Pointer *) { return true; }
         static inline bool classof(const typename Domain::Value *value) { return classof(*value); }
@@ -96,7 +100,8 @@ namespace vanguard{
     template<typename Domain>
     class MemoryRegion : public Domain::Value {
     public:
-        explicit MemoryRegion(typename Domain::Factory &factory) : Domain::Value(factory, MEMORY_REGION) {};
+        template<typename ...Args>
+        explicit MemoryRegion(Args&&... args) : Domain::Value(std::forward<Args>(args)..., MEMORY_REGION) {};
         static inline bool classof(const MemoryRegion &) { return true; }
         static inline bool classof(const MemoryRegion *) { return true; }
         static inline bool classof(const typename Domain::Value *value) { return classof(*value); }
@@ -115,7 +120,8 @@ namespace vanguard{
     template<typename Domain>
     class Location : public Domain::Value {
     public:
-        explicit Location(typename Domain::Factory &factory) : Domain::Value(factory, LOCATION) {};
+        template<typename ...Args>
+        explicit Location(Args&&... args) : Domain::Value(std::forward<Args>(args)..., LOCATION) {};
         static inline bool classof(const Location &) { return true; }
         static inline bool classof(const Location *) { return true; }
         static inline bool classof(const typename Domain::Value *value) { return classof(*value); }

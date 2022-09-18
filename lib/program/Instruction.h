@@ -14,7 +14,8 @@ namespace vanguard {
     template<typename Domain>
     class Base<Domain>::Instruction {
     public:
-        explicit Instruction(typename Domain::Factory &factory) : factory(factory) {};
+        explicit Instruction() {};
+        Instruction(const Instruction&) = delete;
         static inline bool classof(const Instruction &) { return true; }
         static inline bool classof(const Instruction *) { return true; }
 
@@ -27,6 +28,7 @@ namespace vanguard {
             return unwrap()->willReturn();
         }
         virtual typename Domain::Value* operandAt(unsigned i) const {
+            auto &factory = Domain::Factory::instance();
             return factory.createVal(unwrap()->getOperand(i));
         }
         virtual unsigned numOperands() const {
@@ -36,10 +38,9 @@ namespace vanguard {
         //virtual std::vector<Value *> reads();
         //virtual std::vector<Value *> writes();
         virtual typename Domain::Block* block() const {
+            auto &factory = Domain::Factory::instance();
             return factory.createBlk(unwrap()->getParent());
         }
-    protected:
-        typename Domain::Factory &factory;
     };
 
     // Branch Instruction
@@ -55,14 +56,16 @@ namespace vanguard {
         }
 
         typename Domain::Value* condition() const override {
-            return this->factory.createVal(wrapped->getCondition());
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getCondition());
         }
 
         std::list<typename Domain::Block*> targets() const override {
             std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
+            auto &factory = Domain::Factory::instance();
             for(unsigned int i = 0; i < n; i++){
-                successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
+                successors.push_back(factory.createBlk(wrapped->getSuccessor(i)));
             }
             return successors;
         }
@@ -85,13 +88,15 @@ namespace vanguard {
             return true;
         }
         typename Domain::Value* condition() const override {
-            return this->factory.createVal(wrapped->getCondition());
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getCondition());
         }
         std::list<typename Domain::Block*> targets() const override {
             std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
+            auto &factory = Domain::Factory::instance();
             for(unsigned int i = 0; i < n; i++){
-                successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
+                successors.push_back(factory.createBlk(wrapped->getSuccessor(i)));
             }
             return successors;
         }
@@ -119,8 +124,9 @@ namespace vanguard {
         std::list<typename Domain::Block*> targets() const override {
             std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
+            auto &factory = Domain::Factory::instance();
             for(unsigned int i = 0; i < n; i++){
-                successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
+                successors.push_back(factory.createBlk(wrapped->getSuccessor(i)));
             }
             return successors;
         }
@@ -144,7 +150,8 @@ namespace vanguard {
             return wrapped->getReturnValue() != nullptr;
         }
         typename Domain::Value* value() const override {
-            return this->factory.createVal(wrapped->getReturnValue());
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getReturnValue());
         }
 
         const Wrap *unwrap() const override {
@@ -186,7 +193,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -210,7 +218,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -239,7 +248,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -277,7 +287,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -303,7 +314,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* operand() const override {
-            return this->factory.createVal(wrapped->getOperand(0));
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getOperand(0));
         }
 
         const Wrap *unwrap() const override {
@@ -311,7 +323,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -330,13 +343,15 @@ namespace vanguard {
         }
 
         std::vector<typename Domain::Function*> targets() const override {
-            return {dynamic_cast<typename Domain::Function*>(this->factory.createFn(wrapped->getCalledFunction()))};
+            auto &factory = Domain::Factory::instance();
+            return {factory.createFn(wrapped->getCalledFunction())};
         }
 
         std::list<typename Domain::Value*> args() const override{
             std::list<typename Domain::Value*> args = {};
+            auto &factory = Domain::Factory::instance();
             for(auto itr = wrapped->arg_begin(); itr != wrapped->arg_end(); itr++){
-                args.push_back(this->factory.createVal(*itr));
+                args.push_back(factory.createVal(*itr));
             }
             return args;
         }
@@ -346,7 +361,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -361,7 +377,8 @@ namespace vanguard {
         explicit CastIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CastIns<Domain>(std::forward<Args>(args)...) {};
 
         typename Domain::Type *castTo() const override {
-            return this->factory.createType(wrapped->getDestTy());
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(wrapped->getDestTy());
         }
 
         const Wrap *unwrap() const override {
@@ -369,7 +386,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -384,22 +402,26 @@ namespace vanguard {
         explicit TernaryIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::TernaryIns<Domain>(std::forward<Args>(args)...) {};
 
         typename Domain::Value *condition() const override {
-            return this->factory.createVal(wrapped->getCondition());
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getCondition());
         }
 
         typename Domain::Value *trueValue() const override {
-            return this->factory.createVal(wrapped->getTrueValue());
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getTrueValue());
         }
 
         typename Domain::Value *falseValue() const override {
-            return this->factory.createVal(wrapped->getFalseValue());
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(wrapped->getFalseValue());
         }
         const Wrap *unwrap() const override {
             return wrapped;
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:
@@ -418,7 +440,8 @@ namespace vanguard {
         }
 
         typename Domain::Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
+            auto &factory = Domain::Factory::instance();
+            auto* insVar = factory.createVal(wrapped);
             return insVar;
         }
     protected:

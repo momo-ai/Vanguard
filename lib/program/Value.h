@@ -16,13 +16,15 @@ namespace vanguard{
     template<typename Domain>
     class Base<Domain>::Value {
     public:
-        explicit Value(typename Domain::Factory &factory, ValueClassEnum vc) : factory(factory), valClass(vc) {};
+        explicit Value(ValueClassEnum vc) : valClass(vc) {};
+        Value(const Value&) = delete;
 
         static inline bool classof(const Value &) { return true; }
         static inline bool classof(const Value *) { return true; }
 
         virtual typename Domain::Type* type() const {
-            return this->factory.createType(unwrap()->getType());
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(unwrap()->getType());
         }
 
         ValueClassEnum valueClass() const {
@@ -34,7 +36,6 @@ namespace vanguard{
 
     protected:
         ValueClassEnum valClass;
-        typename Domain::Factory &factory;
     };
 
     template<typename Domain>
@@ -95,11 +96,13 @@ namespace vanguard{
         explicit Pointer(const Wrap *val, const llvm::Value *offset, Args&&... args) : wrapped(val), ptrOffset(offset), vanguard::Pointer<Domain>(std::forward<Args>(args)...) {};
 
         Value *base() const override {
-            return this->factory.createVal(&this->wrapped);
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(&this->wrapped);
         }
 
         Value *offset() const override {
-            return this->factory.createVal(ptrOffset);
+            auto &factory = Domain::Factory::instance();
+            return factory.createVal(ptrOffset);
         }
 
         const Wrap *unwrap() const override {
@@ -132,7 +135,8 @@ namespace vanguard{
         explicit Location(const Wrap *val, Args&&... args) : wrapped(val), vanguard::Location<Domain>(std::forward<Args>(args)...) {};
 
         typename Domain::Block &loc() const override {
-            return *this->factory.createBlk(this->wrapped);
+            auto &factory = Domain::Factory::instance();
+            return *factory.createBlk(this->wrapped);
         }
 
         const Wrap *unwrap() const override {

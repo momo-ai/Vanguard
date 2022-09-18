@@ -12,8 +12,8 @@ namespace vanguard {
     template<class Base, class Domain>
     class Blockchain<Base, Domain>::Contract : public ObjectType<Domain> {
     public:
-        Contract(BlockchainModel<Domain> &model, typename Domain::Factory &factory, std::string name, std::vector<typename Domain::Function *> fns, std::vector<vanguard::Variable<Domain> *> vars/*, std::vector<BlkType *> inherits,
-            std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events*/) : model(model), contractName(std::move(name)), fns(std::move(fns)), vars(std::move(vars)), ObjectType<Domain>(factory) {
+        Contract(BlockchainModel<Domain> &model, std::string name, std::vector<typename Domain::Function *> fns, std::vector<vanguard::Variable<Domain> *> vars/*, std::vector<BlkType *> inherits,
+            std::vector<BlkEnum *> enums, std::vector<BlkStruct *> structs, std::vector<BlkEvent *> events*/) : model(model), contractName(std::move(name)), fns(std::move(fns)), vars(std::move(vars)), ObjectType<Domain>() {
             auto contract = (typename Domain::Contract *) this;
             for(auto fn : this->fns) {
                 fn->setContract(contract);

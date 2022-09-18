@@ -21,7 +21,7 @@ namespace vanguard {
     template<typename Domain>
     class SummaryReader{
     public:
-        SummaryReader(const llvm::Module &mod, const std::string& projectFile, typename Domain::Factory *factory) : module(mod), factory(factory) {
+        SummaryReader(const llvm::Module &mod, const std::string& projectFile) : module(mod) {
             model = nullptr;
             std::ifstream inStream(projectFile);
             rapidjson::IStreamWrapper jsonStream(inStream);
@@ -42,7 +42,6 @@ namespace vanguard {
         //std::map<BlkUserType *, int> storageRefs;
         BlockchainModel<Domain> *model;
         std::vector<typename Domain::Contract *> foundContracts;
-        typename Domain::Factory *factory;
         const llvm::Module &module;
         //Blockchain *summary;
         //vanguard::AAWrapper *alias;
@@ -180,7 +179,8 @@ namespace vanguard {
                 }
             }*/
 
-            auto *contract = factory->createContract(module, *model, name, functions, variables);
+            auto &factory = Domain::Factory::instance();
+            auto *contract = factory.createContract(module, *model, name, functions, variables);
             //auto *contract = new Blockchain<Universe>::Contract(name, functions, variables);
             //storageDecls[id] = contract;
             return contract;
@@ -202,7 +202,8 @@ namespace vanguard {
                 }
             }
 
-            auto *aStruct = factory->createStruct(module, *model, name, fields);
+            auto &factory = Domain::Factory::instance();
+            auto *aStruct = factory.createStruct(module, *model, name, fields);
 
             //auto aStruct = new BlkStruct(llvmTrans, name, fields);
             //storageDecls[id] = aStruct;
@@ -252,7 +253,8 @@ namespace vanguard {
 
             std::string selector = val["selector"].GetString();
 
-            return factory->createBlkFn(module, *model, contractName, name, selector, isConstructor, visibility, mutability, params, returns, modifiers);
+            auto &factory = Domain::Factory::instance();
+            return factory.createBlkFn(module, *model, contractName, name, selector, isConstructor, visibility, mutability, params, returns, modifiers);
             //BlkFunction<Universe> *fn = new BlkFunction<Universe>(name, selector, isConstructor, visibility, mutability, params, returns, modifiers);
         }
         Variable<Domain> *readVariable(rapidjson::Value &val) {
@@ -266,7 +268,8 @@ namespace vanguard {
                 name = val["name"].GetString();
             }
 
-            return factory->createVariable(module, *model, name, type);
+            auto &factory = Domain::Factory::instance();
+            return factory.createVariable(module, *model, name, type);
             //return new BlkVariable(llvmTrans, name, type);
         }
 
@@ -300,7 +303,8 @@ namespace vanguard {
             require(val.HasMember("base"), "ArrayType must have a base type");
             auto base = readType(val["base"]);
             std::string name = val["name"].GetString();
-            return factory->createArrayType(module, *model, name, base);
+            auto &factory = Domain::Factory::instance();
+            return factory.createArrayType(module, *model, name, base);
             //return new BlkArrayType(llvmTrans, name, base);
         }
 
@@ -315,7 +319,8 @@ namespace vanguard {
             std::string name = val["name"].GetString();
             uint id = val["refId"].GetUint();
 
-            auto userType = factory->createBasicType(module, *model, name);
+            auto &factory = Domain::Factory::instance();
+            auto userType = factory.createBasicType(module, *model, name);
             //auto userType = new BlkUserType(llvmTrans, name, nullptr);
             //storageRefs[userType] = id;
 
@@ -333,7 +338,8 @@ namespace vanguard {
             typename Domain::Type *key = readType(val["key"]);
             typename Domain::Type *value = readType(val["value"]);
             std::string name = val["name"].GetString();
-            return factory->createMapType(module, *model, name, key, value);
+            auto &factory = Domain::Factory::instance();
+            return factory.createMapType(module, *model, name, key, value);
             //return new BlkMapType(llvmTrans, name, key, value);
         }
 
@@ -344,7 +350,8 @@ namespace vanguard {
 
             require(val.HasMember("name") && val["name"].IsString(), "ElementaryType must have a name");
             std::string name = val["name"].GetString();
-            return factory->createBasicType(module, *model, name);
+            auto &factory = Domain::Factory::instance();
+            return factory.createBasicType(module, *model, name);
             //return new BlkType<Type>(name);
             //return new BlkElementaryType(llvmTrans, name);
         }

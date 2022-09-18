@@ -195,25 +195,25 @@ int main(int argc, char **argv) {
 
     if(domain == vanguard::Detector::BASIC) {
         //vanguard::LLVMFactory *factory = vanguard::LLVMFactory::getInstance();
-        auto *factory = new vanguard::LLVMDomain::Factory();
+        auto &factory = vanguard::LLVMDomain::Factory::instance();
         std::vector<vanguard::LLVMDomain::CompilationUnit *> units;
         units.reserve(modules.size());
         for(auto &mod : modules) {
-            units.push_back(factory->createUnit(modules.back().get()));
+            units.push_back(factory.createUnit(modules.back().get()));
         }
-        vanguard::LLVMDomain::Universe universe(*factory, units);
+        vanguard::LLVMDomain::Universe universe(units);
         runDetectors<vanguard::LLVMDomain>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else if(domain == vanguard::Detector::BLOCKCHAIN) {
-        auto *factory = new vanguard::BlockchainDomain::Factory();
+        auto &factory = vanguard::BlockchainDomain::Factory::instance();
         std::vector<vanguard::BlockchainDomain::CompilationUnit *> units;
         units.reserve(modules.size());
         for(auto &mod : modules) {
             std::string filename = filenames[mod.get()];
             std::string summary = filename.substr(0, filename.length() - 2) + "json";
-            units.push_back(factory->createBlkUnit(modules.back().get(), summary));
+            units.push_back(factory.createBlkUnit(modules.back().get(), summary));
         }
-        vanguard::BlockchainDomain::Universe universe(*factory, units);
+        vanguard::BlockchainDomain::Universe universe(units);
         runDetectors<vanguard::BlockchainDomain>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
     else {

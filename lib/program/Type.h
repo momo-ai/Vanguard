@@ -12,12 +12,12 @@ namespace vanguard{
     template<typename Domain>
     class Base<Domain>::Type{
     public:
-        Type(typename Domain::Factory &factory, TypeSquared typeType) : factory(factory), typeType(typeType) {};
+        Type(TypeSquared typeType) : typeType(typeType) {};
+        Type(const Type&) = delete;
         virtual std::string name() const = 0;
         virtual void accept(TypeVisitor<Domain> &v) const = 0;
         virtual const llvm::Type *unwrap() const = 0;
     protected:
-        typename Domain::Factory &factory;
         TypeSquared typeType;
     };
 
@@ -59,7 +59,8 @@ namespace vanguard{
         }
 
         typename Domain::Type* baseType() const override {
-            return this->factory.createType(this->wrapped->getElementType());
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(this->wrapped->getElementType());
         }
 
         uint64_t length() const override {
@@ -89,7 +90,8 @@ namespace vanguard{
         }
 
         typename Domain::Type* baseType() const override {
-            return this->factory.createType(this->wrapped->getElementType());
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(this->wrapped->getElementType());
         }
 
         uint64_t length() const override {
@@ -150,7 +152,8 @@ namespace vanguard{
         }
 
         typename Domain::Type* referencedType() const override {
-            return this->factory.createType(this->wrapped->getElementType());
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(this->wrapped->getElementType());
         }
 
         const Wrap *unwrap() const override {
@@ -178,8 +181,9 @@ namespace vanguard{
         std::list<typename Domain::Type*> fieldTypes() override {
             std::list<typename Domain::Type*> fieldTypesList = {};
             unsigned numFields = this->wrapped->getStructNumElements();
+            auto &factory = Domain::Factory::instance();
             for(unsigned n = 0; n < numFields; n++){
-                fieldTypesList.push_back(this->factory.createType(this->wrapped->getStructElementType(n)));
+                fieldTypesList.push_back(factory.createType(this->wrapped->getStructElementType(n)));
             }
             return fieldTypesList;
         }

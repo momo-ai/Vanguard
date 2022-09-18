@@ -8,7 +8,7 @@ namespace vanguard{
     template<typename Domain>
     class Base<Domain>::CompilationUnit {
     public:
-        explicit CompilationUnit(typename Domain::Factory &factory, const llvm::Module* mod): factory(factory), module(mod){}
+        explicit CompilationUnit(const llvm::Module* mod): module(mod){}
         CompilationUnit(const CompilationUnit&) = delete;
         std::string name() {
             return module->getModuleIdentifier();
@@ -24,12 +24,14 @@ namespace vanguard{
             if (globalVariable == nullptr){
                 return nullptr;
             }
+            auto &factory = Domain::Factory::instance();
             return factory.createVal(globalVariable);
         }
 
         virtual std::list<typename Domain::Value*> globalVariables() {
             //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
             std::list<typename Domain::Value*> allGlobalVariables = {};
+            auto &factory = Domain::Factory::instance();
             for (auto gv= module->global_begin(); gv != module->global_end(); gv++){
                 allGlobalVariables.push_back(factory.createVal(&*gv));
             }
@@ -39,6 +41,7 @@ namespace vanguard{
         virtual typename Domain::Function* findFunction(std::string name) const {
             //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
             auto function = module->getFunction(llvm::StringRef(name));
+            auto &factory = Domain::Factory::instance();
             if (function != nullptr) {
                 return factory.createFn(function);
             }
@@ -54,6 +57,7 @@ namespace vanguard{
 
         virtual std::list<typename Domain::Function *> functions() const {
             //auto &llvmToVanguard = LLVMtoVanguard::getInstance();
+            auto &factory = Domain::Factory::instance();
             std::list<typename Domain::Function*> allFunctions = {};
             for(auto &F: *module){
                 allFunctions.push_back(factory.createFn(&F));
@@ -78,7 +82,6 @@ namespace vanguard{
     protected:
         //typename Domain::Function* findFn(std::string name) const;
         //virtual std::list<typename Domain::Function *> fns() const;
-        typename Domain::Factory &factory;
         typename Domain::Universe *uni;
     private:
         const llvm::Module* module;

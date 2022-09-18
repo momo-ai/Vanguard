@@ -25,7 +25,8 @@ namespace vanguard {
     template<typename Domain>
     class IntegerType : public Domain::Type {
     public:
-        explicit IntegerType(typename Domain::Factory &factory) : Domain::Type(factory, INT_TYPE) {};
+        template<typename ...Args>
+        explicit IntegerType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., INT_TYPE) {};
         IntegerType(const IntegerType&) = delete;
 
         virtual unsigned int width() const = 0; //returns width of integer in bytes
@@ -37,7 +38,8 @@ namespace vanguard {
     template<typename Domain>
     class ObjectType: public Domain::Type {
     public:
-        explicit ObjectType(typename Domain::Factory &factory) : Domain::Type(factory, OBJECT_TYPE) {};
+        template<typename ...Args>
+        explicit ObjectType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., OBJECT_TYPE) {};
         ObjectType(const ObjectType&) = delete;
         void accept(TypeVisitor<Domain> &v) const override {
             v.visit(*this);
@@ -47,7 +49,8 @@ namespace vanguard {
     template<typename Domain>
     class MapType: public Domain::Type {
     public:
-        explicit MapType(typename Domain::Factory &factory) : Domain::Type(factory, MAP_TYPE) {};
+        template<typename ...Args>
+        explicit MapType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., MAP_TYPE) {};
         MapType(const MapType&) = delete;
 
         virtual typename Domain::Type* keyType() const = 0;
@@ -60,7 +63,8 @@ namespace vanguard {
     template<typename Domain>
     class ArrayType: public Domain::Type {
     public:
-        explicit ArrayType(typename Domain::Factory &factory) : Domain::Type(factory, ARRAY_TYPE) {};
+        template<typename ...Args>
+        explicit ArrayType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., ARRAY_TYPE) {};
         ArrayType(const ArrayType&) = delete;
 
         virtual bool isDynamic() const = 0;
@@ -74,7 +78,8 @@ namespace vanguard {
     template<typename Domain>
     class PointerType: public Domain::Type{
     public:
-        explicit PointerType(typename Domain::Factory &factory) : Domain::Type(factory, POINTER_TYPE ) {};
+        template<typename ...Args>
+        explicit PointerType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., POINTER_TYPE) {};
         PointerType(const PointerType&) = delete;
 
         //bool isOpaque();
@@ -87,7 +92,8 @@ namespace vanguard {
     template<typename Domain>
     class StructType: public Domain::Type{
     public:
-        explicit StructType(typename Domain::Factory &factory) : Domain::Type(factory, STRUCT_TYPE) {};
+        template<typename ...Args>
+        explicit StructType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., STRUCT_TYPE) {};
         StructType(const StructType&) = delete;
 
         virtual unsigned int numFields() = 0;
@@ -100,7 +106,8 @@ namespace vanguard {
     template<typename Domain>
     class VoidType: public Domain::Type{
     public:
-        explicit VoidType(typename Domain::Factory &factory) : Domain::Type(factory, VOID_TYPE) {};
+        template<typename ...Args>
+        explicit VoidType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., VOID_TYPE) {};
         VoidType(const VoidType&) = delete;
         void accept(TypeVisitor<Domain> &v) const override {
             v.visit(*this);
@@ -110,7 +117,8 @@ namespace vanguard {
     template<typename Domain>
     class LocationType: public Domain::Type{
     public:
-        explicit  LocationType(typename Domain::Factory &factory) : Domain::Type(factory, LOCATION_TYPE) {};
+        template<typename ...Args>
+        explicit LocationType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., LOCATION_TYPE) {};
         LocationType(const LocationType&) = delete;
         void accept(TypeVisitor<Domain> &v) const override {
             v.visit(*this);
@@ -120,7 +128,8 @@ namespace vanguard {
     template<typename Domain>
     class UnknownType : public Domain::Type {
     public:
-        explicit UnknownType(typename Domain::Factory &factory) : Domain::Type(factory, UNKNOWN_TYPE) {};
+        template<typename ...Args>
+        explicit UnknownType(Args&&... args) : Domain::Type(std::forward<Args>(args)..., UNKNOWN_TYPE) {};
         UnknownType(const UnknownType&) = delete;
         void accept(TypeVisitor<Domain> &v) const override {
             v.visit(*this);

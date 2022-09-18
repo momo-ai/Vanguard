@@ -8,7 +8,7 @@ namespace vanguard{
     template<typename Domain>
     class Base<Domain>::Block {
     public:
-        explicit Block(typename Domain::Factory &factory, const llvm::BasicBlock *blk): factory(factory), block(blk) {}
+        explicit Block(const llvm::BasicBlock *blk): block(blk) {}
         Block(const Block&) = delete;
         virtual std::string name() {
             if (block->hasName()) {
@@ -22,6 +22,7 @@ namespace vanguard{
         }
 
         virtual typename Domain::Function* function() const {
+            auto &factory = Domain::Factory::instance();
             return factory.createFn(block->getParent());
         }
 
@@ -35,6 +36,7 @@ namespace vanguard{
             }
 
             std::list<typename Domain::Instruction*> instructions = {};
+            auto &factory = Domain::Factory::instance();
             for (auto &I : *block){
                 instructions.push_back(factory.createIns(&I));
             }
@@ -43,6 +45,7 @@ namespace vanguard{
 
         virtual std::unordered_set<typename Domain::Block *> successors() const {
             std::unordered_set<Block*> allSuccessors = {};
+            auto &factory = Domain::Factory::instance();
             for (auto *succ : llvm::successors(block)) {
                 allSuccessors.insert(factory.createBlk(succ));
             }
@@ -50,7 +53,6 @@ namespace vanguard{
         }
     protected:
         const llvm::BasicBlock* block;
-        typename Domain::Factory &factory;
     };
 
 }

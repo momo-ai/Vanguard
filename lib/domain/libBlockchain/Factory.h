@@ -20,8 +20,7 @@ namespace vanguard {
     class Blockchain<Base, Domain>::Factory : public Base::Factory {
     public:
         typename Domain::Function *createBlkFn(const llvm::Module &module, BlockchainModel<Domain> &model, std::string contract, std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut, std::vector<vanguard::Variable<Domain> *> params, std::vector<vanguard::Variable<Domain> *> rets, std::vector<std::string> mods) {
-            auto factory = (typename Domain::Factory *) this;
-            auto fn = new typename Domain::Function(name, selector, isCnstr, vis, mut, std::move(params), std::move(rets), std::move(mods), *factory, nullptr);
+            auto fn = new typename Domain::Function(name, selector, isCnstr, vis, mut, std::move(params), std::move(rets), std::move(mods), nullptr);
 
             for(auto &llvmFn : module) {
                 if(model.isImplementation(contract, *fn, llvmFn)) {
@@ -35,32 +34,27 @@ namespace vanguard {
         }
 
         typename Domain::Contract *createContract(const llvm::Module &module, BlockchainModel<Domain> &model, std::string& name, std::vector<typename Domain::Function *>& fns, std::vector<vanguard::Variable<Domain> *>& vars) {
-            auto factory = (typename Domain::Factory *) this;
-            auto *contract = new typename Domain::Contract(model, *factory, name, fns, vars);
+            auto *contract = new typename Domain::Contract(model, name, fns, vars);
             return contract;
         }
 
         vanguard::StructType<Domain> *createStruct(const llvm::Module &mod, BlockchainModel<Domain> &model, const std::string& name, std::vector<vanguard::Variable<Domain> *> fields) {
-            auto factory = (typename Domain::Factory *) this;
-            auto *structType = new typename Domain::template BlkStructType<llvm::StructType>>(std::move(fields), nullptr, *factory);
+            auto *structType = new typename Domain::template BlkStructType<llvm::StructType>>(std::move(fields), nullptr);
             return structType;
         }
 
         vanguard::Variable<Domain> *createVariable(const llvm::Module &module, BlockchainModel<Domain> &model, std::string name, typename Domain::Type *type) {
-            auto factory = (typename Domain::Factory *) this;
-            auto *var = new typename Domain::template BlkVariable<llvm::Value>(std::move(name), type, nullptr, *factory);
+            auto *var = new typename Domain::template BlkVariable<llvm::Value>(std::move(name), type, nullptr);
             return var;
         }
 
         vanguard::ArrayType<Domain> *createArrayType(const llvm::Module &module, BlockchainModel<Domain> &model, std::string name, typename Domain::Type *base) {
-            auto factory = (typename Domain::Factory *) this;
-            auto *arr = new typename Domain::template BlkArrayType<llvm::ArrayType>(base, nullptr, *factory);
+            auto *arr = new typename Domain::template BlkArrayType<llvm::ArrayType>(base, nullptr);
             return arr;
         }
 
         vanguard::MapType<Domain> *createMapType(const llvm::Module &module, BlockchainModel<Domain> &model, std::string name, typename Domain::Type *keyType, typename Domain::Type *valType) {
-            auto factory = (typename Domain::Factory *) this;
-            auto *map = new typename Domain::template BlkMapType<llvm::Type>(keyType, valType, nullptr, *factory);
+            auto *map = new typename Domain::template BlkMapType<llvm::Type>(keyType, valType, nullptr);
             return map;
         }
 
@@ -69,10 +63,9 @@ namespace vanguard {
                 return nullptr;
             }
 
-            auto factory = (typename Domain::Factory *) this;
             if(this->moduleMap.find(module) == this->moduleMap.end()){
-                SummaryReader<Domain> reader(*module, summary, factory);
-                this->moduleMap[module] = new typename Domain::CompilationUnit(reader.contracts(), *factory, module);
+                SummaryReader<Domain> reader(*module, summary);
+                this->moduleMap[module] = new typename Domain::CompilationUnit(reader.contracts(), module);
             }
 
             return this->moduleMap[module];

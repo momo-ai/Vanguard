@@ -19,7 +19,7 @@ namespace vanguard {
             std::unordered_set<typename Domain::Function *> processed;
             std::deque<typename Domain::Function *> fnWorklist;
             for(auto f : unit.functions()) {
-                fnWorklist.push_back(dynamic_cast<typename Domain::Function *>(f));
+                fnWorklist.push_back(f);
             }
 
             while(!fnWorklist.empty()) {

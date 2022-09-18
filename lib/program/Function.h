@@ -10,7 +10,7 @@ namespace vanguard{
     template<typename Domain>
     class Base<Domain>::Function {
     public:
-        explicit Function(typename Domain::Factory &factory, const llvm::Function* func): factory(factory), function(func){}
+        explicit Function(const llvm::Function* func): function(func){}
         Function(const Function&) = delete;
         virtual std::string name() const {
             return function->getName().str();
@@ -18,6 +18,7 @@ namespace vanguard{
 
         virtual std::vector<vanguard::Variable<Domain>*> params() const {
             std::vector<vanguard::Variable<Domain>*> params = {};
+            auto &factory = Domain::Factory::instance();
             for (auto itr = function->arg_begin(); itr != function->arg_end(); itr++){
                 params.push_back((vanguard::Variable<Domain> *) factory.createVal(itr));
             }
@@ -25,6 +26,7 @@ namespace vanguard{
         }
 
         virtual typename Domain::Type* returnType() const {
+            auto &factory = Domain::Factory::instance();
             return factory.createType(function->getReturnType());
         }
 
@@ -37,15 +39,18 @@ namespace vanguard{
         }
 
         virtual typename Domain::CompilationUnit *unit() const {
+            auto &factory = Domain::Factory::instance();
             return factory.createUnit(function->getParent());
         }
 
         virtual typename Domain::Block* body() const {
+            auto &factory = Domain::Factory::instance();
             return factory.createBlk(&function->getEntryBlock());
         }
 
         virtual std::vector<typename Domain::Instruction*> instructions() const {
             std::vector<typename Domain::Instruction*> instructionsList = {};
+            auto &factory = Domain::Factory::instance();
             for (auto &blk : *function){
                 for(auto &ins : blk) {
                     instructionsList.push_back(factory.createIns(&ins));
@@ -56,6 +61,7 @@ namespace vanguard{
 
         virtual std::vector<typename Domain::Block *> blocks() const {
             std::vector<Block *> blocks = {};
+            auto &factory = Domain::Factory::instance();
             for (auto &blk : *function){
                 blocks.push_back(factory.createBlk(&blk));
             }
@@ -63,7 +69,6 @@ namespace vanguard{
         }
     protected:
         const llvm::Function *function;
-        typename Domain::Factory &factory;
     };
 }
 

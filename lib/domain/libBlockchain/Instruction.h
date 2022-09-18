@@ -93,7 +93,10 @@ namespace vanguard {
         }
 
         std::vector<typename Domain::Function*> targets() const override {
-            auto contract = this->block()->function()->contract();
+            auto blk = this->block();
+            auto fn = blk->function();
+            auto contract = fn->contract();
+            //auto contract = this->block()->function()->contract();
             typename Domain::Universe *universe = this->block()->function()->unit()->universe();
             if(contract != nullptr) {
                 auto &model = contract->blockchainModel();
