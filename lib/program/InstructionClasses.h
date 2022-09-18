@@ -108,10 +108,7 @@ namespace vanguard {
             return false;
         }
 
-        virtual typename Domain::Value* result() const {
-            auto* insVar = this->factory.createVal(this->ins);
-            return insVar;
-        }
+        virtual typename Domain::Value* result() const = 0;
     };
 
     // Assign Instruction

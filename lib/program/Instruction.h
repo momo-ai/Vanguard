@@ -14,34 +14,31 @@ namespace vanguard {
     template<typename Domain>
     class Base<Domain>::Instruction {
     public:
-        explicit Instruction(typename Domain::Factory &factory, const llvm::Instruction *ins) : ins(ins), factory(factory) {};
+        explicit Instruction(typename Domain::Factory &factory) : factory(factory) {};
         static inline bool classof(const Instruction &) { return true; }
         static inline bool classof(const Instruction *) { return true; }
 
         virtual InstructionClassEnum instructionClass() const = 0;
         virtual void accept(InstructionClassVisitor<Domain> &v) const = 0;
         virtual std::string name() const {
-            return ins->getName().str();
+            return unwrap()->getName().str();
         }
         virtual bool willReturn() const {
-            return ins->willReturn();
+            return unwrap()->willReturn();
         }
         virtual typename Domain::Value* operandAt(unsigned i) const {
-            return factory.createVal(ins->getOperand(i));
+            return factory.createVal(unwrap()->getOperand(i));
         }
         virtual unsigned numOperands() const {
-            return ins->getNumOperands();
+            return unwrap()->getNumOperands();
         }
-        virtual const llvm::Instruction &unwrap() const {
-            return *ins;
-        }
+        virtual const llvm::Instruction *unwrap() const = 0;
         //virtual std::vector<Value *> reads();
         //virtual std::vector<Value *> writes();
         virtual typename Domain::Block* block() const {
-            return factory.createBlk(ins->getParent());
+            return factory.createBlk(unwrap()->getParent());
         }
     protected:
-        const llvm::Instruction* ins;
         typename Domain::Factory &factory;
     };
 
@@ -51,23 +48,27 @@ namespace vanguard {
     class Base<Domain>::BranchIns : public vanguard::BranchIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BranchIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit BranchIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)...) {};
 
-        virtual bool isConditional() const {
+        bool isConditional() const override {
             return wrapped->isConditional();
         }
 
-        virtual typename Domain::Value* condition() const {
+        typename Domain::Value* condition() const override {
             return this->factory.createVal(wrapped->getCondition());
         }
 
-        virtual std::list<typename Domain::Block*> targets() const {
+        std::list<typename Domain::Block*> targets() const override {
             std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
             for(unsigned int i = 0; i < n; i++){
                 successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
             }
             return successors;
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
         }
     protected:
         const Wrap *wrapped;
@@ -78,15 +79,15 @@ namespace vanguard {
     class Base<Domain>::BranchIns<llvm::SwitchInst, D>: public vanguard::BranchIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BranchIns(const llvm::SwitchInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit BranchIns(const llvm::SwitchInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)...) {};
 
-        virtual bool isConditional() const override {
+        bool isConditional() const override {
             return true;
         }
-        virtual typename Domain::Value* condition() const override {
+        typename Domain::Value* condition() const override {
             return this->factory.createVal(wrapped->getCondition());
         }
-        virtual std::list<typename Domain::Block*> targets() const override {
+        std::list<typename Domain::Block*> targets() const override {
             std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
             for(unsigned int i = 0; i < n; i++){
@@ -95,6 +96,9 @@ namespace vanguard {
             return successors;
         }
 
+        const llvm::SwitchInst *unwrap() const override {
+            return wrapped;
+        }
     protected:
         const llvm::SwitchInst *wrapped;
     };
@@ -104,15 +108,15 @@ namespace vanguard {
     class Base<Domain>::BranchIns<llvm::IndirectBrInst, D>: public vanguard::BranchIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BranchIns(const llvm::IndirectBrInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit BranchIns(const llvm::IndirectBrInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)...) {};
 
-        virtual bool isConditional() const override {
+        bool isConditional() const override {
             return false;
         }
-        virtual typename Domain::Value* condition() const override {
+        typename Domain::Value* condition() const override {
             throw std::runtime_error("Indirect Branch Instruction does not have a condition.");
         }
-        virtual std::list<typename Domain::Block*> targets() const override {
+        std::list<typename Domain::Block*> targets() const override {
             std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
             for(unsigned int i = 0; i < n; i++){
@@ -121,6 +125,9 @@ namespace vanguard {
             return successors;
         }
 
+        const llvm::IndirectBrInst *unwrap() const override {
+            return wrapped;
+        }
     protected:
         const llvm::IndirectBrInst *wrapped;
     };
@@ -131,7 +138,7 @@ namespace vanguard {
     class Base<Domain>::ReturnIns : public vanguard::ReturnIns<Domain> {
     public:
         template<typename ...Args>
-        explicit ReturnIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ReturnIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit ReturnIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ReturnIns<Domain>(std::forward<Args>(args)...) {};
 
         bool returnsValue() const override {
             return wrapped->getReturnValue() != nullptr;
@@ -140,6 +147,9 @@ namespace vanguard {
             return this->factory.createVal(wrapped->getReturnValue());
         }
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -149,31 +159,19 @@ namespace vanguard {
     class Base<Domain>::ErrorIns : public vanguard::ErrorIns<Domain> {
     public:
         template<typename ...Args>
-        explicit ErrorIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ErrorIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit ErrorIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ErrorIns<Domain>(std::forward<Args>(args)...) {};
 
 
         std::string msg() const override{
             return "This instruction is unreachable.";
         }
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
     protected:
         const Wrap *wrapped;
     };
-
-    /*template<typename Base, typename Wrap>
-    class Universe::Expression : public vanguard::Expression<Base> {
-    public:
-        template<typename ...Args>
-        explicit Expression(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::Expression<Base>(std::forward<Args>(args)..., ins) {};
-
-        Value* result() const override {
-            auto* insVar = this->factory.createVal(wrapped);
-            return insVar;
-        }
-
-    protected:
-        const Wrap *wrapped;
-    };*/
 
     // Assign Instruction
     template<typename Domain>
@@ -181,9 +179,16 @@ namespace vanguard {
     class Base<Domain>::AssignIns : public vanguard::AssignIns<Domain> {
     public:
         template<typename ...Args>
-        explicit AssignIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::AssignIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit AssignIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::AssignIns<Domain>(std::forward<Args>(args)...) {};
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
 
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -194,12 +199,20 @@ namespace vanguard {
     class Base<Domain>::BinaryOpIns : public vanguard::BinaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BinaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit BinaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)...) {};
 
         BinOp op() const override {
             throw std::runtime_error("Unknown op");
         }
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -209,7 +222,7 @@ namespace vanguard {
     class Base<Domain>::BinaryOpIns<llvm::CmpInst, D> : public vanguard::BinaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BinaryOpIns(const llvm::CmpInst *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit BinaryOpIns(const llvm::CmpInst *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)...) {};
 
         BinOp op() const override {
             unsigned opcode = wrapped->getOpcode();
@@ -221,6 +234,14 @@ namespace vanguard {
             return  binaryOpClass;
         }
 
+        const llvm::CmpInst *unwrap() const override {
+            return wrapped;
+        }
+
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const llvm::CmpInst *wrapped;
     };
@@ -230,7 +251,7 @@ namespace vanguard {
     class Base<Domain>::BinaryOpIns<llvm::BinaryOperator, D> : public vanguard::BinaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BinaryOpIns(const llvm::BinaryOperator *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit BinaryOpIns(const llvm::BinaryOperator *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)...) {};
 
         BinOp op() const override {
             unsigned opcode = wrapped->getOpcode();
@@ -251,6 +272,14 @@ namespace vanguard {
             return binaryOpClass;
         }
 
+        const llvm::BinaryOperator *unwrap() const override {
+            return wrapped;
+        }
+
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const llvm::BinaryOperator *wrapped;
     };
@@ -261,9 +290,9 @@ namespace vanguard {
     class  Base<Domain>::UnaryOpIns : public vanguard::UnaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit UnaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit UnaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnaryOpIns<Domain>(std::forward<Args>(args)...) {};
 
-        virtual UnOp op() const override {
+        UnOp op() const override {
             unsigned opcode = wrapped->getOpcode();
             UnOp unaryOpClass;
             if (opcode == 12) unaryOpClass = Neg;
@@ -277,6 +306,14 @@ namespace vanguard {
             return this->factory.createVal(wrapped->getOperand(0));
         }
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -286,7 +323,7 @@ namespace vanguard {
     class Base<Domain>::CallIns : public vanguard::CallIns<Domain> {
     public:
         template<typename ...Args>
-        explicit CallIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CallIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit CallIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CallIns<Domain>(std::forward<Args>(args)...) {};
 
         bool hasReturn() const override {
             return !wrapped->doesNotReturn();
@@ -304,6 +341,14 @@ namespace vanguard {
             return args;
         }
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -313,13 +358,20 @@ namespace vanguard {
     class Base<Domain>::CastIns : public vanguard::CastIns<Domain> {
     public:
         template<typename ...Args>
-        explicit CastIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CastIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit CastIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CastIns<Domain>(std::forward<Args>(args)...) {};
 
         typename Domain::Type *castTo() const override {
             return this->factory.createType(wrapped->getDestTy());
         }
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
 
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -329,7 +381,7 @@ namespace vanguard {
     class Base<Domain>::TernaryIns : public vanguard::TernaryIns<Domain> {
     public:
         template<typename ...Args>
-        explicit TernaryIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::TernaryIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit TernaryIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::TernaryIns<Domain>(std::forward<Args>(args)...) {};
 
         typename Domain::Value *condition() const override {
             return this->factory.createVal(wrapped->getCondition());
@@ -342,7 +394,14 @@ namespace vanguard {
         typename Domain::Value *falseValue() const override {
             return this->factory.createVal(wrapped->getFalseValue());
         }
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
 
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
@@ -352,9 +411,16 @@ namespace vanguard {
     class Base<Domain>::UnknownIns : public vanguard::UnknownIns<Domain> {
     public:
         template<typename ...Args>
-        explicit UnknownIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnknownIns<Domain>(std::forward<Args>(args)..., ins) {};
+        explicit UnknownIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnknownIns<Domain>(std::forward<Args>(args)...) {};
 
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
 
+        typename Domain::Value* result() const override {
+            auto* insVar = this->factory.createVal(wrapped);
+            return insVar;
+        }
     protected:
         const Wrap *wrapped;
     };
