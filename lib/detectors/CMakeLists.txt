@@ -3,8 +3,6 @@ target_sources(Vanguard PRIVATE
         #${CMAKE_CURRENT_SOURCE_DIR}/FunctionDetector.cpp
         #${CMAKE_CURRENT_SOURCE_DIR}/UniverseDetector.cpp
         ${CMAKE_CURRENT_SOURCE_DIR}/DetectorRegistry.cpp
-        ../analysis/alias/AAWrapper.cpp
-        ../analysis/alias/AARequirement.cpp
     )
 
 #add_subdirectory(FunctionPrinter)

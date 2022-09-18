@@ -5,6 +5,7 @@
 #ifndef VANGUARD_INSTRUCTIONTRANS_H
 #define VANGUARD_INSTRUCTIONTRANS_H
 
+#include <program/InstructionClasses.h>
 #include <program/InstructionClassVisitor.h>
 #include <string>
 #include "ValueTrans.h"
@@ -13,8 +14,8 @@ namespace vanguard {
     template<typename Domain>
     class InstructionTrans: public InstructionClassVisitor<Domain>{
     public:
-        std::string getValueString(const Value &v){
-            ValueTrans trans;
+        std::string getValueString(const typename Domain::Value &v){
+            ValueTrans<Domain> trans;
             v.accept(trans);
             return trans.result;
         }

@@ -6,10 +6,10 @@
 //#include "StatGen/StatGen.h"
 //#include "IRValidator/IRValidator.h"
 #include "FunctionPrinter/FunctionPrinter.h"
-#include "domain/libBlockchain/Blockchain.h"
+//#include "domain/libBlockchain/Blockchain.h"
 //#include "Reentrancy/ReentrancyDetector.h"
 #include <llvm/Support/CommandLine.h>
-#include <program/Top.h>
+//#include "program/Block.tpp"
 
 /* This is how you can add additional detectors from external sources. Essentially add them in at compile time and
  * then in a cpp file, implement the addToRegistry function.
@@ -29,15 +29,15 @@ namespace vanguard {
     DetectorRegistry *DetectorRegistry::instance = nullptr;
 
     template<>
-    UniverseDetector<Top<Universe>> *DetectorRegistry::get(const std::string& name) {
-        if(name == FunctionPrinter<Universe>::name()) {
-            return new FunctionPrinter<Top<Universe>>();
+    UniverseDetector<LLVMDomain> *DetectorRegistry::get(const std::string& name) {
+        if(name == FunctionPrinter<LLVMDomain>::name()) {
+            return new FunctionPrinter<LLVMDomain>();
         }
-        else if(name == StatGen<Universe>::name()) {
-            return new StatGen<Top<Universe>>();
+        else if(name == StatGen<LLVMDomain>::name()) {
+            return new StatGen<LLVMDomain>();
         }
-        else if(name == IRValidator<Universe>::name()) {
-            return new IRValidator<Top<Universe>>();
+        else if(name == IRValidator<LLVMDomain>::name()) {
+            return new IRValidator<LLVMDomain>();
         }
         /*else if(name == ReentrancyDetector<Domain>::name()) {
             return new ReentrancyDetector<Domain>();
@@ -46,7 +46,7 @@ namespace vanguard {
         return nullptr;
     };
 
-    template<>
+    /*template<>
     UniverseDetector<Top<Blockchain<Universe>>> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
         if(name == FunctionPrinter<Blockchain<Universe>>::name()) {
             return new FunctionPrinter<Top<Blockchain<Universe>>>();
@@ -62,7 +62,7 @@ namespace vanguard {
         }
 
         return nullptr;
-    };
+    };*/
 
     DetectorRegistry &DetectorRegistry::getInstance() {
         if(instance == nullptr) {

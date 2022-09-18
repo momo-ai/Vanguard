@@ -6,6 +6,7 @@
 #define VANGUARD_UNIVERSEDETECTOR_H
 
 #include "Detector.h"
+#include "program/Base.h"
 #include "program/Universe.h"
 
 namespace vanguard {
@@ -14,7 +15,7 @@ namespace vanguard {
     class UniverseDetector : public Detector {
     public:
         virtual ~UniverseDetector() = default;
-        virtual void detect(Domain &universe) = 0;
+        virtual void detect(typename Domain::Universe &universe) = 0;
     };
 }
 

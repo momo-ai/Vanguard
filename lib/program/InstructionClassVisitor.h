@@ -7,30 +7,30 @@
 
 
 namespace vanguard {
-    template<typename Base> class BranchIns;
-    template<typename Base> class ReturnIns;
-    template<typename Base> class ErrorIns;
-    template<typename Base> class AssignIns;
-    template<typename Base> class BinaryOpIns;
-    template<typename Base> class UnaryOpIns;
-    template<typename Base> class CallIns;
-    template<typename Base> class CastIns;
-    template<typename Base> class TernaryIns;
-    template<typename Base> class UnknownIns;
+    template<typename Domain> class BranchIns;
+    template<typename Domain> class ReturnIns;
+    template<typename Domain> class ErrorIns;
+    template<typename Domain> class AssignIns;
+    template<typename Domain> class BinaryOpIns;
+    template<typename Domain> class UnaryOpIns;
+    template<typename Domain> class CallIns;
+    template<typename Domain> class CastIns;
+    template<typename Domain> class TernaryIns;
+    template<typename Domain> class UnknownIns;
 
-    template<typename Base>
+    template<typename Domain>
     class InstructionClassVisitor{
     public:
-        virtual void visit(const BranchIns<Base> &v) {};
-        virtual void visit(const ReturnIns<Base> &v) {};
-        virtual void visit(const ErrorIns<Base> &v) {};
-        virtual void visit(const BinaryOpIns<Base> &v) {};
-        virtual void visit(const UnaryOpIns<Base> &v) {};
-        virtual void visit(const CallIns<Base> &v) {};
-        virtual void visit(const CastIns<Base> &v) {};
-        virtual void visit(const TernaryIns<Base> &v) {};
-        virtual void visit(const AssignIns<Base> &v) {};
-        virtual void visit(const UnknownIns<Base> &v) {};
+        virtual void visit(const BranchIns<Domain> &v) {};
+        virtual void visit(const ReturnIns<Domain> &v) {};
+        virtual void visit(const ErrorIns<Domain> &v) {};
+        virtual void visit(const BinaryOpIns<Domain> &v) {};
+        virtual void visit(const UnaryOpIns<Domain> &v) {};
+        virtual void visit(const CallIns<Domain> &v) {};
+        virtual void visit(const CastIns<Domain> &v) {};
+        virtual void visit(const TernaryIns<Domain> &v) {};
+        virtual void visit(const AssignIns<Domain> &v) {};
+        virtual void visit(const UnknownIns<Domain> &v) {};
     };
 }
 

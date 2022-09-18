@@ -1,23 +1,57 @@
-
 //
 // Created by Jon Stephens on 8/26/22.
 //
 
-#ifndef VANGUARD_UNIVERSEINSTRUCTIONCLASSES_H
-#define VANGUARD_UNIVERSEINSTRUCTIONCLASSES_H
+#ifndef VANGUARD_INSTRUCTION_H
+#define VANGUARD_INSTRUCTION_H
 
-#include "Universe.h"
+#include "Base.h"
 #include "InstructionClasses.h"
 #include "llvm/IR/Instructions.h"
 
 namespace vanguard {
 
+    template<typename Domain>
+    class Base<Domain>::Instruction {
+    public:
+        explicit Instruction(typename Domain::Factory &factory, const llvm::Instruction *ins) : ins(ins), factory(factory) {};
+        static inline bool classof(const Instruction &) { return true; }
+        static inline bool classof(const Instruction *) { return true; }
+
+        virtual InstructionClassEnum instructionClass() const = 0;
+        virtual void accept(InstructionClassVisitor<Domain> &v) const = 0;
+        virtual std::string name() const {
+            return ins->getName().str();
+        }
+        virtual bool willReturn() const {
+            return ins->willReturn();
+        }
+        virtual typename Domain::Value* operandAt(unsigned i) const {
+            return factory.createVal(ins->getOperand(i));
+        }
+        virtual unsigned numOperands() const {
+            return ins->getNumOperands();
+        }
+        virtual const llvm::Instruction &unwrap() const {
+            return *ins;
+        }
+        //virtual std::vector<Value *> reads();
+        //virtual std::vector<Value *> writes();
+        virtual typename Domain::Block* block() const {
+            return factory.createBlk(ins->getParent());
+        }
+    protected:
+        const llvm::Instruction* ins;
+        typename Domain::Factory &factory;
+    };
+
     // Branch Instruction
-    template<typename Base, typename Wrap>
-    class Universe::BranchIns : public vanguard::BranchIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::BranchIns : public vanguard::BranchIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BranchIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit BranchIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         virtual bool isConditional() const {
             return wrapped->isConditional();
@@ -27,11 +61,11 @@ namespace vanguard {
             return this->factory.createVal(wrapped->getCondition());
         }
 
-        virtual std::list<typename Base::Block*> targets() const {
-            std::list<typename Base::Block*> successors = {};
+        virtual std::list<typename Domain::Block*> targets() const {
+            std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
             for(unsigned int i = 0; i < n; i++){
-                successors.push_back(dynamic_cast<typename Base::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
+                successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
             }
             return successors;
         }
@@ -39,11 +73,12 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base>
-    class Universe::BranchIns<Base, llvm::SwitchInst>: public vanguard::BranchIns<Base> {
+    template<typename Domain>
+    template<typename D>
+    class Base<Domain>::BranchIns<llvm::SwitchInst, D>: public vanguard::BranchIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BranchIns(const llvm::SwitchInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit BranchIns(const llvm::SwitchInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         virtual bool isConditional() const override {
             return true;
@@ -51,11 +86,11 @@ namespace vanguard {
         virtual Value* condition() const override {
             return this->factory.createVal(wrapped->getCondition());
         }
-        virtual std::list<typename Base::Block*> targets() const override {
-            std::list<typename Base::Block*> successors = {};
+        virtual std::list<typename Domain::Block*> targets() const override {
+            std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
             for(unsigned int i = 0; i < n; i++){
-                successors.push_back(dynamic_cast<typename Base::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
+                successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
             }
             return successors;
         }
@@ -64,11 +99,12 @@ namespace vanguard {
         const llvm::SwitchInst *wrapped;
     };
 
-    template<typename Base>
-    class Universe::BranchIns<Base, llvm::IndirectBrInst>: public vanguard::BranchIns<Base> {
+    template<typename Domain>
+    template<typename D>
+    class Base<Domain>::BranchIns<llvm::IndirectBrInst, D>: public vanguard::BranchIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BranchIns(const llvm::IndirectBrInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit BranchIns(const llvm::IndirectBrInst *ins, Args&&... args) : wrapped(ins), vanguard::BranchIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         virtual bool isConditional() const override {
             return false;
@@ -76,11 +112,11 @@ namespace vanguard {
         virtual Value* condition() const override {
             throw std::runtime_error("Indirect Branch Instruction does not have a condition.");
         }
-        virtual std::list<typename Base::Block*> targets() const override {
-            std::list<typename Base::Block*> successors = {};
+        virtual std::list<typename Domain::Block*> targets() const override {
+            std::list<typename Domain::Block*> successors = {};
             unsigned int n = wrapped->getNumSuccessors();
             for(unsigned int i = 0; i < n; i++){
-                successors.push_back(dynamic_cast<typename Base::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
+                successors.push_back(dynamic_cast<typename Domain::Block*>(this->factory.createBlk(wrapped->getSuccessor(i))));
             }
             return successors;
         }
@@ -90,11 +126,12 @@ namespace vanguard {
     };
 
     //Return Instruction
-    template<typename Base, typename Wrap>
-    class Universe::ReturnIns : public vanguard::ReturnIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::ReturnIns : public vanguard::ReturnIns<Domain> {
     public:
         template<typename ...Args>
-        explicit ReturnIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ReturnIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit ReturnIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ReturnIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         bool returnsValue() const override {
             return wrapped->getReturnValue() != nullptr;
@@ -107,11 +144,12 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base, typename Wrap>
-    class Universe::ErrorIns : public vanguard::ErrorIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::ErrorIns : public vanguard::ErrorIns<Domain> {
     public:
         template<typename ...Args>
-        explicit ErrorIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ErrorIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit ErrorIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::ErrorIns<Domain>(std::forward<Args>(args)..., ins) {};
 
 
         std::string msg() const override{
@@ -138,11 +176,12 @@ namespace vanguard {
     };*/
 
     // Assign Instruction
-    template<typename Base, typename Wrap>
-    class Universe::AssignIns : public vanguard::AssignIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::AssignIns : public vanguard::AssignIns<Domain> {
     public:
         template<typename ...Args>
-        explicit AssignIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::AssignIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit AssignIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::AssignIns<Domain>(std::forward<Args>(args)..., ins) {};
 
 
     protected:
@@ -150,11 +189,12 @@ namespace vanguard {
     };
 
     //BinaryOpInstruction
-    template<typename Base, typename Wrap>
-    class Universe::BinaryOpIns : public vanguard::BinaryOpIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::BinaryOpIns : public vanguard::BinaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BinaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit BinaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         BinOp op() const override {
             throw std::runtime_error("Unknown op");
@@ -164,11 +204,12 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base>
-    class Universe::BinaryOpIns<Base, llvm::CmpInst> : public vanguard::BinaryOpIns<Base> {
+    template<typename Domain>
+    template<typename D>
+    class Base<Domain>::BinaryOpIns<llvm::CmpInst, D> : public vanguard::BinaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BinaryOpIns(const llvm::CmpInst *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit BinaryOpIns(const llvm::CmpInst *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         BinOp op() const override {
             unsigned opcode = wrapped->getOpcode();
@@ -184,11 +225,12 @@ namespace vanguard {
         const llvm::CmpInst *wrapped;
     };
 
-    template<typename Base>
-    class Universe::BinaryOpIns<Base, llvm::BinaryOperator> : public vanguard::BinaryOpIns<Base> {
+    template<typename Domain>
+    template<typename D>
+    class Base<Domain>::BinaryOpIns<llvm::BinaryOperator, D> : public vanguard::BinaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit BinaryOpIns(const llvm::BinaryOperator *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit BinaryOpIns(const llvm::BinaryOperator *ins, Args&&... args) : wrapped(ins), vanguard::BinaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         BinOp op() const override {
             unsigned opcode = wrapped->getOpcode();
@@ -214,11 +256,12 @@ namespace vanguard {
     };
 
     //Unary Operation Instruction
-    template<typename Base, typename Wrap>
-    class  Universe::UnaryOpIns : public vanguard::UnaryOpIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class  Base<Domain>::UnaryOpIns : public vanguard::UnaryOpIns<Domain> {
     public:
         template<typename ...Args>
-        explicit UnaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnaryOpIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit UnaryOpIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnaryOpIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         virtual UnOp op() const override {
             unsigned opcode = wrapped->getOpcode();
@@ -238,18 +281,19 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base, typename Wrap>
-    class Universe::CallIns : public vanguard::CallIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::CallIns : public vanguard::CallIns<Domain> {
     public:
         template<typename ...Args>
-        explicit CallIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CallIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit CallIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CallIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         bool hasReturn() const override {
             return !wrapped->doesNotReturn();
         }
 
-        std::vector<typename Base::Function*> targets() const override {
-            return {dynamic_cast<typename Base::Function*>(this->factory.createFn(wrapped->getCalledFunction()))};
+        std::vector<typename Domain::Function*> targets() const override {
+            return {dynamic_cast<typename Domain::Function*>(this->factory.createFn(wrapped->getCalledFunction()))};
         }
 
         std::list<Value*> args() const override{
@@ -264,11 +308,12 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base, typename Wrap>
-    class Universe::CastIns : public vanguard::CastIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::CastIns : public vanguard::CastIns<Domain> {
     public:
         template<typename ...Args>
-        explicit CastIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CastIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit CastIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::CastIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         Type *castTo() const override {
             return this->factory.createType(wrapped->getDestTy());
@@ -279,11 +324,12 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base, typename Wrap>
-    class Universe::TernaryIns : public vanguard::TernaryIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::TernaryIns : public vanguard::TernaryIns<Domain> {
     public:
         template<typename ...Args>
-        explicit TernaryIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::TernaryIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit TernaryIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::TernaryIns<Domain>(std::forward<Args>(args)..., ins) {};
 
         Value *condition() const override {
             return this->factory.createVal(wrapped->getCondition());
@@ -301,11 +347,12 @@ namespace vanguard {
         const Wrap *wrapped;
     };
 
-    template<typename Base, typename Wrap>
-    class Universe::UnknownIns : public vanguard::UnknownIns<Base> {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::UnknownIns : public vanguard::UnknownIns<Domain> {
     public:
         template<typename ...Args>
-        explicit UnknownIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnknownIns<Base>(std::forward<Args>(args)..., ins) {};
+        explicit UnknownIns(const Wrap *ins, Args&&... args) : wrapped(ins), vanguard::UnknownIns<Domain>(std::forward<Args>(args)..., ins) {};
 
 
     protected:
@@ -314,4 +361,4 @@ namespace vanguard {
 }
 
 
-#endif //VANGUARD_WRAPPEDINSTRUCTIONCLASS_H
+#endif //VANGUARD_INSTRUCTION_H

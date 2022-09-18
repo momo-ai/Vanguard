@@ -5,13 +5,21 @@
 #ifndef VANGUARD_REGISTRY_H
 #define VANGUARD_REGISTRY_H
 
+#include "program/Base.h"
 #include <unordered_map>
 #include "FunctionPrinter/FunctionPrinter.h"
-#include "Reentrancy/ReentrancyDetector.h"
+//#include "Reentrancy/ReentrancyDetector.h"
 #include "StatGen/StatGen.h"
 #include "IRValidator/IRValidator.h"
+#include "program/Factory.h"
 
 namespace vanguard {
+    class LLVMDomain : public Base<LLVMDomain> {
+    /*public:
+        template<typename ...Args>
+        explicit LLVMDomain(Args&&... args) : Base<LLVMDomain>(std::forward<Args>(args)...) {};*/
+    };
+
     class DetectorRegistry {
     public:
         static DetectorRegistry &getInstance();
@@ -46,10 +54,10 @@ namespace vanguard {
 
         DetectorRegistry() {
             //assert(add(StatGen::name(), StatGen::domain()));
-            add(FunctionPrinter<Universe>::name(), FunctionPrinter<Universe>::domain());
-            add(StatGen<Universe>::name(), StatGen<Universe>::domain());
-            add(IRValidator<Universe>::name(), IRValidator<Universe>::domain());
-            add(ReentrancyDetector<Universe>::name(), ReentrancyDetector<Universe>::domain());
+            add(FunctionPrinter<LLVMDomain>::name(), FunctionPrinter<LLVMDomain>::domain());
+            add(StatGen<LLVMDomain>::name(), StatGen<LLVMDomain>::domain());
+            add(IRValidator<LLVMDomain>::name(), IRValidator<LLVMDomain>::domain());
+            //add(ReentrancyDetector<Universe>::name(), ReentrancyDetector<Universe>::domain());
             //add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
             // add(IRValidator::name(), new IRValidator());
         }
