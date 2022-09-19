@@ -6,16 +6,19 @@
 #define VANGUARD_AAWRAPPER_H
 
 #include "llvm/Analysis/AliasAnalysis.h"
-#include <program/Universe.h>
+#include <program/Base.h>
 
 namespace vanguard {
+    template<typename Domain>
     class AAWrapper {
     public:
-        AAWrapper();
-        virtual llvm::AAResults *request(Universe::Function &reqFn) = 0;
-        bool noAlias(Universe::Function &fn);
+        AAWrapper() : curFn(nullptr), fnAlias(nullptr) {}
+        virtual llvm::AAResults *request(typename Domain::Function &reqFn) = 0;
+        bool noAlias(typename Domain::Function &fn) {
+            return fn.unwrap()->isDeclaration();
+        }
     protected:
-        Universe::Function *curFn;
+        typename Domain::Function *curFn;
         llvm::AAResults *fnAlias;
     };
 }

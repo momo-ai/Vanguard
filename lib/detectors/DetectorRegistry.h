@@ -5,32 +5,30 @@
 #ifndef VANGUARD_REGISTRY_H
 #define VANGUARD_REGISTRY_H
 
+#include "program/Base.h"
 #include <unordered_map>
 #include "FunctionPrinter/FunctionPrinter.h"
 #include "Reentrancy/ReentrancyDetector.h"
 #include "StatGen/StatGen.h"
 #include "IRValidator/IRValidator.h"
+#include "program/Factory.h"
+#include <domain/libBlockchain/Blockchain.h>
+#include <domain/libBlockchain/Universe.h>
+#include <domain/libBlockchain/Factory.h>
 
 namespace vanguard {
+    class BlockchainDomain : public Blockchain<Base<BlockchainDomain>, BlockchainDomain> {
+    };
+
+    class LLVMDomain : public Base<LLVMDomain> {
+    };
+
     class DetectorRegistry {
     public:
         static DetectorRegistry &getInstance();
 
         template<typename Domain>
         UniverseDetector<Domain> *get(const std::string& name) {
-            /*if(name == FunctionPrinter<Domain>::name()) {
-                return new FunctionPrinter<Domain>();
-            }
-            else if(name == StatGen<Domain>::name()) {
-                return new StatGen<Domain>();
-            }
-            else if(name == IRValidator<Domain>::name()) {
-                return new IRValidator<Domain>();
-            }
-            else if(name == ReentrancyDetector<Domain>::name()) {
-                return new ReentrancyDetector<Domain>();
-            }*/
-
             return nullptr;
         };
 
@@ -46,10 +44,10 @@ namespace vanguard {
 
         DetectorRegistry() {
             //assert(add(StatGen::name(), StatGen::domain()));
-            add(FunctionPrinter<Universe>::name(), FunctionPrinter<Universe>::domain());
-            add(StatGen<Universe>::name(), StatGen<Universe>::domain());
-            add(IRValidator<Universe>::name(), IRValidator<Universe>::domain());
-            add(ReentrancyDetector<Universe>::name(), ReentrancyDetector<Universe>::domain());
+            add(FunctionPrinter<LLVMDomain>::name(), FunctionPrinter<LLVMDomain>::domain());
+            add(StatGen<LLVMDomain>::name(), StatGen<LLVMDomain>::domain());
+            add(IRValidator<LLVMDomain>::name(), IRValidator<LLVMDomain>::domain());
+            add(ReentrancyDetector<BlockchainDomain>::name(), ReentrancyDetector<BlockchainDomain>::domain());
             //add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
             // add(IRValidator::name(), new IRValidator());
         }

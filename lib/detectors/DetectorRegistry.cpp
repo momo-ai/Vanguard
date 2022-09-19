@@ -6,10 +6,10 @@
 //#include "StatGen/StatGen.h"
 //#include "IRValidator/IRValidator.h"
 #include "FunctionPrinter/FunctionPrinter.h"
-#include "domain/libBlockchain/Blockchain.h"
+//#include "domain/libBlockchain/Blockchain.h"
 //#include "Reentrancy/ReentrancyDetector.h"
 #include <llvm/Support/CommandLine.h>
-#include <program/Top.h>
+//#include "program/Block.tpp"
 
 /* This is how you can add additional detectors from external sources. Essentially add them in at compile time and
  * then in a cpp file, implement the addToRegistry function.
@@ -19,7 +19,7 @@ void addToRegistry(vanguard::DetectorRegistry *registry) {
 }
  */
 
-static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain Summary"), llvm::cl::value_desc("filename"), llvm::cl::Optional);
+//static llvm::cl::opt<std::string> summary("summary", llvm::cl::desc("Blockchain Summary"), llvm::cl::value_desc("filename"), llvm::cl::Optional);
 
 
 //extern "C" __attribute__((__weak__))
@@ -29,15 +29,15 @@ namespace vanguard {
     DetectorRegistry *DetectorRegistry::instance = nullptr;
 
     template<>
-    UniverseDetector<Top<Universe>> *DetectorRegistry::get(const std::string& name) {
-        if(name == FunctionPrinter<Universe>::name()) {
-            return new FunctionPrinter<Top<Universe>>();
+    UniverseDetector<LLVMDomain> *DetectorRegistry::get(const std::string& name) {
+        if(name == FunctionPrinter<LLVMDomain>::name()) {
+            return new FunctionPrinter<LLVMDomain>();
         }
-        else if(name == StatGen<Universe>::name()) {
-            return new StatGen<Top<Universe>>();
+        else if(name == StatGen<LLVMDomain>::name()) {
+            return new StatGen<LLVMDomain>();
         }
-        else if(name == IRValidator<Universe>::name()) {
-            return new IRValidator<Top<Universe>>();
+        else if(name == IRValidator<LLVMDomain>::name()) {
+            return new IRValidator<LLVMDomain>();
         }
         /*else if(name == ReentrancyDetector<Domain>::name()) {
             return new ReentrancyDetector<Domain>();
@@ -47,18 +47,18 @@ namespace vanguard {
     };
 
     template<>
-    UniverseDetector<Top<Blockchain<Universe>>> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
-        if(name == FunctionPrinter<Blockchain<Universe>>::name()) {
-            return new FunctionPrinter<Top<Blockchain<Universe>>>();
+    UniverseDetector<BlockchainDomain> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
+        if(name == FunctionPrinter<BlockchainDomain>::name()) {
+            return new FunctionPrinter<BlockchainDomain>();
         }
-        else if(name == StatGen<Blockchain<Universe>>::name()) {
-            return new StatGen<Top<Blockchain<Universe>>>();
+        else if(name == StatGen<BlockchainDomain>::name()) {
+            return new StatGen<BlockchainDomain>();
         }
-        else if(name == IRValidator<Blockchain<Universe>>::name()) {
-            return new IRValidator<Top<Blockchain<Universe>>>();
+        else if(name == IRValidator<BlockchainDomain>::name()) {
+            return new IRValidator<BlockchainDomain>();
         }
-        else if(name == ReentrancyDetector<Blockchain<Universe>>::name()) {
-            return new ReentrancyDetector<Top<Blockchain<Universe>>>();
+        else if(name == ReentrancyDetector<BlockchainDomain>::name()) {
+            return new ReentrancyDetector<BlockchainDomain>();
         }
 
         return nullptr;

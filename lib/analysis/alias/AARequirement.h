@@ -10,10 +10,27 @@
 #include "AAWrapper.h"
 
 namespace vanguard {
-    class AARequirement : public Requirement, public AAWrapper {
+    template<typename Domain>
+    class AARequirement : public Requirement, public AAWrapper<Domain> {
     public:
-        virtual void fetch(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam) override;
-        llvm::AAResults *request(Universe::Function &reqFn) override;
+        virtual void fetch(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManager &fam) override {
+            fnAnalysis = &fam;
+        }
+        llvm::AAResults *request(typename Domain::Function &reqFn) override {
+            if(noAlias(reqFn)) {
+                return nullptr;
+            }
+
+            if(this->curFn == &reqFn) {
+                return this->fnAlias;
+            }
+
+            this->curFn = &reqFn;
+            auto *fn = const_cast<llvm::Function *>(reqFn.unwrap());
+            this->fnAlias = &fnAnalysis->getResult<llvm::AAManager>(*fn);
+
+            return this->fnAlias;
+        }
     private:
         llvm::FunctionAnalysisManager *fnAnalysis;
     };

@@ -48,9 +48,9 @@ namespace vanguard {
                 std::cout << "\n ---- Listing global variables with their types ---- \n";
             }
             for (auto globalVariableValue: unit.globalVariables()){
-                auto globalVariable = llvm::dyn_cast<Variable>(globalVariableValue);
+                auto globalVariable = llvm::dyn_cast<Variable<Domain>>(globalVariableValue);
                 if (globalVariable->hasName()) {
-                    auto globalVariableFromName = (Variable *) unit.findGlobalVariable(globalVariable->name());
+                    auto globalVariableFromName = (Variable<Domain> *) unit.findGlobalVariable(globalVariable->name());
                     assert(globalVariableFromName == globalVariable && "globalVariable and globalVariableFromName ");
                     assert(globalVariableFromName != nullptr && "Global variable from Name is null.");
                     auto globalVariableName = globalVariableFromName->name();
@@ -65,8 +65,8 @@ namespace vanguard {
                 std::cout << "\n ---- Listing functions with their signature ---- \n";
             }
             std::vector< std::string > functionsNames = {};
-            std::vector< std::vector< Variable* > > functionsArguments = {};
-            std::vector< Type* > functionReturnTypes = {};
+            std::vector< std::vector<Variable<Domain>* > > functionsArguments = {};
+            std::vector<typename Domain::Type* > functionReturnTypes = {};
             int numFunctions = 0;
             for (auto function: unit.functions()){
                 auto functionFromName = unit.findFunction(function->name());

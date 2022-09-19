@@ -34,7 +34,7 @@ namespace vanguard {
                 CallTargetResolver resolver;
                 ins.accept(resolver);
 
-                return ins.template writesStorage<Domain>() || std::any_of(resolver.tgts.begin(), resolver.tgts.end(),
+                return ins.writesStorage() || std::any_of(resolver.tgts.begin(), resolver.tgts.end(),
                         [&](auto tgt){return storageWriteFns.find(tgt) != storageWriteFns.end();});
             }
 
@@ -62,7 +62,7 @@ namespace vanguard {
                             }
                         }
 
-                        if(ins->template writesStorage<Domain>() || writesStorage.find(tgt) != writesStorage.end()) {
+                        if(ins->writesStorage() || writesStorage.find(tgt) != writesStorage.end()) {
                             writesStorage.insert(fn);
                         }
                     }
@@ -70,8 +70,8 @@ namespace vanguard {
             }
         }
 
-        void detect(Domain &universe) override {
-            auto contracts = universe.template contracts<Domain>();
+        void detect(typename Domain::Universe &universe) override {
+            auto contracts = universe.contracts();
             for(auto contract : contracts) {
                 for(auto fn : contract->functions()) {
                     process(fn);

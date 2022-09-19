@@ -12,7 +12,7 @@ namespace vanguard {
     template<typename Domain>
     class CallResolver {
     public:
-        virtual std::vector<typename Domain::Function *> resolve(const CallIns<Domain> &call, Domain &universe)  = 0;
+        virtual std::vector<typename Domain::Function *> resolve(const CallIns<Domain> &call, typename Domain::Universe &universe)  = 0;
     };
 }
 

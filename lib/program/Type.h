@@ -1,264 +1,235 @@
 #ifndef VANGUARD_PROGRAM_TYPE_H
 #define VANGUARD_PROGRAM_TYPE_H
 
+#include "Base.h"
+#include "TypeClass.h"
 #include <list>
 #include "llvm/IR/Type.h"
 #include "llvm/IR/DerivedTypes.h"
 
 namespace vanguard{
-    class UnitFactory;
-    enum TypeSquared {
-        INT_TYPE,
-        ARRAY_TYPE,
-        MAP_TYPE,
-        OBJECT_TYPE,
-        POINTER_TYPE,
-        STRUCT_TYPE,
-        VOID_TYPE,
-        LOCATION_TYPE,
-        UNKNOWN_TYPE
-    };
 
-    class TypeVisitor;
-
-    class Type{
+    template<typename Domain>
+    class Base<Domain>::Type{
     public:
-        Type(UnitFactory &factory, TypeSquared typeType);
+        Type(TypeSquared typeType) : typeType(typeType) {};
+        Type(const Type&) = delete;
         virtual std::string name() const = 0;
-        virtual void accept(TypeVisitor &v) const = 0;
+        virtual void accept(TypeVisitor<Domain> &v) const = 0;
+        virtual const llvm::Type *unwrap() const = 0;
     protected:
-        UnitFactory &factory;
         TypeSquared typeType;
     };
 
-    class IntegerType : public Type {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::IntegerType : public vanguard::IntegerType<Domain> {
     public:
-        explicit IntegerType(UnitFactory &factory) : Type(factory, INT_TYPE) {};
-        IntegerType(const IntegerType&) = delete;
+        template<typename ...Args>
+        explicit IntegerType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::IntegerType<Domain>(std::forward<Args>(args)...) {};
 
-        virtual unsigned int width() const = 0; //returns width of integer in bytes
-        void accept(TypeVisitor &v) const override;
+        unsigned int width() const override {
+            return this->wrapped->getBitWidth()/8;
+        }
+
+        std::string name() const override {
+            return "int" + std::to_string(width());
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
 
-    class ObjectType: public Type {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::ArrayType : public vanguard::ArrayType<Domain> {
     public:
-        explicit ObjectType(UnitFactory &factory) : Type(factory, OBJECT_TYPE) {};
-        ObjectType(const ObjectType&) = delete;
-        void accept(TypeVisitor &v) const override;
+        template<typename ...Args>
+        explicit ArrayType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::ArrayType<Domain>(std::forward<Args>(args)...) {};
+
+        virtual std::string name() const override {
+            return baseType()->name() + "[]";
+        }
+
+        bool isDynamic() const override {
+            return false;
+        }
+
+        typename Domain::Type* baseType() const override {
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(this->wrapped->getElementType());
+        }
+
+        uint64_t length() const override {
+            return this->wrapped->getNumElements();
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
 
-    class MapType: public Type {
+    template<typename Domain>
+    template<typename D>
+    class Base<Domain>::ArrayType<llvm::VectorType, D> : public vanguard::ArrayType<Domain> {
     public:
-        explicit MapType(UnitFactory &factory) : Type(factory, MAP_TYPE) {};
-        MapType(const MapType&) = delete;
+        template<typename ...Args>
+        explicit ArrayType(const llvm::VectorType *ty, Args&&... args) : wrapped(ty), vanguard::ArrayType<Domain>(std::forward<Args>(args)...) {};
 
-        virtual Type* keyType() const = 0;
-        virtual Type* valueType() const = 0;
-        void accept(TypeVisitor &v) const override;
+        virtual std::string name() const override {
+            return baseType()->name() + "[]";
+        }
+
+        bool isDynamic() const override {
+            return false;
+        }
+
+        typename Domain::Type* baseType() const override {
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(this->wrapped->getElementType());
+        }
+
+        uint64_t length() const override {
+            auto cnt = this->wrapped->getElementCount();
+            if(cnt.isZero()) {
+                return 0;
+            }
+            else if(cnt.isScalar()) {
+                return 1;
+            }
+            else {
+                return (uint64_t)(-1);
+            }
+        }
+
+        const llvm::VectorType *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const llvm::VectorType *wrapped;
     };
 
-    class ArrayType: public Type {
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::MapType : public vanguard::MapType<Domain> {
     public:
-        explicit ArrayType(UnitFactory &factory) : Type(factory, ARRAY_TYPE) {};
-        ArrayType(const ArrayType&) = delete;
+        template<typename ...Args>
+        explicit MapType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::MapType<Domain>(std::forward<Args>(args)...) {};
 
-        virtual bool isDynamic() const = 0;
-        virtual Type* baseType() const = 0;
-        virtual uint64_t length() const = 0;
-        void accept(TypeVisitor &v) const override;
+        std::string name() const override {
+            return valueType()->name() + "[" + keyType()->name() + "]";
+        }
+
+        typename Domain::Type* keyType() const override {
+            return nullptr;
+        }
+
+        typename Domain::Type* valueType() const override {
+            return nullptr;
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
 
-    class PointerType: public Type{
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::PointerType : public vanguard::PointerType<Domain> {
     public:
-        explicit PointerType(UnitFactory &factory) : Type(factory, POINTER_TYPE ) {};
-        PointerType(const PointerType&) = delete;
+        template<typename ...Args>
+        explicit PointerType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::PointerType<Domain>(std::forward<Args>(args)...) {};
 
-        //bool isOpaque();
-        virtual Type* referencedType() const = 0;
-        void accept(TypeVisitor &v) const override;
+        virtual std::string name() const override {
+            return this->referencedType()->name() + " *";
+        }
+
+        typename Domain::Type* referencedType() const override {
+            auto &factory = Domain::Factory::instance();
+            return factory.createType(this->wrapped->getElementType());
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
 
-    class StructType: public Type{
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::StructType : public vanguard::StructType<Domain> {
     public:
-        explicit StructType(UnitFactory &factory) : Type(factory, STRUCT_TYPE) {};
-        StructType(const StructType&) = delete;
+        template<typename ...Args>
+        explicit StructType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::StructType<Domain>(std::forward<Args>(args)...) {};
 
-        virtual unsigned int numFields() = 0;
-        virtual std::list<Type*> fieldTypes() = 0;
-        void accept(TypeVisitor &v) const override;
+        virtual std::string name() const override {
+            return this->wrapped->getName().str();
+        }
+
+        unsigned int numFields() override {
+            return this->wrapped->getStructNumElements();
+        }
+
+        std::list<typename Domain::Type*> fieldTypes() override {
+            std::list<typename Domain::Type*> fieldTypesList = {};
+            unsigned numFields = this->wrapped->getStructNumElements();
+            auto &factory = Domain::Factory::instance();
+            for(unsigned n = 0; n < numFields; n++){
+                fieldTypesList.push_back(factory.createType(this->wrapped->getStructElementType(n)));
+            }
+            return fieldTypesList;
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
 
-    class VoidType: public Type{
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::VoidType : public vanguard::VoidType<Domain> {
     public:
-        explicit VoidType(UnitFactory &factory) : Type(factory, VOID_TYPE) {};
-        VoidType(const VoidType&) = delete;
-        void accept(TypeVisitor &v) const override;
+        template<typename ...Args>
+        explicit VoidType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::VoidType<Domain>(std::forward<Args>(args)...) {};
+
+        virtual std::string name() const override {
+            return "void";
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
 
-    class LocationType: public Type{
+    template<typename Domain>
+    template<typename Wrap, typename D>
+    class Base<Domain>::LocationType : public vanguard::LocationType<Domain> {
     public:
-        explicit  LocationType(UnitFactory &factory) : Type(factory, LOCATION_TYPE) {};
-        LocationType(const LocationType&) = delete;
-        void accept(TypeVisitor &v) const override;
+        template<typename ...Args>
+        explicit LocationType(const Wrap *ty, Args&&... args) : wrapped(ty), vanguard::LocationType<Domain>(std::forward<Args>(args)...) {};
+
+        virtual std::string name() const override {
+            return "label";
+        }
+
+        const Wrap *unwrap() const override {
+            return wrapped;
+        }
+    protected:
+        const Wrap *wrapped;
     };
-
-    class UnknownType : public Type {
-    public:
-        explicit UnknownType(UnitFactory &factory) : Type(factory, UNKNOWN_TYPE) {};
-        UnknownType(const UnknownType&) = delete;
-        void accept(TypeVisitor &v) const override;
-    };
-
-    class TypeVisitor {
-    public:
-        virtual void commonVisit(const Type &v) {};
-        virtual void visit(const IntegerType &v) { commonVisit(v); };
-        virtual void visit(const ObjectType &v) { commonVisit(v); };
-        virtual void visit(const MapType &v) { commonVisit(v); };
-        virtual void visit(const ArrayType &v) { commonVisit(v); };
-        virtual void visit(const PointerType &v) { commonVisit(v); };
-        virtual void visit(const StructType &v) { commonVisit(v); };
-        virtual void visit(const VoidType &v) { commonVisit(v); };
-        virtual void visit(const LocationType &v) { commonVisit(v); };
-        virtual void visit(const UnknownType &v) { commonVisit(v); };
-    };
-
-
-
-    /*class IntegerType: public Type{
-        public:
-            explicit IntegerType(UnitFactory &factory, const llvm::IntegerType&);
-
-            IntegerType(const IntegerType&) = delete;
-
-            unsigned width(); //returns width of integer in bytes
-
-            std::string name() const override;
-
-            const llvm::IntegerType &unwrap();
-
-        private:
-            const llvm::IntegerType& integer;
-    };
-
-    class ArrayType: public Type{
-        public:
-            explicit ArrayType(UnitFactory &factory, const llvm::ArrayType&);
-
-            ArrayType(const ArrayType&) = delete;
-
-            Type* baseType() const;
-
-            uint64_t length() const;
-
-            std::string name() const override;
-
-            const llvm::ArrayType &unwrap();
-
-        private:
-            const llvm::ArrayType& array;
-    };
-
-//     class FunctionT: public Type{
-//         public:
-//             explicit FunctionT(const llvm::FunctionType& function);
-//
-//             std::string name() override;
-//
-//             Type* returnType();
-//
-//             unsigned getNumParams();
-//
-//             std::list<Type*> getParamsType();
-//
-//         private:
-//             const llvm::FunctionType& function;
-//     };
-
-    class PointerType: public Type{
-        public:
-            explicit PointerType(UnitFactory &factory, const llvm::PointerType& pointer);
-
-            PointerType(const PointerType&) = delete;
-            
-            bool isOpaque();
-
-            Type* referencedType() const;
-
-            std::string name() const override;
-
-            const llvm::PointerType &unwrap();
-
-        private:
-            const llvm::PointerType& pointer;
-    };
-
-    class StructType: public Type{
-        public:
-            explicit StructType(UnitFactory &factory, const llvm::StructType& structT);
-
-            StructType(const StructType&) = delete;
-
-            //struct name
-
-            unsigned numFields();
-
-            std::list<Type*> fieldTypes();
-
-            Type* getTypeAtIndex(unsigned n);
-
-            std::string name() const override;
-
-            const llvm::StructType &unwrap();
-
-        private:
-            const llvm::StructType& structT;
-    };
-
-    class VectorType: public Type{
-        public:
-            explicit VectorType(UnitFactory &factory, const llvm::VectorType& vector);
-
-            VectorType(const VectorType&) = delete;
-
-            Type* baseType() const;
-
-            std::string name() const override;
-
-            const llvm::VectorType &unwrap();
-
-            //TODO: getElementCount()
-        private:
-            const llvm::VectorType& vector;
-    };
-
-    class VoidType: public Type{
-        public:
-            explicit VoidType(UnitFactory &factory, const llvm::Type&);
-
-            VoidType(const VoidType&) = delete;
-
-            std::string name() const override;
-
-            const llvm::Type &unwrap();
-
-        private:
-            const llvm::Type& voidType;
-    };
-
-    class LabelType: public Type{
-    public:
-        explicit  LabelType(UnitFactory &factory, const llvm::Type&);
-
-        LabelType(const LabelType&) = delete;
-
-        std::string name() const override;
-
-        const llvm::Type &unwrap();
-
-    private:
-        const llvm::Type& labelType;
-    };*/
 }
 
 #endif
