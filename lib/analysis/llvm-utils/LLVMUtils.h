@@ -76,7 +76,7 @@ namespace analysis {
         meta.push_back(n);
 
         for (unsigned i = 0, e = n->getNumOperands(); i!=e; ++i){
-            if(auto op = dyn_cast_or_null<llvm::MDNode>(n->getOperand(i))){
+            if(auto op = llvm::dyn_cast_or_null<llvm::MDNode>(n->getOperand(i))){
                 createMetadataSlot(mod, op, mdMap);
             }
         }
