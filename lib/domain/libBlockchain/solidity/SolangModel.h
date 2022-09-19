@@ -113,6 +113,11 @@ namespace vanguard {
         CallResolver<Domain> *callResolver() override  {
             return nullptr;
         }
+
+        bool isExternalCall(CallIns<Domain> &call) const {
+            throw std::runtime_error("To be implemented");
+        }
+
         /*bool writesVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;
         bool readsVariable(const BlkVariable &var, vanguard::Instruction &ins) const override;*/
 

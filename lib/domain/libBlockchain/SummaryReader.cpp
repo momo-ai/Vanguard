@@ -7,6 +7,7 @@
 #include "BlockchainFactory.h"
 #include "BlkType.h"
 #include "solidity/SolangModel.h"
+#include "rust/near/NearModel.h"
 //#include "domain/libBlockchain/include/solidity/Solidity.h"
 #include <fstream>
 #include "rapidjson/document.h"
@@ -66,16 +67,12 @@ namespace vanguard {
         }
         /*else if(compiler == "cargo-contract") {
             model = new InkModel(*alias);
-        }
+        }*/
         else if(compiler == "rustc") {
             require(val.HasMember("blockchain") && val["blockchain"].IsString(), "Missing blockchain for rustc compiler");
             string blockchainStr = val["blockchain"].GetString();
             if (blockchainStr == "near"){
-                auto nearToLLVM = new NearToLLVM(*alias);
-                llvmTrans = nearToLLVM;
-                blockchain = new Near(llvmTrans, compiler, version, contracts, *alias);
-
-                nearToLLVM->setNear((Near*)blockchain);
+                model = new NearModel();
             }
             else {
                 error( string("Unknown blockchain for rustc"));
@@ -83,7 +80,7 @@ namespace vanguard {
         }
         else {
             error(string("Unknown compiler: ") + compiler);
-        }*/
+        }
 
         if(val.HasMember("contracts")) {
             require(val["contracts"].IsArray(), "Summary contracts must be an array");

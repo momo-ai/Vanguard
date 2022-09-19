@@ -19,7 +19,8 @@
           "isConstructor": true,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "<hello_near::Contract as core::default::Default>::default"
+            "name": "<hello_near::Contract as core::default::Default>::default",
+            "selector": ""
         },
         {
           "params": [],
@@ -35,7 +36,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "hello_near::Contract::get_greeting"
+          "name": "hello_near::Contract::get_greeting",
+            "selector": ""
         },
         {
           "params": [
@@ -51,7 +53,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "hello_near::Contract::set_greeting"
+          "name": "hello_near::Contract::set_greeting",
+            "selector": ""
         },
         {
           "params": [],
@@ -67,7 +70,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "hello_near::Contract::set_int"
+          "name": "hello_near::Contract::set_int",
+            "selector": ""
         }
       ],
       "variables": [

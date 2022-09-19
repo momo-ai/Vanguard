@@ -9,6 +9,7 @@
 #include <unordered_map>
 #include "FunctionPrinter/FunctionPrinter.h"
 #include "Reentrancy/ReentrancyDetector.h"
+#include "NEAR/PublicCallbacks/PublicCallbacksDetector.h"
 #include "StatGen/StatGen.h"
 #include "IRValidator/IRValidator.h"
 #include "program/Factory.h"
@@ -48,6 +49,7 @@ namespace vanguard {
             add(StatGen<LLVMDomain>::name(), StatGen<LLVMDomain>::domain());
             add(IRValidator<LLVMDomain>::name(), IRValidator<LLVMDomain>::domain());
             add(ReentrancyDetector<BlockchainDomain>::name(), ReentrancyDetector<BlockchainDomain>::domain());
+            add(PublicCallbacksDetector<BlockchainDomain>::name(), PublicCallbacksDetector<BlockchainDomain>::domain());
             //add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
             // add(IRValidator::name(), new IRValidator());
         }

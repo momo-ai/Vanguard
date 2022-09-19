@@ -18,7 +18,8 @@
           "isConstructor": true,
           "visibility": "private",
           "mutability": "nonpayable",
-          "name": "cross_contract_call::Contract::new"
+          "name": "cross_contract_call::Contract::new",
+            "selector": ""
         },
         {
           "params": [],
@@ -32,9 +33,10 @@
           ],
           "modifiers": [],
           "isConstructor": false,
-          "visibility": "private",
+          "visibility": "public",
           "mutability": "nonpayable",
-          "name": "cross_contract_call::Contract::query_greeting"
+            "name": "cross_contract_call::Contract::query_greeting",
+            "selector": ""
         },
         {
           "params": [
@@ -50,7 +52,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "cross_contract_call::Contract::query_greeting_callback"
+          "name": "cross_contract_call::Contract::query_greeting_callback",
+            "selector": ""
         }
       ],
       "variables": [
@@ -85,7 +88,8 @@
           "isConstructor": true,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "cross_contract_call::ContractExt::new"
+          "name": "cross_contract_call::ContractExt::new",
+            "selector": ""
         },
         {
           "params": [],
@@ -101,7 +105,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "cross_contract_call::ContractExt::query_greeting"
+          "name": "cross_contract_call::ContractExt::query_greeting",
+            "selector": ""
         },
         {
           "params": [
@@ -117,7 +122,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "nonpayable",
-          "name": "cross_contract_call::ContractExt::query_greeting_callback"
+          "name": "cross_contract_call::ContractExt::query_greeting_callback",
+            "selector": ""
         }
       ],
       "structs": [],
@@ -142,7 +148,8 @@
           "isConstructor": false,
           "visibility": "public",
           "mutability": "payable",
-          "name": "cross_contract_call::external::hello_near::HelloNearExt::get_greeting"
+          "name": "cross_contract_call::external::hello_near::HelloNearExt::get_greeting",
+            "selector": ""
         }
       ],
       "variables": [],
