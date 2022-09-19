@@ -89,6 +89,19 @@ namespace vanguard {
             if(compiler == "Solang") {
                 model = new SolangModel<Domain>();
             }
+            else if(compiler == "rustc") {
+                require(val.HasMember("blockchain") && val["blockchain"].IsString(), "Missing blockchain for rustc compiler");
+                std::string blockchainStr = val["blockchain"].GetString();
+                if (blockchainStr == "near"){
+                    model = new NearModel<Domain>();
+                }
+                else {
+                    error(std::string("Unknown blockchain for rustc"));
+                }
+            }
+            else {
+                error(std::string("Unknown compiler: ") + compiler);
+            }
             /*else if(compiler == "cargo-contract") {
                 model = new InkModel(*alias);
             }
@@ -181,6 +194,14 @@ namespace vanguard {
 
             auto &factory = Domain::Factory::instance();
             auto *contract = factory.createContract(module, *model, name, functions, variables);
+
+            // TODO: Fix this temp hack: this is for NEAR contracts
+            if (val.HasMember("external")) {
+                require(val["external"].IsBool(), "external must be boolean");
+                if (val["external"].GetBool())
+                    contract->setExternal();
+            }
+
             //auto *contract = new Blockchain<Universe>::Contract(name, functions, variables);
             //storageDecls[id] = contract;
             return contract;

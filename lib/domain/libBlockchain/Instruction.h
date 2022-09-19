@@ -42,8 +42,8 @@ namespace vanguard {
         bool readsStorage()  {
             auto contract = this->block()->function()->contract();
             if(contract != nullptr) {
-                auto &model = contract->blockchainModel();
-                return model.readsStorage(*static_cast<typename Domain::Instruction *>(this));
+                auto model = contract->blockchainModel();
+                return model->readsStorage(*static_cast<typename Domain::Instruction *>(this));
             }
             return false;
         }

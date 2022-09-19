@@ -68,10 +68,10 @@ namespace vanguard {
             if (auto callIns = dynamic_cast<CallIns<Domain> *>(inst)) {
                 auto insFun = inst->block()->function();
                 auto contract = insFun->contract();
-                auto model = contract->blockchainModel();
+                auto &model = contract->blockchainModel();
                 auto contrFuns = contract->functions();
 
-                if (model->isExternalCall(*callIns)) {
+                if (model.isExternalCall(*callIns)) {
 
                     for (auto trg : callIns->targets()) {
                         auto matchesCallback = [&trg, this](Function *f) -> bool {

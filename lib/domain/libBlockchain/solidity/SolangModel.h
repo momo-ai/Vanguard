@@ -49,11 +49,11 @@ namespace vanguard {
         }
         //bool isExternalCall(const llvm::Function &llvmFn) override;
         //bool isDelegateCall(const llvm::Function &llvmFn) override;
-        bool isAnyLowLevelCall(CallIns<Domain> &call)  override {
+        bool isAnyLowLevelCall(CallIns<Domain> &call) const override {
             return isLowLevelCall(call) || isLowLevelStaticCall(call) || isLowLevelDelegateCall(call);
         }
 
-        bool isLowLevelCall(CallIns<Domain> &call)  override {
+        bool isLowLevelCall(CallIns<Domain> &call) const override {
             for(auto tgt : call.targets()) {
                 if(tgt->name() == "call") {
                     return true;
@@ -63,7 +63,7 @@ namespace vanguard {
             return false;
         }
 
-        bool isLowLevelStaticCall(CallIns<Domain> &call)  override {
+        bool isLowLevelStaticCall(CallIns<Domain> &call) const override {
             for(auto tgt : call.targets()) {
                 if(tgt->name() == "callStatic") {
                     return true;
@@ -73,7 +73,7 @@ namespace vanguard {
             return false;
         }
 
-        bool isLowLevelDelegateCall(CallIns<Domain> &call)  override {
+        bool isLowLevelDelegateCall(CallIns<Domain> &call) const override {
             for(auto tgt : call.targets()) {
                 if(tgt->name() == "callDelegate") {
                     return true;
@@ -83,7 +83,7 @@ namespace vanguard {
             return false;
         }
 
-        bool writesStorage(typename Domain::Instruction &ins) override {
+        bool writesStorage(typename Domain::Instruction &ins) const override {
             CallTargetResolver tgtResolver;
             ins.accept(tgtResolver);
 
@@ -96,7 +96,7 @@ namespace vanguard {
 
             return std::any_of(tgtResolver.tgts.begin(), tgtResolver.tgts.end(), [&ss](auto fn){std::regex reg(ss.str()); return regex_match(fn->name(), reg);});
         }
-        bool readsStorage(typename Domain::Instruction &ins) override {
+        bool readsStorage(typename Domain::Instruction &ins) const override {
             CallTargetResolver tgtResolver;
             ins.accept(tgtResolver);
 
@@ -110,11 +110,11 @@ namespace vanguard {
             return std::any_of(tgtResolver.tgts.begin(), tgtResolver.tgts.end(), [&ss](auto fn){std::regex reg(ss.str()); return regex_match(fn->name(), reg);});
         }
 
-        CallResolver<Domain> *callResolver() override  {
+        CallResolver<Domain> *callResolver() const override {
             return nullptr;
         }
 
-        bool isExternalCall(CallIns<Domain> &call) const {
+        bool isExternalCall(CallIns<Domain> &call) const override {
             throw std::runtime_error("To be implemented");
         }
 

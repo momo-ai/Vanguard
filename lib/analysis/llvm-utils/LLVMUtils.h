@@ -20,7 +20,7 @@
 namespace analysis {
 
     // For debugging purposes.
-    std::string printLLVMValue(const llvm::Value *v) {
+    static std::string printLLVMValue(const llvm::Value *v) {
         std::string s;
         llvm::raw_string_ostream sstr(s);
         v->print(sstr, false);
@@ -31,7 +31,7 @@ namespace analysis {
     // Does not consider any aliasing and over-approximates method calls.
     // I believe the cleanest way to make this more precise is to use MemorySSA
     // and augment the worklist with the memory defs.
-    bool dependsOnValue(const llvm::Value *srcVal, const llvm::Value *destVal) {
+    static bool dependsOnValue(const llvm::Value *srcVal, const llvm::Value *destVal) {
         std::set<const llvm::Use*> visited;
 
         // TODO: switch to SmallVector
@@ -67,7 +67,7 @@ namespace analysis {
         return false;
     }
 
-    void createMetadataSlot(llvm::Module const * mod, llvm::MDNode *n, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
+    static void createMetadataSlot(llvm::Module const * mod, llvm::MDNode *n, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
 
         auto &meta = mdMap[(llvm::MDNode::MetadataKind)n->getMetadataID()];
         if (std::find(meta.begin(), meta.end(), n) != meta.end())
@@ -82,7 +82,7 @@ namespace analysis {
         }
     }
 
-    void collectMedataForFunction(llvm::Function const *fun, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
+    static void collectMedataForFunction(llvm::Function const *fun, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
         llvm::SmallVector<std::pair<unsigned, llvm::MDNode*>, 4> MDForInst;
         for(auto bb = fun->begin(), e = fun->end(); bb != e; ++bb) {
             for (const auto & inst : *bb) {
@@ -159,16 +159,16 @@ namespace analysis {
         static const typename Domain::Value* getFunctionArg(typename Domain::Function *fun, int i) {
             assert("Invalid argument index." && i < fun->params().size());
 
-            return Domain::Factory::instance()->createVal(fun->unwrap()->getArg(i));
+            return Domain::Factory::instance().createVal(fun->unwrap()->getArg(i));
         }
 
         static const typename Domain::Value* getNamedFunctionArg(typename Domain::Function *fun, const std::string &name) {
             auto llFun = fun->unwrap();
-            auto factory = Domain::Factory::instance();
+            auto &factory = Domain::Factory::instance();
 
             for (auto &a : llFun->args()) {
                 if (a.hasName() && a.getName() == name)
-                    return factory->createVal(&a);
+                    return factory.createVal(&a);
             }
 
             return nullptr;
@@ -187,23 +187,23 @@ namespace analysis {
         }
 
         static const llvm::Value* isMemRead(const typename Domain::Instruction *inst) {
-            auto &llvmIns = inst->unwrap();
+            const auto llvmIns = inst->unwrap();
 
-            if (auto loadInst = llvm::dyn_cast<llvm::LoadInst>(&llvmIns)) {
+            if (auto loadInst = llvm::dyn_cast<llvm::LoadInst>(llvmIns)) {
                 return loadInst->getPointerOperand();
             }
-            else if (auto memTrans = llvm::dyn_cast<llvm::MemTransferInst>(&llvmIns)) {
+            else if (auto memTrans = llvm::dyn_cast<llvm::MemTransferInst>(llvmIns)) {
                 return memTrans->getRawSource();
             }
             return nullptr;
         }
 
         static const llvm::Value* isMemWrite(const typename Domain::Instruction *inst) {
-            auto &llvmIns = inst->unwrap();
-            if (auto store = llvm::dyn_cast<llvm::StoreInst>(&llvmIns)) {
+            const auto llvmIns = inst->unwrap();
+            if (auto store = llvm::dyn_cast<llvm::StoreInst>(llvmIns)) {
                 return store->getPointerOperand();
             }
-            else if (auto memIntr = llvm::dyn_cast<llvm::MemIntrinsic>(&llvmIns)) {
+            else if (auto memIntr = llvm::dyn_cast<llvm::MemIntrinsic>(llvmIns)) {
                 return memIntr->getDest();
             }
             return nullptr;
@@ -221,9 +221,9 @@ namespace analysis {
             llvm::SmallVector<llvm::BasicBlock*> descendants;
             domTree->getDescendants(const_cast<llvm::BasicBlock*>(llvmBlock), descendants);
 
-            auto factory = Domain::Factory::instance();
+            auto &factory = Domain::Factory::instance();
             for (auto & descendant : descendants)
-                dominated.push_back(factory->createBlk(descendant));
+                dominated.push_back(factory.createBlk(descendant));
         }
 
         static bool postDominates(const typename Domain::Instruction *i1, const typename Domain::Instruction *i2) {
@@ -232,9 +232,9 @@ namespace analysis {
             assert(i1BB->function() == i2BB->function() && "Invalid instructions: i1 & i2 must belong to the same function");
             auto domTree = getPostDomTree(i1BB->function()->unwrap());
 
-            auto &llvmI1 = i1->unwrap(), &llvmI2 = i2->unwrap();
-            if (i1->block() == i2->block()) return domTree->dominates(&llvmI1, &llvmI2);
-            else return domTree->dominates(llvmI1.getParent(), llvmI2.getParent());
+            auto llvmI1 = i1->unwrap(), llvmI2 = i2->unwrap();
+            if (i1->block() == i2->block()) return domTree->dominates(llvmI1, llvmI2);
+            else return domTree->dominates(llvmI1->getParent(), llvmI2->getParent());
         }
 
         static bool returnDependsOnVal(const typename Domain::Function *fun, const typename Domain::Value *val) {
@@ -317,6 +317,14 @@ namespace analysis {
             }
         }
     };
+
+
+    template<typename Domain>
+    std::map<const llvm::Function *, const llvm::PostDominatorTree*> LLVMUtils<Domain>::postDomTrees;
+
+    template<typename Domain>
+    std::map<llvm::Module const *, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>> LLVMUtils<Domain>::mdnMap;
+
 
 } // analysis
 

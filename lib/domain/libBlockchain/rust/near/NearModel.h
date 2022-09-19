@@ -7,6 +7,7 @@
 
 #include <analysis/llvm-utils/LLVMUtils.h>
 #include "../../BlockchainModel.h"
+#include "program/TypeClass.h"
 
 namespace vanguard {
 
@@ -44,7 +45,7 @@ namespace vanguard {
                 selfVal = analysis::LLVMUtils<Domain>::getFunctionArg(insFun, 0);
 
             assert(("Could not find self argument" && selfVal != nullptr));
-            assert(("Invalid pointer type" && dynamic_cast<typename Domain::PointerType *>(selfVal->type())));
+            assert(("Invalid pointer type" && dynamic_cast<PointerType<Domain> *>(selfVal->type())));
 
             return analysis::LLVMUtils<Domain>::writesMemTo(&ins, selfVal);
         }
@@ -58,13 +59,13 @@ namespace vanguard {
                 selfVal = analysis::LLVMUtils<Domain>::getFunctionArg(insFun, 0);
 
             assert(("Could not find self argument" && selfVal != nullptr));
-            assert(("Invalid pointer type" && dynamic_cast<typename Domain::PointerType *>(selfVal->type())));
+            assert(("Invalid pointer type" && dynamic_cast<PointerType<Domain> *>(selfVal->type())));
 
             return analysis::LLVMUtils<Domain>::readsMemFrom(&ins, selfVal);
         }
 
         CallResolver<Domain> *callResolver() const override {
-
+            return nullptr;
         }
 
         bool isExternalCall(CallIns<Domain> &call) const override {
@@ -97,6 +98,40 @@ namespace vanguard {
                 fixDemangler(demangledName);
 
             return demangledName;
+        }
+
+    private:
+
+        static void replace_all(std::string &s, const std::string &toRepl, const std::string &replStr) {
+            std::string buf;
+            std::size_t pos = 0;
+            std::size_t prevPos = 0;
+            std::size_t toReplSize = toRepl.size();
+
+            buf.reserve(s.size());
+
+            while ((pos = s.find(toRepl, pos)) != std::string::npos) {
+                buf.append(s, prevPos, pos - prevPos);
+                buf += replStr;
+                prevPos = (pos += toReplSize);
+            }
+
+            buf.append(s, prevPos, s.size() - prevPos);
+            s.swap(buf);
+        }
+
+        static void fixDemangler(std::string &funcDemName) {
+            replace_all(funcDemName, "$LT$", "<");
+            replace_all(funcDemName, "$GT$", ">");
+            replace_all(funcDemName, "..", "::");
+            replace_all(funcDemName, "$u20$", " ");
+
+            if (funcDemName[0] == '_')
+                funcDemName.replace(0, 1, "");
+        }
+
+        static std::string clipRustHash(const std::string& funcName) {
+            return funcName.substr(0, funcName.size() - 19);
         }
 
         // TODO: Move rest of the methods from old Near.cpp here.
