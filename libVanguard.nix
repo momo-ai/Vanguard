@@ -1,5 +1,5 @@
 { stdenv, cmake, ninja,
-  llvmPackages_13, lib, nodePackages, solang, python3
+  llvmPackages_13, lib, nodePackages, solang, python3, git, gtest
 }:
 
 let
@@ -24,7 +24,9 @@ stdenv.mkDerivation {
       src = src0;
     };
 
-  nativeBuildInputs = [ cmake ninja python3 ];
+  nativeBuildInputs = [ cmake ninja python3 git gtest ];
+  cmakeFlags = ["-DDOWNLOAD_GTEST=OFF"]; 
+
   buildInputs = [
     libllvm
   ];
@@ -32,6 +34,8 @@ stdenv.mkDerivation {
   postInstall = ''
     install -m755 -D ../run.py $out/bin/vanguard
   '';
+
+  doCheck = true;
 
  # outputs = [ "out" "dev" ];
 
