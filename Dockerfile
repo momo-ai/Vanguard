@@ -34,7 +34,7 @@ RUN cargo install cargo-dylint dylint-link
 RUN cargo install --force cargo-contract
 RUN rustup update nightly
 # RUN rustup target add wasm32-unknown-unknown --toolchain nightly # NEEDED?
-RUN rustup component add rust-src --toolchain nightly-aarch64-unknown-linux-gnu
+RUN rustup component add rust-src --toolchain nightly
 
 # Install Solang
 WORKDIR /
