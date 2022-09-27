@@ -1,0 +1,166 @@
+{
+  "contracts": [
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "near_sdk::AccountId"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": true,
+          "visibility": "private",
+          "mutability": "nonpayable",
+            "name": "cross_contract_call::Contract::new",
+            "selector": ""
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "near_sdk::Promise"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "private",
+          "mutability": "nonpayable",
+          "name": "cross_contract_call::Contract::query_greeting",
+            "selector": ""
+        },
+        {
+          "params": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "std::result::Result<std::string::String, near_sdk::PromiseError>"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "cross_contract_call::Contract::query_greeting_callback",
+            "selector": ""
+        }
+      ],
+      "variables": [
+        {
+          "name": "hello_account",
+          "type": {
+            "subType": "ElementaryType",
+            "name": "near_sdk::AccountId"
+            }
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 111,
+      "name": "cross_contract_call::Contract"
+    },
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "near_sdk::AccountId"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": true,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "cross_contract_call::ContractExt::new",
+            "selector": ""
+        },
+        {
+          "params": [],
+          "returns": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "near_sdk::Promise"
+              }
+            }
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "cross_contract_call::ContractExt::query_greeting",
+            "selector": ""
+        },
+        {
+          "params": [
+            {
+              "type": {
+                "subType": "ElementaryType",
+                "name": "std::result::Result<std::string::String, near_sdk::PromiseError>"
+              }
+            }
+          ],
+          "returns": [],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "nonpayable",
+          "name": "cross_contract_call::ContractExt::query_greeting_callback",
+            "selector": ""
+        }
+      ],
+      "structs": [],
+      "enums": [],
+      "id": 1111,
+      "external": true,
+      "name": "cross_contract_call::ContractExt"
+    },
+    {
+      "inherits": [],
+      "events": [],
+      "functions": [
+        {
+          "params": [],
+          "returns": [
+            {"type": {
+                "subType": "ElementaryType",
+                "name": "std::string::String"
+            }}
+          ],
+          "modifiers": [],
+          "isConstructor": false,
+          "visibility": "public",
+          "mutability": "payable",
+          "name": "cross_contract_call::external::hello_near::HelloNearExt::get_greeting",
+            "selector": ""
+        }
+      ],
+      "variables": [],
+      "structs": [],
+      "enums": [],
+      "id": 113,
+      "external": true,
+      "name": "cross_contract_call::external::hello_near::HelloNearExt"
+    }
+  ],
+  "compiler": "rustc",
+  "version": "1.56.0",
+  "blockchain": "near"
+}

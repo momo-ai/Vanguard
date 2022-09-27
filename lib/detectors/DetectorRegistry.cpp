@@ -60,6 +60,9 @@ namespace vanguard {
         else if(name == ReentrancyDetector<BlockchainDomain>::name()) {
             return new ReentrancyDetector<BlockchainDomain>();
         }
+        else if(name == PublicCallbacksDetector<BlockchainDomain>::name()) {
+            return new PublicCallbacksDetector<BlockchainDomain>();
+        }
 
         return nullptr;
     };

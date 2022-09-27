@@ -15,14 +15,14 @@ namespace vanguard {
         public:
             virtual ~BlockchainModel() = default;
             virtual bool isImplementation(std::string contract, const typename Domain::Function &blockchainFn, const llvm::Function &llvmFn) const = 0;
-            virtual bool isAnyLowLevelCall(CallIns<Domain> &call)  = 0;
-            virtual bool isLowLevelCall(CallIns<Domain> &call) = 0;
-            virtual bool isLowLevelStaticCall(CallIns<Domain> &call) = 0;
-            virtual bool isLowLevelDelegateCall(CallIns<Domain> &call) = 0;
-            virtual bool writesStorage(typename Domain::Instruction &ins) = 0;
-            virtual bool readsStorage(typename Domain::Instruction &ins) = 0;
-            virtual CallResolver<Domain> *callResolver() = 0;
-            //virtual bool isExternalCall(const llvm::Function &llvmFn) = 0;
+            virtual bool isAnyLowLevelCall(CallIns<Domain> &call) const = 0;
+            virtual bool isLowLevelCall(CallIns<Domain> &call) const = 0;
+            virtual bool isLowLevelStaticCall(CallIns<Domain> &call) const = 0;
+            virtual bool isLowLevelDelegateCall(CallIns<Domain> &call) const = 0;
+            virtual bool writesStorage(typename Domain::Instruction &ins) const = 0;
+            virtual bool readsStorage(typename Domain::Instruction &ins) const = 0;
+            virtual CallResolver<Domain> *callResolver() const = 0;
+            virtual bool isExternalCall(CallIns<Domain> &call) const = 0;
             //virtual bool isDelegateCall(const llvm::Function &llvmFn) = 0;
             //virtual bool isAnyExternalCall(vanguard::Function &llvmFn) const = 0;
             //virtual bool isCall(vanguard::Function &llvmFn) const = 0;

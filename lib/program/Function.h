@@ -34,7 +34,7 @@ namespace vanguard{
             return !function->isDeclaration();
         }
 
-        const llvm::Function *unwrap() {
+        const llvm::Function *unwrap() const {
             return function;
         }
 

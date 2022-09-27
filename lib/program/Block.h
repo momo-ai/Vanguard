@@ -26,7 +26,7 @@ namespace vanguard{
             return factory.createFn(block->getParent());
         }
 
-        virtual const llvm::BasicBlock* unwrap() {
+        virtual const llvm::BasicBlock* unwrap() const {
             return block;
         }
 

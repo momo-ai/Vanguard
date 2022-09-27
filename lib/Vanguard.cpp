@@ -106,6 +106,7 @@ void initializeLLVM(int argc, char **argv) {
     llvm::initializeHardwareLoopsPass(registry);
     llvm::initializeTypePromotionPass(registry);
     llvm::initializeReplaceWithVeclibLegacyPass(registry);
+    //llvm::initializeDependenceAnalysisPass(registry);
 
     llvm::cl::ParseCommandLineOptions(argc, argv, "Vanguard Static Analyzer\n");
 }
@@ -177,7 +178,7 @@ int main(int argc, char **argv) {
     std::unordered_map<llvm::Module *, std::string> filenames;
     std::vector<std::unique_ptr<llvm::Module>> modules;
     for (auto inFile: inputFiles) {
-        auto module = parseIRFile(inputFiles[0], Err, ctxt, setDataLayout);
+        auto module = parseIRFile(inFile, Err, ctxt, setDataLayout);
         if (!module) {
             Err.print(argv[0], llvm::errs());
             return 1;

@@ -42,6 +42,14 @@ namespace vanguard {
             return nullptr;
         }
         //std::vector<BlkContract *> inherits() const;
+
+        void setExternal() {
+            external = true;
+        }
+
+        bool isExternal() const {
+            return external;
+        }
     private:
         const std::string contractName;
         BlockchainModel<Domain> &model;
@@ -51,6 +59,7 @@ namespace vanguard {
         std::vector<BlkStruct *> contractStructs;*/
         std::vector<typename Domain::Function *> fns;
         std::vector<vanguard::Variable<Domain> *> vars;
+        bool external = false;
     };
 }
 
