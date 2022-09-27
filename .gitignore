@@ -6,6 +6,5 @@ processed_examples
 run.py
 target
 Cargo.lock
-Cargo.toml
 .idea/*
 cmake-build-vanguard/*
