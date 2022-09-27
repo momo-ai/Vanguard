@@ -1,3 +1,4 @@
+# link ctest to unit tests
 include(GoogleTest)
 
 macro(vanguard_gtest_suite target)
@@ -5,15 +6,20 @@ macro(vanguard_gtest_suite target)
   list(APPEND VANGUARD_UNIT_TESTS ${target})
 endmacro() 
 
-add_executable(ExampleTest
-    Example.cpp
+add_executable(VanguardUnitTests
+    vanguard-unittests.cpp
 )
-target_link_libraries(ExampleTest PUBLIC 
+target_link_libraries(VanguardUnitTests PUBLIC 
   GTest::gtest_main
 )
-vanguard_gtest_suite(ExampleTest)
+vanguard_gtest_suite(VanguardUnitTests)
 
 add_custom_target(check-unit
   DEPENDS ${VANGUARD_UNIT_TESTS}
   COMMAND "${CMAKE_COMMAND}" --build "${CMAKE_BINARY_DIR}" --target test
 )
+
+# define header file that points to unit test source files 
+set(UNITTESTS_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src")
+
+configure_file("${CMAKE_CURRENT_SOURCE_DIR}/unittests_config.h.in" "${CMAKE_BINARY_DIR}/test/unittests_config.h")

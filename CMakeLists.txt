@@ -24,7 +24,7 @@ add_subdirectory(lib)  # Use your pass name here.
 configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
 
 ### TESTING ###
-option(DOWNLOAD_GTEST ON)
+option(DOWNLOAD_GTEST "automatically download gtest" ON)
 
 include(CTest)
 enable_testing() 
