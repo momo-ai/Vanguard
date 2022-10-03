@@ -21,6 +21,60 @@ set(CMAKE_CXX_STANDARD_REQUIRED on)
 set(CMAKE_CXX_VISIBILITY_PRESET hidden)
 set(CMAKE_VISIBILITY_INLINES_HIDDEN on)
 
+### Setting Up SVF ###
+set(SVF_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SVF")
+
+if(CMAKE_BUILD_TYPE MATCHES "Debug")
+    MESSAGE (STATUS "building SVF in debug mode")
+    if (EXISTS "${SVF_DIR}/Debug-build")
+        set(SVF_LIB "${SVF_DIR}/Debug-build/lib/libSvf.a")
+    else()
+        set(SVF_LIB "${SVF_DIR}/Release-build/lib/libSvf.a")
+    endif()
+else()
+    MESSAGE (STATUS "building SVF in release mode")
+    set(SVF_LIB "${SVF_DIR}/Release-build/lib/libSvf.a")
+endif()
+set(SVF_HEADER "${SVF_DIR}/include")
+include_directories("${SVF_HEADER}")
+MESSAGE("${SVF_HEADER}")
+
+## We don't need this now, leaving it here as we might need it in the future.
+##set z3 env
+#if (DEFINED Z3_DIR)
+#    set(ENV{Z3_DIR} "${Z3_DIR}")
+#endif()
+#if(CMAKE_BUILD_TYPE MATCHES "Debug")
+#    if(EXISTS "${Z3_DIR}/src")
+#        find_package(Z3 REQUIRED CONFIG)
+#        include_directories(${Z3_CXX_INCLUDE_DIRS})
+#    else()
+#        find_library(Z3_LIBRARIES NAMES libz3.a libz3.so
+#                HINTS $ENV{Z3_DIR}
+#                PATH_SUFFIXES bin)
+#        find_path(Z3_INCLUDES NAMES z3++.h
+#                HINTS $ENV{Z3_DIR}
+#                PATH_SUFFIXES include z3)
+#        if(NOT Z3_LIBRARIES OR NOT Z3_INCLUDES)
+#            message(FATAL_ERROR "Z3 not found!")
+#        endif()
+#        include_directories(${Z3_INCLUDES})
+#        LINK_DIRECTORIES(${Z3_DIR}/bin)
+#    endif()
+#else()
+#    find_library(Z3_LIBRARIES NAMES libz3.a libz3.so
+#            HINTS $ENV{Z3_DIR}
+#            PATH_SUFFIXES bin)
+#    find_path(Z3_INCLUDES NAMES z3++.h
+#            HINTS $ENV{Z3_DIR}
+#            PATH_SUFFIXES include z3)
+#    if(NOT Z3_LIBRARIES OR NOT Z3_INCLUDES)
+#        message(FATAL_ERROR "Z3 not found!")
+#    endif()
+#    include_directories(${Z3_INCLUDES})
+#    LINK_DIRECTORIES(${Z3_DIR}/bin)
+#endif()
+
 add_subdirectory(lib)  # Use your pass name here.
 # TODO Here: define a bunch of variables in CMAKE that can be used as string substitutes into configure file
 # Pass them in as options in CMake, try to set up variables
