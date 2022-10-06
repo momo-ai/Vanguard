@@ -23,6 +23,10 @@
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Analysis/AliasAnalysis.h>
 #include <llvm/Demangle/Demangle.h>
+
+#include <SVF-FE/LLVMUtil.h>
+#include <Util/Options.h>
+
 #include "program/Base.h"
 #include "detectors/DetectorRegistry.h"
 #include "program/Factory.h"
@@ -111,8 +115,28 @@ void initializeLLVM(int argc, char **argv) {
     llvm::cl::ParseCommandLineOptions(argc, argv, "Vanguard Static Analyzer\n");
 }
 
+void initializeSVF(int argc, char **argv) {
+    int arg_num = 0;
+    char **arg_value = new char*[argc];
+    std::vector<std::string> moduleNameVec;
+    SVF::LLVMUtil::processArguments(argc, argv, arg_num, arg_value, moduleNameVec);
+
+    // Hack to avoid the const-ness of Options in SVF.
+    // We could pass additional arguments in the processArguments above, but this one is a bit cleaner.
+    *const_cast<llvm::cl::opt<bool>*>(&SVF::Options::PStat) = false;
+
+    // Pass all modules to the set. Unfortunately, it seems that SVF only supports a single set per run.
+    // I am not sure if we can have more control over this.
+    SVF::SVFModule* svfModule = SVF::LLVMModuleSet::getLLVMModuleSet()->buildSVFModule(moduleNameVec);
+    svfModule->buildSymbolTableInfo();
+
+    // No need for this
+    delete[] arg_value;
+}
+
 int main(int argc, char **argv) {
     initializeLLVM(argc, argv);
+    initializeSVF(argc, argv);
 
     llvm::LoopAnalysisManager LAM;
     llvm::FunctionAnalysisManager FAM;
