@@ -27,46 +27,6 @@ namespace analysis {
         return s;
     }
 
-    // TODO: refine/fix this.
-    // Does not consider any aliasing and over-approximates method calls.
-    // I believe the cleanest way to make this more precise is to use MemorySSA
-    // and augment the worklist with the memory defs.
-    static bool dependsOnValue(const llvm::Value *srcVal, const llvm::Value *destVal) {
-        std::set<const llvm::Use*> visited;
-
-        // TODO: switch to SmallVector
-        std::vector<const llvm::Value*> toVisit;
-
-        toVisit.push_back(srcVal);
-
-        while (!toVisit.empty()) {
-            auto currVal = toVisit.front();
-
-            if (currVal == destVal)
-                return true;
-
-            if (auto user = llvm::dyn_cast<llvm::User>(currVal)) {
-                for (auto &use: user->operands()) {
-                    auto useAsVal = llvm::dyn_cast<llvm::Value>(&use);
-                    if (useAsVal && useAsVal == destVal)
-                        return true;
-
-                    if (visited.find(&use) != visited.end())
-                        continue;
-
-                    visited.insert(&use);
-
-                    if (auto useAsUser = llvm::dyn_cast<llvm::User>(&use))
-                        toVisit.push_back(useAsUser);
-                }
-            }
-
-            toVisit.erase(toVisit.begin());
-        }
-
-        return false;
-    }
-
     static void createMetadataSlot(llvm::Module const * mod, llvm::MDNode *n, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
 
         auto &meta = mdMap[(llvm::MDNode::MetadataKind)n->getMetadataID()];
@@ -174,18 +134,6 @@ namespace analysis {
             return nullptr;
         }
 
-        static bool readsMemFrom(const typename Domain::Instruction *instr, const typename Domain::Value *obj) {
-            if (auto src = isMemRead(instr))
-                return dependsOnValue(src, obj->unwrap());
-            return false;
-        }
-
-        static bool writesMemTo(const typename Domain::Instruction *instr, const typename Domain::Value *obj) {
-            if (auto dest = isMemWrite(instr))
-                return dependsOnValue(dest, obj->unwrap());
-            return false;
-        }
-
         static const llvm::Value* isMemRead(const typename Domain::Instruction *inst) {
             const auto llvmIns = inst->unwrap();
 
@@ -235,23 +183,6 @@ namespace analysis {
             auto llvmI1 = i1->unwrap(), llvmI2 = i2->unwrap();
             if (i1->block() == i2->block()) return domTree->dominates(llvmI1, llvmI2);
             else return domTree->dominates(llvmI1->getParent(), llvmI2->getParent());
-        }
-
-        static bool returnDependsOnVal(const typename Domain::Function *fun, const typename Domain::Value *val) {
-            auto llvmFun = fun->unwrap();
-
-            llvm::SmallVector<const llvm::Value*> rvs;
-            for (auto &bb : *llvmFun)
-                for (auto &inst : bb)
-                    if (auto retInst = llvm::dyn_cast<llvm::ReturnInst>(&inst))
-                        if (auto retVal = retInst->getReturnValue())
-                            rvs.push_back(retVal);
-
-            return llvm::any_of(rvs, [&val](const llvm::Value *retVal) -> bool {return dependsOnValue(retVal, val->unwrap()); });
-        }
-
-        static bool valueDependsOn(const typename Domain::Value *src, const typename Domain::Instruction *instr) {
-            return dependsOnValue(src->unwrap(), &instr->unwrap());
         }
 
         static LocationInfo getLocInfo(const typename Domain::Instruction *instr) {

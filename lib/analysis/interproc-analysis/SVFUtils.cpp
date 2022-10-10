@@ -8,8 +8,10 @@ SVF::SVFModule * analysis::SVFUtils::svfModule = nullptr;
 
 SVF::SVFIR * analysis::SVFUtils::pag = nullptr;
 
-SVF::PointerAnalysis * analysis::SVFUtils::pa = nullptr;
+SVF::BVDataPTAImpl * analysis::SVFUtils::pa = nullptr;
 
 SVF::PTACallGraph * analysis::SVFUtils::callgraph = nullptr;
 
-SVF::VFG * analysis::SVFUtils::vfg = nullptr;
+SVF::SVFG * analysis::SVFUtils::svfg = nullptr;
+
+std::map<const llvm::Value*, std::set<const SVF::VFGNode*>> analysis::SVFUtils::cachedDeps;

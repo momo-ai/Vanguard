@@ -10,7 +10,8 @@
 #include <domain/libBlockchain/BlockchainModel.h>
 #include <detectors/UniverseDetector.h>
 #include <domain/libBlockchain/rust/near/NearModel.h>
-#include <analysis/llvm-utils/LLVMUtils.h>
+#include <analysis/ir-utils/LLVMUtils.h>
+#include <analysis/interproc-analysis/SVFUtils.h>
 
 namespace vanguard {
 
@@ -31,32 +32,34 @@ namespace vanguard {
         }
 
         void process(Function *fun) {
+            std::map<const typename Domain::Value*, Function*> pubCallbackPromises;
             for (auto instr : fun->instructions()) {
                 if (auto callBack = isCallbackCall(instr)) {
-                    if (callBack->visibility() == Visibility::PRIVATE)
-                        continue;
+                    if (callBack->visibility() == Visibility::PRIVATE) continue;
 
-                    llvm::SmallVector<Block *> doms;
-                    auto currBB = instr->block();
-                    analysis::LLVMUtils<Domain>::getPostDominatedBlocks(currBB, doms);
+                    auto args = dynamic_cast<CallIns<Domain>*>(instr)->args();
+                    pubCallbackPromises[args.front()] = callBack;
+                }
+            }
 
-                    for (auto postDom : doms) {
-                        for (auto postInstr : postDom->instructions()) {
-                            // Skip instructions prior to the callback.
-                            if (postDom == currBB && analysis::LLVMUtils<Domain>::postDominates(instr, postInstr))
-                                continue;
+            for (auto instr : fun->instructions()) {
+                if (auto call = dynamic_cast<CallIns<Domain>*>(instr)) {
+                    // TODO: handle all APIs that register a callback
 
-                            if (auto postCall = dynamic_cast<CallIns<Domain>*>(postInstr)) {
-                                // TODO: handle all APIs that register a callback
+                    // TODO: maybe create a declared target method
+                    auto trgs = call->targets();
+                    if (std::any_of(trgs.begin(), trgs.end(),  [](auto trg) -> bool {
+                        return NearModel<Domain>::demangleRustName(*trg) == "near_sdk::promise::Promise::then";
+                    }))
+                    {
+                        auto args = call->args();
+                        auto secondPromise = args.back();
 
-                                // TODO: maybe create a declared target method
-                                auto trgs = postCall->targets();
-                                if (std::any_of(trgs.begin(), trgs.end(),  [](auto trg) -> bool {
-                                    return NearModel<Domain>::demangleRustName(*trg) == "near_sdk::promise::Promise::then";
-                                }))
-                                {
-                                    publicCallbacks.insert(callBack);
-                                }
+                        // Check if any dependency of the second future passed to method then, is public callback.
+                        for (auto dep : analysis::InterProceduralAnalyses<Domain>::getMemDeps(secondPromise)) {
+                            if (pubCallbackPromises.find(dep) != pubCallbackPromises.end()) {
+                                publicCallbacks.insert(pubCallbackPromises[dep]);
+                                break;
                             }
                         }
                     }

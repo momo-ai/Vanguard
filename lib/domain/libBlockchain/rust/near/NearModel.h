@@ -5,7 +5,8 @@
 #ifndef VANGUARD_NEARMODEL_H
 #define VANGUARD_NEARMODEL_H
 
-#include <analysis/llvm-utils/LLVMUtils.h>
+#include <analysis/ir-utils/LLVMUtils.h>
+#include <analysis/interproc-analysis/InterProceduralAnalyses.h>
 #include "../../BlockchainModel.h"
 #include "program/TypeClass.h"
 
@@ -47,7 +48,7 @@ namespace vanguard {
             assert(("Could not find self argument" && selfVal != nullptr));
             assert(("Invalid pointer type" && dynamic_cast<PointerType<Domain> *>(selfVal->type())));
 
-            return analysis::LLVMUtils<Domain>::writesMemTo(&ins, selfVal);
+            return analysis::InterProceduralAnalyses<Domain>::writesMemTo(&ins, selfVal);
         }
 
         bool readsStorage(typename Domain::Instruction &ins) const override {
@@ -61,7 +62,7 @@ namespace vanguard {
             assert(("Could not find self argument" && selfVal != nullptr));
             assert(("Invalid pointer type" && dynamic_cast<PointerType<Domain> *>(selfVal->type())));
 
-            return analysis::LLVMUtils<Domain>::readsMemFrom(&ins, selfVal);
+            return analysis::InterProceduralAnalyses<Domain>::readsMemFrom(&ins, selfVal);
         }
 
         CallResolver<Domain> *callResolver() const override {

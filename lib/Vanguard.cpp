@@ -115,7 +115,7 @@ void initializeLLVM(int argc, char **argv) {
     llvm::cl::ParseCommandLineOptions(argc, argv, "Vanguard Static Analyzer\n");
 }
 
-void initializeSVF(int argc, char **argv) {
+void initializeSVF(int argc, char **argv, std::unordered_map<llvm::Module *, std::string> &filenames, std::vector<llvm::Module*> &modules) {
     int arg_num = 0;
     char **arg_value = new char*[argc];
     std::vector<std::string> moduleNameVec;
@@ -127,16 +127,27 @@ void initializeSVF(int argc, char **argv) {
 
     // Pass all modules to the set. Unfortunately, it seems that SVF only supports a single set per run.
     // I am not sure if we can have more control over this.
-    SVF::SVFModule* svfModule = SVF::LLVMModuleSet::getLLVMModuleSet()->buildSVFModule(moduleNameVec);
-    svfModule->buildSymbolTableInfo();
+    SVF::LLVMModuleSet *modSet = SVF::LLVMModuleSet::getLLVMModuleSet();
+    SVF::SVFModule* svfModule = modSet->buildSVFModule(moduleNameVec);
+
+    for (int i = 0; i < modSet->getModuleNum(); i++) {
+        auto llvmMod = modSet->getModule(i);
+        modules.push_back(llvmMod);
+        filenames[llvmMod] = llvmMod->getModuleIdentifier();
+    }
 
     // No need for this
     delete[] arg_value;
 }
 
 int main(int argc, char **argv) {
+    std::unordered_map<llvm::Module *, std::string> filenames;
+    std::vector<llvm::Module *> modules;
+
     initializeLLVM(argc, argv);
-    initializeSVF(argc, argv);
+
+    // TODO: If any detector does not need SVF info, prevent SVF from running
+    initializeSVF(argc, argv, filenames, modules);
 
     llvm::LoopAnalysisManager LAM;
     llvm::FunctionAnalysisManager FAM;
@@ -195,23 +206,12 @@ int main(int argc, char **argv) {
 
     ctxt.setDiscardValueNames(false);
 
-    auto setDataLayout = [](llvm::StringRef) -> llvm::Optional<std::string> {
-        return llvm::None;
-    };
-
-    std::unordered_map<llvm::Module *, std::string> filenames;
-    std::vector<std::unique_ptr<llvm::Module>> modules;
-    for (auto inFile: inputFiles) {
-        auto module = parseIRFile(inFile, Err, ctxt, setDataLayout);
-        if (!module) {
-            Err.print(argv[0], llvm::errs());
-            return 1;
-        }
-
-        filenames[module.get()] = inFile;
-        modules.push_back(move(module));
-        MPM.run(*module, MAM);
+    for (auto mod : modules) {
+        MPM.run(*mod, MAM);
     }
+
+    // Just to be safe, build the SVF symbol table *after* all passes in MPM.
+    SVF::LLVMModuleSet::getLLVMModuleSet()->getSVFModule()->buildSymbolTableInfo();
 
     vanguard::DetectorRegistry &detectorRegistry = vanguard::DetectorRegistry::getInstance();
 
@@ -224,7 +224,7 @@ int main(int argc, char **argv) {
         std::vector<vanguard::LLVMDomain::CompilationUnit *> units;
         units.reserve(modules.size());
         for(auto &mod : modules) {
-            units.push_back(factory.createUnit(modules.back().get()));
+            units.push_back(factory.createUnit(modules.back()));
         }
         vanguard::LLVMDomain::Universe universe(units);
         runDetectors<vanguard::LLVMDomain>(MAM, FAM, detectorRegistry, detectorNames, universe);
@@ -234,9 +234,9 @@ int main(int argc, char **argv) {
         std::vector<vanguard::BlockchainDomain::CompilationUnit *> units;
         units.reserve(modules.size());
         for(auto &mod : modules) {
-            std::string filename = filenames[mod.get()];
+            std::string filename = filenames[mod];
             std::string summary = filename.substr(0, filename.length() - 2) + "json";
-            units.push_back(factory.createBlkUnit(modules.back().get(), summary));
+            units.push_back(factory.createBlkUnit(modules.back(), summary));
         }
         vanguard::BlockchainDomain::Universe universe(units);
         runDetectors<vanguard::BlockchainDomain>(MAM, FAM, detectorRegistry, detectorNames, universe);
