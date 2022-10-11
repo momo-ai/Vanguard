@@ -34,7 +34,10 @@ namespace vanguard {
                 }
 
                 for(auto var : blockchainFn.params()) {
-                    ss << getTypeString(var->type()) << ".*";
+                  ss << ".*";
+
+                  // FIXME: llvm value is null at this point
+                  // ss << getTypeString(var->type()) << ".*";
                 }
 
                 for(auto &modifier : blockchainFn.modifiers()) {
