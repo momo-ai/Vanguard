@@ -18,7 +18,7 @@
       in {
 
     packages = flake-utils.lib.flattenTree {
-      inherit (pkgs) libVanguard solc-typed-ast;
+      inherit (pkgs) libVanguard solc-typed-ast svf z3-cmake;
 
       default = pkgs.libVanguard;
 
@@ -88,7 +88,10 @@
         inherit (final) lib nodejs;
       };
 
-      rust-preprocessor = final.callPackage ./rust-preprocessor.nix {}; 
+      rust-preprocessor = final.callPackage ./rust-preprocessor.nix {};
+
+      svf = with final; callPackage ./nix/svf/default.nix {};
+      z3-cmake = with final; callPackage ./nix/z3-cmake.nix {};
     };
   };
 }
