@@ -14,9 +14,9 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 message(${LLVM_LIBRARY_DIRS})
-if (${LLVM_VERSION_MAJOR} VERSION_GREATER_EQUAL 10)
-  set(CMAKE_CXX_STANDARD 14)
-endif ()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
 
 add_subdirectory(lib)  # Use your pass name here.
 # TODO Here: define a bunch of variables in CMAKE that can be used as string substitutes into configure file
