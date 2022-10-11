@@ -54,6 +54,24 @@
           pkgs.nodePackages.npm
           pkgs.nodePackages.typescript
         ];
+        nativeBuildInputs = (attrs.nativeBuildInputs or []) ++ [
+          # clang-format, clang-tidy
+          pkgs.clang-tools
+
+          # git-clang-format
+          pkgs.llvmPackages_latest.libclang.python
+        ];
+
+        cmakeBuildType = "Debug";
+        cmakeFlags = ["-DCMAKE_EXPORT_COMPILE_COMMANDS=on"];
+
+        shellHook = ''
+          # Fix CMAKE_COMPILE_COMMANDS
+          export CXXFLAGS="$NIX_CFLAGS_COMPILE"
+
+          # Add Vanguard binaries to PATH
+          export PATH="$PWD"/build/lib:"$PATH"
+        '';
       });
     };
   }) // {
