@@ -2,6 +2,7 @@
 // Created by Jon Stephens on 8/19/22.
 //
 
+#include <llvm/ADT/STLExtras.h>
 #include <llvm/IR/LLVMContext.h>
 #include <llvm/Support/InitLLVM.h>
 #include <llvm/Support/CommandLine.h>
@@ -19,6 +20,7 @@
 #include <llvm/MC/MCTargetOptions.h>
 #include <llvm/Passes/StandardInstrumentations.h>
 #include <llvm/Support/TargetRegistry.h>
+#include <llvm/Support/FileSystem.h>
 #include <llvm/CodeGen/CommandFlags.h>
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Analysis/AliasAnalysis.h>
@@ -26,6 +28,7 @@
 #include "program/Base.h"
 #include "detectors/DetectorRegistry.h"
 #include "program/Factory.h"
+#include <llvm/Support/FormatVariadic.h>
 //#include "domain/libBlockchain/BlockchainFactory.h"
 //#include "domain/libBlockchain/Blockchain.h"
 
@@ -211,9 +214,23 @@ int main(int argc, char **argv) {
         units.reserve(modules.size());
         for(auto &mod : modules) {
             std::string filename = filenames[mod.get()];
-            std::string summary = filename.substr(0, filename.length() - 2) + "json";
+
+            // summary file is filename with the extension replaced with .json
+            std::string summary = filename;
+            if (auto dotIdx = summary.rfind("."); dotIdx != std::string::npos) {
+                summary.replace(dotIdx, std::string::npos, ".json");
+            }
+
+            if (!llvm::sys::fs::exists(summary)) {
+                llvm::WithColor::error()
+                    << "the summary file " << summary << " does not exist!\n";
+                return EXIT_FAILURE;
+            }
+
+            llvm::dbgs() << "Read summary from: " << summary << "\n";
             units.push_back(factory.createBlkUnit(modules.back().get(), summary));
         }
+
         vanguard::BlockchainDomain::Universe universe(units);
         runDetectors<vanguard::BlockchainDomain>(MAM, FAM, detectorRegistry, detectorNames, universe);
     }
