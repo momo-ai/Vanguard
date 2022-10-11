@@ -18,15 +18,16 @@ can be compiled to LLVM.
 To run Vanguard on a smart contract, you can simply run the following command:
 
 ```bash
-python3 run.py --src_path=<PATH_TO_SMART_CONTRACT> --detector=<NAME_OF_DETECTOR>
+python3 vanguard_driver.py --src_path=<PATH_TO_SMART_CONTRACT> --detector=<NAME_OF_DETECTOR>
 ```
 
-where `<PATH_TO_SMART_CONTRACT>` is the path to the contract to be analyzed, and `<NAME_OF_DETECTOR>` is the name 
-of the detector to be run (e.g., `reentrancy`). To run all available detectors on the contract, use the detector name `all`.
+where `<PATH_TO_SMART_CONTRACT>` is the path to the contract to be analyzed, and
+`<NAME_OF_DETECTOR>` is the name of the detector to be run (e.g., `reentrancy`).
+To run all available detectors on the contract, use the detector name `all`.
 
 As an example, running this command:
 ```bash
-python3 run.py --src_path test/PuppetPool.sol --detector statGen
+python3 vanguard_driver.py --src_path test/PuppetPool.sol --detector statGen
 ```
 should produce the following result:
 ```bash
@@ -43,6 +44,16 @@ Statistics:
 # Basic Blocks: 462
 # Instructions: 3316
 ```
+
+If you need to debug the output of the driver application, you can add the `-o
+<PATH_TO_DIR>` argument to have the driver script dump all of the intermediate
+files in the provided directory. By default, the output dir will be set to a
+temporary file that will be deleted when the driver script exits.
+
+If the output directory is specified, the driver script will not delete the
+output directory by default so that it can cache the intermediate outputs. For
+convenience, the `--clean` argument can be used to delete the output directory
+before running through the pipeline.
 
 ### Vanguard (for running on compiled LLVM bytecode)
 
@@ -61,6 +72,22 @@ and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor).
 Finally, `<LLVM_Bytecode_Files>` is the path to one or more `.bc` file to be analyzed.
 
 ## How to Install
+
+There are three methods that you can use: Nix (preferred), Docker, and build from source.
+
+### Nix
+
+This repository contains a Nix flake that sets up the environment. However,
+because submodules are used, you must add a flag to Nix to build correctly.
+
+To build, use `nix build '.?submodules=1#vanguard`.
+
+To launch a developer shell, use `nix develop '.?submodules=1'`. Once you are in
+the developer shell, you can run the following commands:
+* Generate CMake configuration: `phases=configurePhase genericBuild`
+* Maintain the driver script
+  * Run mypy: `mypy vanguard_driver.py`
+  * Format the driver script: `black vanguard_driver.py && isort --profile black vanguard_driver.py`
 
 ### Docker
 

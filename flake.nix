@@ -50,9 +50,9 @@
 
       default = pkgs.libVanguard.overrideAttrs (attrs: {
         buildInputs = attrs.buildInputs ++ [
-          pkgs.nodejs
-          pkgs.nodePackages.npm
-          pkgs.nodePackages.typescript
+          pkgs.solidity-preprocessor
+          pkgs.solang
+          pkgs.python3Packages.venvShellHook
         ];
         nativeBuildInputs = (attrs.nativeBuildInputs or []) ++ [
           # clang-format, clang-tidy
@@ -64,6 +64,15 @@
 
         cmakeBuildType = "Debug";
         cmakeFlags = ["-DCMAKE_EXPORT_COMPILE_COMMANDS=on"];
+
+        venvDir = "./.venv";
+        postVenvCreation = ''
+          pip3 install --upgrade pip
+          # TODO: create a pyproject.toml
+          pip3 install 'tabulate==0.9.0'
+          # developer stuff
+          pip3 install mypy black isort 'python-lsp-server[all]' pytest
+        '';
 
         shellHook = ''
           # Fix CMAKE_COMPILE_COMMANDS
