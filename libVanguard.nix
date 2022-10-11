@@ -14,12 +14,17 @@ stdenv.mkDerivation {
         name = "libVanguard-source";
         path = ./.;
       };
+      isTopLevelDir = path: type: name:
+        (type == "directory" &&
+         lib.strings.removePrefix (toString (src0 + "/")) (toString path) == name);
     in
     lib.cleanSourceWith {
       filter = path: type: !(lib.lists.any (x: x) [
         (lib.strings.hasSuffix ".nix" (toString path))
         (type == "regular" && baseNameOf path == "flake.lock")
-        (type == "directory" && lib.strings.removePrefix (toString (src0 + "/")) (toString path) == "deps")
+        (isTopLevelDir path type "deps")
+        (isTopLevelDir path type ".github")
+        (isTopLevelDir path type "nix")
       ]);
       src = src0;
     };

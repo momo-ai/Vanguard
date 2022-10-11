@@ -21,14 +21,16 @@ jobs:
           authToken: '${{ secrets.CACHIX_AUTH_TOKEN }}'
       - name: Build dependencies
         run: |
-          nix build '.?submodules=1#svf'
+          nix build --print-build-logs '.?submodules=1#svf'
       - name: Build libVanguard component
         run: |
-          nix build --print-build-logs .#libVanguard
+          nix build --print-build-logs '.?submodules=1#libVanguard'
           echo "Done."
       - name: Build preprocessor components
         run: |
-          nix build .#rust-preprocessor '.?submodules=1#solidity-preprocessor'
+          nix build --print-build-logs \
+              '.?submodules=1#rust-preprocessor' \
+              '.?submodules=1#solidity-preprocessor'
       # - name: Test IR Validator
       #   run: |
       #     python3 run.py --src_path test/PuppetPool.sol  --detector irValidator
