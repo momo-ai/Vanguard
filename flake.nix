@@ -65,6 +65,10 @@
         cmakeBuildType = "Debug";
         cmakeFlags = ["-DCMAKE_EXPORT_COMPILE_COMMANDS=on"];
 
+        # Don't inject security hardening & optimization flags for the debug build.
+        # See: https://github.com/NixOS/nixpkgs/issues/18995
+        hardeningDisable = ["all"];
+
         venvDir = "./.venv";
         postVenvCreation = ''
           pip3 install --upgrade pip

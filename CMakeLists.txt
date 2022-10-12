@@ -18,6 +18,9 @@ message(${LLVM_LIBRARY_DIRS})
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
 
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN on)
+
 add_subdirectory(lib)  # Use your pass name here.
 # TODO Here: define a bunch of variables in CMAKE that can be used as string substitutes into configure file
 # Pass them in as options in CMake, try to set up variables
