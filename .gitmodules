@@ -4,6 +4,3 @@
 [submodule "deps/RustPreprocessor"]
 	path = deps/RustPreprocessor
 	url = https://github.com/Veridise/RustPreprocessor.git
-[submodule "SVF"]
-	path = SVF
-	url = git@github.com:SVF-tools/SVF.git
