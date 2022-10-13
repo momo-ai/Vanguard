@@ -1,0 +1,120 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 0e576588..ecd234d0 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -1,7 +1,8 @@
+ cmake_minimum_required(VERSION 3.13.4)
+ 
+-project("SVF")
++project(SVF VERSION 2.5)
+ 
++include(GNUInstallDirs)
+ 
+ configure_file(${CMAKE_CURRENT_SOURCE_DIR}/config.in ${CMAKE_CURRENT_SOURCE_DIR}/include/Util/config.h @ONLY)
+ 
+@@ -31,7 +32,7 @@ if(NOT COMMAND add_llvm_library)
+         endif()
+ 
+         find_package(LLVM REQUIRED CONFIG)
+-        
++
+         list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+         include(AddLLVM)
+ 
+@@ -72,10 +73,38 @@ endif()
+ add_subdirectory(lib)
+ add_subdirectory(tools)
+ 
+-INSTALL(
++## Install targets
++
++include(CMakePackageConfigHelpers)
++
++install(
+     DIRECTORY ${CMAKE_CURRENT_SOURCE_DIR}/include/
+     COMPONENT devel
+-    DESTINATION include/svf
++    DESTINATION "${CMAKE_INSTALL_INCLUDEDIR}/svf"
+     FILES_MATCHING
+     PATTERN "**/*.h"
+     )
++
++export(EXPORT SVFTargets
++    FILE "${CMAKE_CURRENT_BINARY_DIR}/SVFTargets.cmake"
++    NAMESPACE SVF::
++)
++install(EXPORT SVFTargets
++    NAMESPACE SVF::
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVF"
++)
++write_basic_package_version_file(
++    "${CMAKE_CURRENT_BINARY_DIR}/SVFConfigVersion.cmake"
++    VERSION "${PROJECT_VERSION}"
++    COMPATIBILITY SameMinorVersion
++)
++configure_package_config_file(
++    "${CMAKE_CURRENT_SOURCE_DIR}/SVFConfig.cmake.in"
++    "${CMAKE_CURRENT_BINARY_DIR}/SVFConfig.cmake"
++    INSTALL_DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVF"
++)
++install(FILES
++    "${CMAKE_CURRENT_BINARY_DIR}/SVFConfigVersion.cmake"
++    "${CMAKE_CURRENT_BINARY_DIR}/SVFConfig.cmake"
++    DESTINATION "${CMAKE_INSTALL_LIBDIR}/cmake/SVF"
++)
+diff --git a/SVFConfig.cmake.in b/SVFConfig.cmake.in
+new file mode 100644
+index 00000000..cbbb834d
+--- /dev/null
++++ b/SVFConfig.cmake.in
+@@ -0,0 +1,8 @@
++@PACKAGE_INIT@
++
++include(CMakeFindDependencyMacro)
++find_dependency(LLVM)
++
++include("${CMAKE_CURRENT_LIST_DIR}/SVFTargets.cmake")
++check_required_components(SVFTargets)
++set_and_check(SVF_INCLUDE_DIR "@CMAKE_INSTALL_FULL_INCLUDEDIR@/svf")
+diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
+index bd8c4646..1bb648a9 100644
+--- a/lib/CMakeLists.txt
++++ b/lib/CMakeLists.txt
+@@ -2,7 +2,7 @@ add_subdirectory(CUDD)
+ 
+ # Due to a mutual dependencies, all the sub projects of the SVG are merged here
+ # Otherwise it is impossible to load the dependencies in opt
+-# NOTE: if the SVF should be linked into opt, we should probably use the individual sub projects here, rather than the combined project 
++# NOTE: if the SVF should be linked into opt, we should probably use the individual sub projects here, rather than the combined project
+ 
+ if (LLVM_LINK_LLVM_DYLIB)
+     set(llvm_libs LLVM)
+@@ -25,6 +25,11 @@ file (GLOB SOURCES
+ )
+ 
+ add_llvm_library(Svf STATIC ${SOURCES} LINK_LIBS Cudd ${Z3_LIBRARIES})
++install(TARGETS Svf
++    EXPORT SVFTargets
++    LIBRARY
++    ARCHIVE
++)
+ 
+ link_directories(${CMAKE_BINARY_DIR}/lib/Cudd)
+ 
+diff --git a/lib/CUDD/CMakeLists.txt b/lib/CUDD/CMakeLists.txt
+index 35e152ba..2a625d58 100644
+--- a/lib/CUDD/CMakeLists.txt
++++ b/lib/CUDD/CMakeLists.txt
+@@ -7,7 +7,11 @@ set(SOURCES
+ )
+ 
+ add_llvm_library(Cudd ${SOURCES} LINK_LIBS m)
+-
++install(TARGETS Cudd
++    EXPORT SVFTargets
++    LIBRARY
++    ARCHIVE
++)
+ 
+ set_target_properties(Cudd PROPERTIES COMPILE_FLAGS "-Wno-all -Wno-extra -Wno-format -Wno-int-to-pointer-cast -Wno-pointer-to-int-cast -DHAVE_IEEE_754 -DSIZEOF_VOID_P=8 -DSIZEOF_LONG=8")
+ 

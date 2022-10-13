@@ -1,5 +1,6 @@
 { stdenv, cmake, ninja,
-  llvmPackages_13, lib, nodePackages, solang, python3, git, gtest
+  llvmPackages_13, lib, python3, git, gtest,
+  svf
 }:
 
 let
@@ -34,6 +35,7 @@ stdenv.mkDerivation {
 
   buildInputs = [
     libllvm
+    svf
   ];
 
   postInstall = ''
