@@ -10,10 +10,9 @@ else ()
 endif()
 
 find_package(LLVM 13 REQUIRED CONFIG)
-add_definitions(${LLVM_DEFINITIONS})
+separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
+add_definitions(${LLVM_DEFINITIONS_LIST})
 include_directories(${LLVM_INCLUDE_DIRS})
-link_directories(${LLVM_LIBRARY_DIRS})
-message(${LLVM_LIBRARY_DIRS})
 
 find_package(SVF 2.5 REQUIRED CONFIG)
 include_directories(${SVF_INCLUDE_DIR})

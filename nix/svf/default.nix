@@ -25,6 +25,9 @@ stdenv.mkDerivation {
 
     # Export CMake configuration
     ./cmake-export.patch
+
+    # Hardcode paths in extapi
+    ./extapi-path.patch
   ];
 
   buildInputs = [

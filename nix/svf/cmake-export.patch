@@ -77,7 +77,7 @@ index 00000000..cbbb834d
 +check_required_components(SVFTargets)
 +set_and_check(SVF_INCLUDE_DIR "@CMAKE_INSTALL_FULL_INCLUDEDIR@/svf")
 diff --git a/lib/CMakeLists.txt b/lib/CMakeLists.txt
-index bd8c4646..1bb648a9 100644
+index bd8c4646..e70fe925 100644
 --- a/lib/CMakeLists.txt
 +++ b/lib/CMakeLists.txt
 @@ -2,7 +2,7 @@ add_subdirectory(CUDD)
@@ -89,27 +89,35 @@ index bd8c4646..1bb648a9 100644
  
  if (LLVM_LINK_LLVM_DYLIB)
      set(llvm_libs LLVM)
-@@ -25,6 +25,11 @@ file (GLOB SOURCES
+@@ -24,9 +24,13 @@ file (GLOB SOURCES
+         FastCluster/*.cpp
  )
  
- add_llvm_library(Svf STATIC ${SOURCES} LINK_LIBS Cudd ${Z3_LIBRARIES})
+-add_llvm_library(Svf STATIC ${SOURCES} LINK_LIBS Cudd ${Z3_LIBRARIES})
+-
+-link_directories(${CMAKE_BINARY_DIR}/lib/Cudd)
++add_library(Svf ${SOURCES})
++target_link_libraries(Svf PUBLIC Cudd ${Z3_LIBRARIES})
 +install(TARGETS Svf
 +    EXPORT SVFTargets
 +    LIBRARY
 +    ARCHIVE
 +)
  
- link_directories(${CMAKE_BINARY_DIR}/lib/Cudd)
  
+ if(DEFINED IN_SOURCE_BUILD)
 diff --git a/lib/CUDD/CMakeLists.txt b/lib/CUDD/CMakeLists.txt
-index 35e152ba..2a625d58 100644
+index 35e152ba..f31c5fe7 100644
 --- a/lib/CUDD/CMakeLists.txt
 +++ b/lib/CUDD/CMakeLists.txt
-@@ -7,7 +7,11 @@ set(SOURCES
+@@ -6,8 +6,13 @@ set(SOURCES
+ 	cuddInt.c
  )
  
- add_llvm_library(Cudd ${SOURCES} LINK_LIBS m)
+-add_llvm_library(Cudd ${SOURCES} LINK_LIBS m)
 -
++add_library(Cudd ${SOURCES})
++target_link_libraries(Cudd PUBLIC m)
 +install(TARGETS Cudd
 +    EXPORT SVFTargets
 +    LIBRARY
