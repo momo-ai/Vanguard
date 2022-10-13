@@ -14,9 +14,12 @@ add_definitions(${LLVM_DEFINITIONS})
 include_directories(${LLVM_INCLUDE_DIRS})
 link_directories(${LLVM_LIBRARY_DIRS})
 message(${LLVM_LIBRARY_DIRS})
-if (${LLVM_VERSION_MAJOR} VERSION_GREATER_EQUAL 10)
-  set(CMAKE_CXX_STANDARD 14)
-endif ()
+
+set(CMAKE_CXX_STANDARD 17)
+set(CMAKE_CXX_STANDARD_REQUIRED on)
+
+set(CMAKE_CXX_VISIBILITY_PRESET hidden)
+set(CMAKE_VISIBILITY_INLINES_HIDDEN on)
 
 ### Setting Up SVF ###
 set(SVF_DIR "${CMAKE_CURRENT_SOURCE_DIR}/SVF")
@@ -78,7 +81,7 @@ add_subdirectory(lib)  # Use your pass name here.
 configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
 
 ### TESTING ###
-option(DOWNLOAD_GTEST ON)
+option(DOWNLOAD_GTEST "automatically download gtest" ON)
 
 include(CTest)
 enable_testing() 

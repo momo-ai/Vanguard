@@ -28,44 +28,23 @@ void addToRegistry(vanguard::DetectorRegistry *registry) {
 namespace vanguard {
     DetectorRegistry *DetectorRegistry::instance = nullptr;
 
-    template<>
-    UniverseDetector<LLVMDomain> *DetectorRegistry::get(const std::string& name) {
-        if(name == FunctionPrinter<LLVMDomain>::name()) {
-            return new FunctionPrinter<LLVMDomain>();
-        }
-        else if(name == StatGen<LLVMDomain>::name()) {
-            return new StatGen<LLVMDomain>();
-        }
-        else if(name == IRValidator<LLVMDomain>::name()) {
-            return new IRValidator<LLVMDomain>();
-        }
-        /*else if(name == ReentrancyDetector<Domain>::name()) {
-            return new ReentrancyDetector<Domain>();
-        }*/
+    template <>
+    UniverseDetector<LLVMDomain> *
+    DetectorRegistry::get(const std::string &name) {
+        return getGenericDetectors<LLVMDomain>(name);
+    }
 
-        return nullptr;
-    };
-
-    template<>
-    UniverseDetector<BlockchainDomain> *DetectorRegistry::DetectorRegistry::get(const std::string& name) {
-        if(name == FunctionPrinter<BlockchainDomain>::name()) {
-            return new FunctionPrinter<BlockchainDomain>();
-        }
-        else if(name == StatGen<BlockchainDomain>::name()) {
-            return new StatGen<BlockchainDomain>();
-        }
-        else if(name == IRValidator<BlockchainDomain>::name()) {
-            return new IRValidator<BlockchainDomain>();
-        }
-        else if(name == ReentrancyDetector<BlockchainDomain>::name()) {
+    template <>
+    UniverseDetector<BlockchainDomain> *
+    DetectorRegistry::get(const std::string &name) {
+        if (name == PublicCallbacksDetector<BlockchainDomain>::name()) {
+            return new PublicCallbacksDetector<BlockchainDomain>();
+        } else if (name == ReentrancyDetector<BlockchainDomain>::name()) {
             return new ReentrancyDetector<BlockchainDomain>();
         }
-        else if(name == PublicCallbacksDetector<BlockchainDomain>::name()) {
-            return new PublicCallbacksDetector<BlockchainDomain>();
-        }
 
-        return nullptr;
-    };
+        return getGenericDetectors<BlockchainDomain>(name);
+    }
 
     DetectorRegistry &DetectorRegistry::getInstance() {
         if(instance == nullptr) {
@@ -108,4 +87,4 @@ namespace vanguard {
 
         return detectors;
     }
-}
+} // namespace vanguard

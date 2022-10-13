@@ -23,40 +23,40 @@ add_subdirectory(domain)
 add_subdirectory(program)
 
 target_include_directories(Vanguard PUBLIC
-        $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
-        $<INSTALL_INTERFACE:lib>  # <prefix>/include/mylib
-        )
+  $<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>
+  $<INSTALL_INTERFACE:lib>  # <prefix>/include/mylib
+)
 
 set(LLVM_LINK_COMPONENTS
-        LLVM
-        #AllTargetsAsmParsers
-        #AllTargetsCodeGens
-        #AllTargetsDescs
-        #AllTargetsInfos
-        #AggressiveInstCombine
-        LLVMAnalysis
-        LLVMAsmParser
-        LLVMBitWriter
-        LLVMCodeGen
-        LLVMCore
-        LLVMCoroutines
-        LLVMExtensions
-        #IPO
-        LLVMIRReader
-        LLVMInstCombine
-        LLVMInstrumentation
-        LLVMMC
-        LLVMObjCARCOpts
-        LLVMRemarks
-        LLVMScalarOpts
-        LLVMSupport
-        LLVMTarget
-        LLVMTransformUtils
-        LLVMVectorize
-        LLVMPasses
-        )
+  LLVM
+  #AllTargetsAsmParsers
+  #AllTargetsCodeGens
+  #AllTargetsDescs
+  #AllTargetsInfos
+  #AggressiveInstCombine
+  LLVMAnalysis
+  LLVMAsmParser
+  LLVMBitWriter
+  LLVMCodeGen
+  LLVMCore
+  LLVMCoroutines
+  LLVMExtensions
+  #IPO
+  LLVMIRReader
+  LLVMInstCombine
+  LLVMInstrumentation
+  LLVMMC
+  LLVMObjCARCOpts
+  LLVMRemarks
+  LLVMScalarOpts
+  LLVMSupport
+  LLVMTarget
+  LLVMTransformUtils
+  LLVMVectorize
+  LLVMPasses
+)
 
 target_link_libraries(Vanguard PUBLIC
-        ${LLVM_LINK_COMPONENTS}
-        ${SVF_LIB}
-        )
+  ${LLVM_LINK_COMPONENTS}
+  ${SVF_LIB}
+)

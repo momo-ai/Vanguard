@@ -271,8 +271,11 @@ namespace vanguard {
                     modifiers.emplace_back(mVal.GetString());
                 }
             }
-
-            std::string selector = val["selector"].GetString();
+            std::string selector;
+            if (rapidjson::Value::ConstMemberIterator selectorIt = val.FindMember("selector");
+                selectorIt != val.MemberEnd()) {
+              selector = selectorIt->value.GetString();
+            }
 
             auto &factory = Domain::Factory::instance();
             return factory.createBlkFn(module, *model, contractName, name, selector, isConstructor, visibility, mutability, params, returns, modifiers);

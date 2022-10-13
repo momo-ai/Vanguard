@@ -1,0 +1,24 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index 2ce7c56d..479f5760 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -54,18 +54,7 @@ else()
+         set(IN_SOURCE_BUILD 1)
+ endif()
+ 
+-if (DEFINED Z3_DIR)
+-    set(ENV{Z3_DIR} "${Z3_DIR}")
+-endif()
+-find_library(Z3_LIBRARIES NAMES libz3.a
+-                          HINTS $ENV{Z3_DIR}
+-                          PATH_SUFFIXES lib bin)
+-find_path(Z3_INCLUDES NAMES z3++.h
+-                      HINTS $ENV{Z3_DIR}
+-                      PATH_SUFFIXES include z3)
+-if(NOT Z3_LIBRARIES OR NOT Z3_INCLUDES)
+-    message(FATAL_ERROR "Z3 not found!")
+-endif()
++find_package(Z3 REQUIRED CONFIG)
+ message(STATUS "Found Z3: ${Z3_LIBRARIES}")
+ message(STATUS "Z3 include dir: ${Z3_INCLUDES}")
+ 

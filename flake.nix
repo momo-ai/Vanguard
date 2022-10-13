@@ -18,7 +18,7 @@
       in {
 
     packages = flake-utils.lib.flattenTree {
-      inherit (pkgs) libVanguard solc-typed-ast;
+      inherit (pkgs) libVanguard solc-typed-ast svf z3-cmake;
 
       default = pkgs.libVanguard;
 
@@ -50,10 +50,41 @@
 
       default = pkgs.libVanguard.overrideAttrs (attrs: {
         buildInputs = attrs.buildInputs ++ [
-          pkgs.nodejs
-          pkgs.nodePackages.npm
-          pkgs.nodePackages.typescript
+          pkgs.solidity-preprocessor
+          pkgs.solang
+          pkgs.python3Packages.venvShellHook
         ];
+        nativeBuildInputs = (attrs.nativeBuildInputs or []) ++ [
+          # clang-format, clang-tidy
+          pkgs.clang-tools
+
+          # git-clang-format
+          pkgs.llvmPackages_latest.libclang.python
+        ];
+
+        cmakeBuildType = "Debug";
+        cmakeFlags = ["-DCMAKE_EXPORT_COMPILE_COMMANDS=on"];
+
+        # Don't inject security hardening & optimization flags for the debug build.
+        # See: https://github.com/NixOS/nixpkgs/issues/18995
+        hardeningDisable = ["all"];
+
+        venvDir = "./.venv";
+        postVenvCreation = ''
+          pip3 install --upgrade pip
+          # TODO: create a pyproject.toml
+          pip3 install 'tabulate==0.9.0'
+          # developer stuff
+          pip3 install mypy black isort 'python-lsp-server[all]' pytest
+        '';
+
+        shellHook = ''
+          # Fix CMAKE_COMPILE_COMMANDS
+          export CXXFLAGS="$NIX_CFLAGS_COMPILE"
+
+          # Add Vanguard binaries to PATH
+          export PATH="$PWD"/build/lib:"$PATH"
+        '';
       });
     };
   }) // {
@@ -70,7 +101,10 @@
         inherit (final) lib nodejs;
       };
 
-      rust-preprocessor = final.callPackage ./rust-preprocessor.nix {}; 
+      rust-preprocessor = final.callPackage ./rust-preprocessor.nix {};
+
+      svf = with final; callPackage ./nix/svf/default.nix {};
+      z3-cmake = with final; callPackage ./nix/z3-cmake.nix {};
     };
   };
 }

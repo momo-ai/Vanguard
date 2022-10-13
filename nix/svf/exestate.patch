@@ -1,0 +1,12 @@
+diff --git a/lib/Util/ExeState.cpp b/lib/Util/ExeState.cpp
+index e4e3aa78..6c339b7c 100644
+--- a/lib/Util/ExeState.cpp
++++ b/lib/Util/ExeState.cpp
+@@ -28,6 +28,7 @@
+ #include "Util/ExeState.h"
+ #include "MemoryModel/SVFIR.h"
+ #include <iomanip>
++#include <sstream>
+ #include "Util/SVFUtil.h"
+
+ using namespace SVF;

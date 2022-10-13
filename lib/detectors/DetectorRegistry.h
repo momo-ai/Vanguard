@@ -5,17 +5,18 @@
 #ifndef VANGUARD_REGISTRY_H
 #define VANGUARD_REGISTRY_H
 
-#include "program/Base.h"
-#include <unordered_map>
 #include "FunctionPrinter/FunctionPrinter.h"
-#include "Reentrancy/ReentrancyDetector.h"
-#include "NEAR/PublicCallbacks/PublicCallbacksDetector.h"
-#include "StatGen/StatGen.h"
 #include "IRValidator/IRValidator.h"
+#include "NEAR/PublicCallbacks/PublicCallbacksDetector.h"
+#include "Reentrancy/ReentrancyDetector.h"
+#include "StatGen/StatGen.h"
+#include "detectors/UniverseDetector.h"
+#include "program/Base.h"
 #include "program/Factory.h"
 #include <domain/libBlockchain/Blockchain.h>
-#include <domain/libBlockchain/Universe.h>
 #include <domain/libBlockchain/Factory.h>
+#include <domain/libBlockchain/Universe.h>
+#include <unordered_map>
 
 namespace vanguard {
     class BlockchainDomain : public Blockchain<Base<BlockchainDomain>, BlockchainDomain> {
@@ -30,8 +31,24 @@ namespace vanguard {
 
         template<typename Domain>
         UniverseDetector<Domain> *get(const std::string& name) {
+            return getGenericDetectors<Domain>(name);
+        }
+
+        /**
+         * Get detectors that work for all domains.
+         */
+        template <typename Domain>
+        UniverseDetector<Domain> *getGenericDetectors(const std::string &name) {
+            if (name == FunctionPrinter<Domain>::name()) {
+                return new FunctionPrinter<Domain>();
+            } else if (name == StatGen<Domain>::name()) {
+                return new StatGen<Domain>();
+            } else if (name == IRValidator<Domain>::name()) {
+                return new IRValidator<Domain>();
+            }
+
             return nullptr;
-        };
+        }
 
         bool add(const std::string& name, Detector::DetectorDomain domain);
 
@@ -54,7 +71,11 @@ namespace vanguard {
             // add(IRValidator::name(), new IRValidator());
         }
     };
-}
+
+    template <> UniverseDetector<LLVMDomain> *DetectorRegistry::get(const std::string &name);
+    template <>
+    UniverseDetector<BlockchainDomain> *DetectorRegistry::get(const std::string &name);
+} // namespace vanguard
 
 
 
