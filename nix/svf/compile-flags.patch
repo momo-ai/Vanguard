@@ -11,3 +11,4 @@ index 2ce7c56d..aa97c485 100644
 
          if(CMAKE_BUILD_TYPE MATCHES "Debug")
              set(CMAKE_CXX_FLAGS "${CMAKE_CXX_FLAGS} ${COMMON_FLAGS} -O0 -fno-rtti")
+
