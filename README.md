@@ -60,16 +60,17 @@ before running through the pipeline.
 To run a particular detector on a compiled LLVM bytecode file, run the following:
 
 ```bash
-<PATH_TO_VANGUARD>/Vanguard --detectors "<DETECTORS>" --summary <CONTRACT_SUMMARY> [LLVM_Bytecode_Files]
+<PATH_TO_VANGUARD>/Vanguard --detectors "<DETECTORS>" [LLVM_Bytecode_Files]
 ```
 
 where `<PATH_TO_VANGUARD>` is the path to the vanguard executable (so, if running from the Vanguard folder, 
 this should be `build/lib/Vanguard`). `<DETECTORS>` is the list of detectors to run, as a comma separated list. 
-`<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information;
-summaries can be generated for Solidity and Rust contracts using the following tools 
-respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor) 
-and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor). 
-Finally, `<LLVM_Bytecode_Files>` is the path to one or more `.bc` file to be analyzed.
+`[LLVM_Bytecode_Files]` is the path to one or more `.bc` or `.ll` files to be analyzed. Finally, The above invocation 
+expects a file named `file.json` for each `file.bc` (or `file.ll`) provided in the [LLVM_Bytecode_Files] file list.
+Each of these json files are summaries that provide contract specific information;
+summaries can be generated for Solidity and Rust contracts using the following tools
+respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor)
+and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor).
 
 ## How to Install
 
