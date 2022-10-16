@@ -112,6 +112,8 @@ Vanguard has the following dependencies:
    * Tabulate
  * Cargo (Version 1.60.0)
  * Solang (Version 0.1.10-19-ga524ff5)
+ * Z3 (Version 4.8.8, unless on MacOS ARM, then use 4.9.1)
+   * If building from source, make sure to follow the cmake [build instructions](https://github.com/Z3Prover/z3/blob/master/README-CMake.md).
 
 First, make sure all above depenencies are installed and the following executables are avaiable on the `$PATH`:
  * cmake
@@ -125,10 +127,18 @@ First, make sure all above depenencies are installed and the following executabl
  * cargo
  * solang
 
-To build, simply run the following instructions.
+Vanguard also depends on [SVF (Version 2.5)](https://github.com/SVF-tools/SVF/tree/SVF-2.5). However, Vanguard requires a few minor modifications in SVF prior building. To properly build SVF you can run the following::
 
 ```bash
 export LLVM_HOME=<LLVM_HOME_DIR>
+./aux-build-scripts/build-svf.sh
+```
+
+Finally, to build Vanguard, simply run the following instructions.
+
+```bash
+export LLVM_HOME=<LLVM_HOME_DIR>
+export SVF_HOME=<PARH_TO_VANGUARD_REPO>/deps/SVF # Created by build-svf.sh script
 mkdir build && cd build
 cmake -G "Unix Makefiles" ..
 make
