@@ -127,7 +127,7 @@ First, make sure all above depenencies are installed and the following executabl
  * cargo
  * solang
 
-Vanguard also depends on [SVF (Version 2.5)](https://github.com/SVF-tools/SVF/tree/SVF-2.5). However, Vanguard requires a few minor modifications in SVF prior building. To properly build SVF you can run the following::
+Vanguard also depends on [SVF (Version 2.5)](https://github.com/SVF-tools/SVF/tree/SVF-2.5). However, Vanguard requires a few minor modifications in SVF prior building it. To properly build SVF you can run the following:
 
 ```bash
 export LLVM_HOME=<LLVM_HOME_DIR>
