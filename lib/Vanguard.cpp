@@ -118,11 +118,12 @@ void initializeLLVM(int argc, char **argv) {
     llvm::cl::ParseCommandLineOptions(argc, argv, "Vanguard Static Analyzer\n");
 }
 
-void initializeSVF(int argc, char **argv, std::unordered_map<llvm::Module *, std::string> &filenames, std::vector<llvm::Module*> &modules) {
+LLVMContext* initializeSVF(int argc, char **argv, std::unordered_map<llvm::Module *, std::string> &filenames, std::vector<llvm::Module*> &modules) {
     int arg_num = 0;
     char **arg_value = new char*[argc];
     std::vector<std::string> moduleNameVec;
     SVF::LLVMUtil::processArguments(argc, argv, arg_num, arg_value, moduleNameVec);
+    LLVMContext *ctx = nullptr;
 
     // Hack to avoid the const-ness of Options in SVF.
     // We could pass additional arguments in the processArguments above, but this one is a bit cleaner.
@@ -135,12 +136,14 @@ void initializeSVF(int argc, char **argv, std::unordered_map<llvm::Module *, std
 
     for (int i = 0; i < modSet->getModuleNum(); i++) {
         auto llvmMod = modSet->getModule(i);
+        ctx = &llvmMod->getContext();
         modules.push_back(llvmMod);
         filenames[llvmMod] = llvmMod->getModuleIdentifier();
     }
 
     // No need for this
     delete[] arg_value;
+    return ctx;
 }
 
 int main(int argc, char **argv) {
@@ -150,7 +153,7 @@ int main(int argc, char **argv) {
     initializeLLVM(argc, argv);
 
     // TODO: If any detector does not need SVF info, prevent SVF from running
-    initializeSVF(argc, argv, filenames, modules);
+    auto ctxt = initializeSVF(argc, argv, filenames, modules);
 
     llvm::LoopAnalysisManager LAM;
     llvm::FunctionAnalysisManager FAM;
@@ -203,11 +206,10 @@ int main(int argc, char **argv) {
 
     llvm::cl::PrintOptionValues();
 
-    llvm::LLVMContext ctxt;
-
     llvm::SMDiagnostic Err;
 
-    ctxt.setDiscardValueNames(false);
+    if (ctxt)
+        ctxt->setDiscardValueNames(false);
 
     for (auto mod : modules) {
         MPM.run(*mod, MAM);
