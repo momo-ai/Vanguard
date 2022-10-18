@@ -41,7 +41,7 @@ namespace analysis {
                        [](auto mDep) { return mDep->getValue();});
 
         // Filter out null values
-        valDeps.erase(std::remove_if(valDeps.begin(), valDeps.end(), [](auto val) { return val != nullptr;}),
+        valDeps.erase(std::remove_if(valDeps.begin(), valDeps.end(), [](auto val) { return val == nullptr;}),
                       valDeps.end());
         return std::move(valDeps);
     }
