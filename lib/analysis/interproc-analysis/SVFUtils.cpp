@@ -22,7 +22,7 @@ namespace analysis {
             std::set<const SVF::VFGNode *> deps;
             return traverseMemDependencies(src, deps, trg);
         } else {
-            auto deps = cachedDeps[src];
+            auto &deps = cachedDeps[src];
             return std::any_of(deps.begin(), deps.end(), [&trg](auto node) { return node->getValue() == trg; });
         }
     }
@@ -31,7 +31,7 @@ namespace analysis {
         if (cachedDeps.find(src) == cachedDeps.end()) {
             std::set<const SVF::VFGNode*> deps;
             traverseMemDependencies(src, deps);
-            cachedDeps[src] = deps;
+            cachedDeps[src] = std::move(deps);
         }
 
         // Convert VFGNode -> llvm::Value
@@ -41,10 +41,9 @@ namespace analysis {
                        [](auto mDep) { return mDep->getValue();});
 
         // Filter out null values
-        std::vector<const llvm::Value*> nonNullValDeps;
-        std::copy_if(valDeps.begin(), valDeps.end(), std::back_inserter(nonNullValDeps),
-                     [](auto val) { return val != nullptr;});
-        return std::move(nonNullValDeps);
+        valDeps.erase(std::remove_if(valDeps.begin(), valDeps.end(), [](auto val) { return val != nullptr;}),
+                      valDeps.end());
+        return std::move(valDeps);
     }
 
     void SVFUtils::initSVFModule() {
