@@ -20,7 +20,7 @@ namespace analysis {
     class SVFUtils {
     public:
 
-        static bool dependsOnTrg(const llvm::Value *src, const llvm::Value *trg);
+        static bool dependsOnTrg(const llvm::Value &src, const llvm::Value &trg);
 
         static std::vector<const llvm::Value*> valueMemDeps(const llvm::Value *src);
 

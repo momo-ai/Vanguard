@@ -17,13 +17,13 @@ namespace analysis {
 
     std::map<const llvm::Value *, std::set<const SVF::VFGNode *>> SVFUtils::cachedDeps;
 
-    bool SVFUtils::dependsOnTrg(const llvm::Value *src, const llvm::Value *trg) {
-        if (cachedDeps.find(src) == cachedDeps.end()) {
+    bool SVFUtils::dependsOnTrg(const llvm::Value &src, const llvm::Value &trg) {
+        if (cachedDeps.find(&src) == cachedDeps.end()) {
             std::set<const SVF::VFGNode *> deps;
-            return traverseMemDependencies(src, deps, trg);
+            return traverseMemDependencies(&src, deps, &trg);
         } else {
-            auto &deps = cachedDeps[src];
-            return std::any_of(deps.begin(), deps.end(), [&trg](auto node) { return node->getValue() == trg; });
+            auto &deps = cachedDeps[&src];
+            return std::any_of(deps.begin(), deps.end(), [&trg](auto node) { return node->getValue() == &trg; });
         }
     }
 

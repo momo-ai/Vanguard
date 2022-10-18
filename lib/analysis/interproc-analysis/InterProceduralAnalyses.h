@@ -16,13 +16,13 @@ namespace analysis {
 
         static bool readsMemFrom(const typename Domain::Instruction *instr, const typename Domain::Value *obj) {
             if (auto src = analysis::LLVMUtils<Domain>::isMemRead(instr))
-                return analysis::SVFUtils::dependsOnTrg(src, obj->unwrap());
+                return analysis::SVFUtils::dependsOnTrg(*src, *obj->unwrap());
             return false;
         }
 
         static bool writesMemTo(const typename Domain::Instruction *instr, const typename Domain::Value *obj) {
             if (auto dest = analysis::LLVMUtils<Domain>::isMemWrite(instr))
-                return analysis::SVFUtils::dependsOnTrg(dest, obj->unwrap());
+                return analysis::SVFUtils::dependsOnTrg(*dest, *obj->unwrap());
             return false;
         }
 
