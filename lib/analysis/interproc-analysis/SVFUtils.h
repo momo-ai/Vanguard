@@ -22,7 +22,7 @@ namespace analysis {
 
         static bool dependsOnTrg(const llvm::Value &src, const llvm::Value &trg);
 
-        static std::vector<const llvm::Value*> valueMemDeps(const llvm::Value *src);
+        static std::vector<const llvm::Value*> valueDeps(const llvm::Value *src);
 
     private:
         static SVF::SVFModule *svfModule;
@@ -47,7 +47,7 @@ namespace analysis {
 
         static void initSVFG();
 
-        static bool traverseMemDependencies(const llvm::Value *src, std::set<const SVF::VFGNode*> &deps, const llvm::Value *trg = nullptr);
+        static bool traverseDependencies(const llvm::Value *src, std::set<const SVF::VFGNode*> &deps, const llvm::Value *trg = nullptr);
     };
 
 }

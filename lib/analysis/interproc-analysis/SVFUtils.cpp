@@ -20,17 +20,17 @@ namespace analysis {
     bool SVFUtils::dependsOnTrg(const llvm::Value &src, const llvm::Value &trg) {
         if (cachedDeps.find(&src) == cachedDeps.end()) {
             std::set<const SVF::VFGNode *> deps;
-            return traverseMemDependencies(&src, deps, &trg);
+            return traverseDependencies(&src, deps, &trg);
         } else {
             auto &deps = cachedDeps[&src];
             return std::any_of(deps.begin(), deps.end(), [&trg](auto node) { return node->getValue() == &trg; });
         }
     }
 
-    std::vector<const llvm::Value*> SVFUtils::valueMemDeps(const llvm::Value *src) {
+    std::vector<const llvm::Value*> SVFUtils::valueDeps(const llvm::Value *src) {
         if (cachedDeps.find(src) == cachedDeps.end()) {
             std::set<const SVF::VFGNode*> deps;
-            traverseMemDependencies(src, deps);
+            traverseDependencies(src, deps);
             cachedDeps[src] = std::move(deps);
         }
 
@@ -84,7 +84,7 @@ namespace analysis {
         }
     }
 
-    bool SVFUtils::traverseMemDependencies(const llvm::Value *src, std::set<const SVF::VFGNode*> &deps, const llvm::Value *trg)
+    bool SVFUtils::traverseDependencies(const llvm::Value *src, std::set<const SVF::VFGNode*> &deps, const llvm::Value *trg)
     {
         initSVFG();
 

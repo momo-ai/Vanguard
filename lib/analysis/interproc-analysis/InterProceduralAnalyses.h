@@ -32,7 +32,7 @@ namespace analysis {
 
         static std::vector<const typename Domain::Value*> getMemDeps(const typename Domain::Value *val) {
             auto &fact = Domain::Factory::instance();
-            auto llvmDeps = analysis::SVFUtils::valueMemDeps(val->unwrap());
+            auto llvmDeps = analysis::SVFUtils::valueDeps(val->unwrap());
 
             std::vector<const typename Domain::Value*> rv;
             std::transform(llvmDeps.begin(), llvmDeps.end(), std::back_inserter(rv),
