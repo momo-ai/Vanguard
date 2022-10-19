@@ -58,4 +58,5 @@ set(LLVM_LINK_COMPONENTS
 
 target_link_libraries(Vanguard PUBLIC
   ${LLVM_LINK_COMPONENTS}
+  SVF::Svf
 )

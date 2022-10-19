@@ -60,16 +60,17 @@ before running through the pipeline.
 To run a particular detector on a compiled LLVM bytecode file, run the following:
 
 ```bash
-<PATH_TO_VANGUARD>/Vanguard --detectors "<DETECTORS>" --summary <CONTRACT_SUMMARY> [LLVM_Bytecode_Files]
+<PATH_TO_VANGUARD>/Vanguard --detectors "<DETECTORS>" [LLVM_Bytecode_Files]
 ```
 
 where `<PATH_TO_VANGUARD>` is the path to the vanguard executable (so, if running from the Vanguard folder, 
 this should be `build/lib/Vanguard`). `<DETECTORS>` is the list of detectors to run, as a comma separated list. 
-`<CONTRACT_SUMMARY>` is a `JSON` file specifying contract specific information;
-summaries can be generated for Solidity and Rust contracts using the following tools 
-respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor) 
-and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor). 
-Finally, `<LLVM_Bytecode_Files>` is the path to one or more `.bc` file to be analyzed.
+`[LLVM_Bytecode_Files]` is the path to one or more `.bc` or `.ll` files to be analyzed. Finally, The above invocation 
+expects a file named `file.json` for each `file.bc` (or `file.ll`) provided in the [LLVM_Bytecode_Files] file list.
+Each of these json files are summaries that provide contract specific information;
+summaries can be generated for Solidity and Rust contracts using the following tools
+respectively: [SolidityPreprocessor](https://github.com/Veridise/SolidityPreprocessor)
+and [RustPreprocessor](https://github.com/Veridise/RustPreprocessor).
 
 ## How to Install
 
@@ -112,6 +113,8 @@ Vanguard has the following dependencies:
    * Tabulate
  * Cargo (Version 1.60.0)
  * Solang (Version 0.1.10-19-ga524ff5)
+ * Z3 (Version 4.8.8, unless on MacOS ARM, then use 4.9.1)
+   * If building from source, make sure to follow the cmake [build instructions](https://github.com/Z3Prover/z3/blob/master/README-CMake.md).
 
 First, make sure all above depenencies are installed and the following executables are avaiable on the `$PATH`:
  * cmake
@@ -125,10 +128,18 @@ First, make sure all above depenencies are installed and the following executabl
  * cargo
  * solang
 
-To build, simply run the following instructions.
+Vanguard also depends on [SVF (Version 2.5)](https://github.com/SVF-tools/SVF/tree/SVF-2.5). However, Vanguard requires a few minor modifications in SVF prior building it. To properly build SVF you can run the following:
 
 ```bash
 export LLVM_HOME=<LLVM_HOME_DIR>
+./aux-build-scripts/build-svf.sh
+```
+
+Finally, to build Vanguard, simply run the following instructions.
+
+```bash
+export LLVM_HOME=<LLVM_HOME_DIR>
+export SVF_HOME=<PARH_TO_VANGUARD_REPO>/deps/SVF # Created by build-svf.sh script
 mkdir build && cd build
 cmake -G "Unix Makefiles" ..
 make

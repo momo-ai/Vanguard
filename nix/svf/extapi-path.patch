@@ -1,0 +1,124 @@
+diff --git a/CMakeLists.txt b/CMakeLists.txt
+index ecd234d0..205765f4 100644
+--- a/CMakeLists.txt
++++ b/CMakeLists.txt
+@@ -84,6 +84,10 @@ install(
+     FILES_MATCHING
+     PATTERN "**/*.h"
+     )
++install(
++    FILES "${CMAKE_CURRENT_SOURCE_DIR}/include/Util/ExtAPI.json"
++    DESTINATION "${CMAKE_INSTALL_DATADIR}/svf"
++)
+ 
+ export(EXPORT SVFTargets
+     FILE "${CMAKE_CURRENT_BINARY_DIR}/SVFTargets.cmake"
+diff --git a/config.in b/config.in
+index daa94066..18c51fa8 100644
+--- a/config.in
++++ b/config.in
+@@ -1,6 +1,6 @@
+ #ifndef CONFIG_H_IN
+ #define CONFIG_H_IN
+ 
+-#define PROJECT_PATH "@CMAKE_CURRENT_SOURCE_DIR@"
++#define PROJECT_PATH "@CMAKE_INSTALL_FULL_DATADIR@/svf/ExtAPI.json"
+ 
+ #endif
+diff --git a/lib/Util/ExtAPI.cpp b/lib/Util/ExtAPI.cpp
+index 6440615d..51694cf9 100644
+--- a/lib/Util/ExtAPI.cpp
++++ b/lib/Util/ExtAPI.cpp
+@@ -43,28 +43,28 @@ static std::string GetStdoutFromCommand(const std::string &command)
+ }
+ 
+ // Get ExtAPI.json file
+-static std::string getJsonFile(const std::string &path)
+-{
+-    std::string jsonFilePath = GetStdoutFromCommand(path);
+-    if (path.compare("npm root") == 0)
+-    {
+-        int os_flag = 1;
+-        // SVF installed via npm needs to determine the type of operating system,
+-        // otherwise the ExtAPI.json path may not be found
+-        // Linux os
+-#ifdef linux
+-        os_flag = 0;
+-        jsonFilePath.append("/svf-lib/SVF-linux");
+-#endif
+-        // Mac os
+-        if (os_flag == 1)
+-        {
+-            jsonFilePath.append("/svf-lib/SVF-osx");
+-        }
+-    }
+-    jsonFilePath.append(EXTAPI_JSON_PATH);
+-    return jsonFilePath;
+-}
++// static std::string getJsonFile(const std::string &path)
++// {
++//     std::string jsonFilePath = GetStdoutFromCommand(path);
++//     if (path.compare("npm root") == 0)
++//     {
++//         int os_flag = 1;
++//         // SVF installed via npm needs to determine the type of operating system,
++//         // otherwise the ExtAPI.json path may not be found
++//         // Linux os
++// #ifdef linux
++//         os_flag = 0;
++//         jsonFilePath.append("/svf-lib/SVF-linux");
++// #endif
++//         // Mac os
++//         if (os_flag == 1)
++//         {
++//             jsonFilePath.append("/svf-lib/SVF-osx");
++//         }
++//     }
++//     jsonFilePath.append(EXTAPI_JSON_PATH);
++//     return jsonFilePath;
++// }
+ 
+ static cJSON *parseJson(const std::string &path, off_t fileSize)
+ {
+@@ -121,26 +121,27 @@ ExtAPI *ExtAPI::getExtAPI(const std::string &path)
+             return extOp;
+         }
+ 
+-        jsonFilePath = PROJECT_PATH + std::string(EXTAPI_JSON_PATH);
++        // jsonFilePath = PROJECT_PATH + std::string(EXTAPI_JSON_PATH);
++        jsonFilePath = PROJECT_PATH;
+         if (!stat(jsonFilePath.c_str(), &statbuf))
+         {
+             root = parseJson(jsonFilePath, statbuf.st_size);
+             return extOp;
+         }
+ 
+-        jsonFilePath = getJsonFile("$SVF_DIR");
+-        if (!stat(jsonFilePath.c_str(), &statbuf))
+-        {
+-            root = parseJson(jsonFilePath, statbuf.st_size);
+-            return extOp;
+-        }
+-
+-        jsonFilePath = getJsonFile("npm root");
+-        if (!stat(jsonFilePath.c_str(), &statbuf))
+-        {
+-            root = parseJson(jsonFilePath, statbuf.st_size);
+-            return extOp;
+-        }
++        // jsonFilePath = getJsonFile("$SVF_DIR");
++        // if (!stat(jsonFilePath.c_str(), &statbuf))
++        // {
++        //     root = parseJson(jsonFilePath, statbuf.st_size);
++        //     return extOp;
++        // }
++
++        // jsonFilePath = getJsonFile("npm root");
++        // if (!stat(jsonFilePath.c_str(), &statbuf))
++        // {
++        //     root = parseJson(jsonFilePath, statbuf.st_size);
++        //     return extOp;
++        // }
+ 
+         assert(false && "Open ExtAPI.json file fails!");
+     }

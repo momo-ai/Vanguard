@@ -22,11 +22,19 @@ stdenv.mkDerivation {
 
     # Add missing include
     ./exestate.patch
+
+    # Export CMake configuration
+    ./cmake-export.patch
+
+    # Hardcode paths in extapi
+    ./extapi-path.patch
   ];
 
   buildInputs = [
     llvmPackages_13.libllvm
+  ];
 
+  propagatedBuildInputs = [
     # We cannot use the normal z3 from nixpkgs, because it uses the old
     # ./configure based build, which does not have pkg-config files or CMake
     # config files.
