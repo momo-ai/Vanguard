@@ -1,6 +1,5 @@
-target_sources(Vanguard PRIVATE
-
-        )
+target_sources(libVanguard PRIVATE
+)
 
 #include_directories(rapidjson)
 #include_directories(include)

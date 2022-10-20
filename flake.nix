@@ -62,8 +62,12 @@
           pkgs.llvmPackages_latest.libclang.python
         ];
 
+        # Don't use debug build, it runs into linker errors with LLVM release builds.
+        # TODO: build a debug version of LLVM so we can debug our own application
         cmakeBuildType = "Debug";
-        cmakeFlags = ["-DCMAKE_EXPORT_COMPILE_COMMANDS=on"];
+        cmakeFlags = [
+          "-DCMAKE_EXPORT_COMPILE_COMMANDS=on"
+        ];
 
         # Don't inject security hardening & optimization flags for the debug build.
         # See: https://github.com/NixOS/nixpkgs/issues/18995

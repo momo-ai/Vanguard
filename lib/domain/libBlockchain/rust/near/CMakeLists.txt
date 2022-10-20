@@ -1,3 +1,2 @@
-target_sources(Vanguard PRIVATE
-
-        )
+target_sources(libVanguard PRIVATE
+)

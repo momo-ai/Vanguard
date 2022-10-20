@@ -70,16 +70,8 @@ void runDetectors(llvm::ModuleAnalysisManager &mam, llvm::FunctionAnalysisManage
 
 void initializeLLVM(int argc, char **argv) {
     llvm::InitLLVM init(argc, argv);
-    llvm::InitializeAllTargets();
-    llvm::InitializeAllTargetMCs();
-    llvm::InitializeAllAsmParsers();
-    llvm::InitializeAllAsmParsers();
     llvm::PassRegistry &registry = *llvm::PassRegistry::getPassRegistry();
     llvm::initializeCore(registry);
-    llvm::initializeCoroutines(registry);
-    llvm::initializeScalarOpts(registry);
-    llvm::initializeObjCARCOpts(registry);
-    llvm::initializeVectorization(registry);
     llvm::initializeIPO(registry);
     llvm::initializeAnalysis(registry);
     llvm::initializeTransformUtils(registry);
