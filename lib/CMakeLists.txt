@@ -8,9 +8,7 @@ set(LLVM_LINK_COMPONENTS
   LLVMPasses
 )
 
-add_library(libVanguard
-  detectors/DetectorRegistry.cpp
-)
+add_library(libVanguard)
 target_link_libraries(libVanguard
   PUBLIC
   SVF::Svf

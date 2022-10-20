@@ -58,23 +58,17 @@ namespace vanguard {
 
     private:
         static DetectorRegistry *instance;
-        std::unordered_map<std::string, Detector::DetectorDomain> registry;
+        std::unordered_map<std::string, Detector::DetectorDomain> registry{};
 
-        DetectorRegistry() {
-            //assert(add(StatGen::name(), StatGen::domain()));
-            add(FunctionPrinter<LLVMDomain>::name(), FunctionPrinter<LLVMDomain>::domain());
-            add(StatGen<LLVMDomain>::name(), StatGen<LLVMDomain>::domain());
-            add(IRValidator<LLVMDomain>::name(), IRValidator<LLVMDomain>::domain());
-            add(ReentrancyDetector<BlockchainDomain>::name(), ReentrancyDetector<BlockchainDomain>::domain());
-            add(PublicCallbacksDetector<BlockchainDomain>::name(), PublicCallbacksDetector<BlockchainDomain>::domain());
-            //add(ReentrancyDetector::name(), new ReentrancyDetector(summary.getValue()));
-            // add(IRValidator::name(), new IRValidator());
-        }
+        DetectorRegistry();
     };
 
     template <> UniverseDetector<LLVMDomain> *DetectorRegistry::get(const std::string &name);
     template <>
     UniverseDetector<BlockchainDomain> *DetectorRegistry::get(const std::string &name);
+
+    Detector::DetectorDomain domainUnion(Detector::DetectorDomain d1,
+                                         Detector::DetectorDomain d2);
 } // namespace vanguard
 
 

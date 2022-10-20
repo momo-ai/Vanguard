@@ -1,2 +1,1 @@
-target_sources(libVanguard PRIVATE
-)
+target_sources(libVanguard PRIVATE LLVMUtils.cpp)

@@ -20,55 +20,11 @@
 namespace analysis {
 
     // For debugging purposes.
-    static std::string printLLVMValue(const llvm::Value *v) {
-        std::string s;
-        llvm::raw_string_ostream sstr(s);
-        v->print(sstr, false);
-        return s;
-    }
+    std::string printLLVMValue(const llvm::Value *v);
 
-    static void createMetadataSlot(llvm::Module const * mod, llvm::MDNode *n, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
+    void createMetadataSlot(llvm::Module const * mod, llvm::MDNode *n, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap);
 
-        auto &meta = mdMap[(llvm::MDNode::MetadataKind)n->getMetadataID()];
-        if (std::find(meta.begin(), meta.end(), n) != meta.end())
-            return;
-        //the map also stores the number of each metadata node. It is the same order as in the dumped bc file.
-        meta.push_back(n);
-
-        for (unsigned i = 0, e = n->getNumOperands(); i!=e; ++i){
-            if(auto op = llvm::dyn_cast_or_null<llvm::MDNode>(n->getOperand(i))){
-                createMetadataSlot(mod, op, mdMap);
-            }
-        }
-    }
-
-    static void collectMedataForFunction(llvm::Function const *fun, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap){
-        llvm::SmallVector<std::pair<unsigned, llvm::MDNode*>, 4> MDForInst;
-        for(auto bb = fun->begin(), e = fun->end(); bb != e; ++bb) {
-            for (const auto & inst : *bb) {
-                // TODO: see if we need this
-                //get the Metadata declared in the llvm intrinsic functions such as llvm.dbg.declare()
-                // if(auto ci = llvm::dyn_cast<llvm::CallInst>(inst)){
-                //    if(auto f = ci->getCalledFunction()){
-                //        if(f->getName().startswith("llvm.")){
-                //            for(unsigned i = 0, nop = inst->getNumOperands(); i != nop; ++i){
-                //                if(auto n = llvm::dyn_cast_or_null<llvm::MDNode>(inst->getOperand(i))){
-                //                    createMetadataSlot(N);
-                //                }
-                //            }
-                //        }
-                //    }
-                // }
-
-                //Get all the mdnodes attached to each instruction
-                inst.getAllMetadata(MDForInst);
-                for (unsigned i = 0, nMeta = MDForInst.size(); i != nMeta; ++i) {
-                    createMetadataSlot(fun->getParent(), MDForInst[i].second, mdMap);
-                }
-                MDForInst.clear();
-            }
-        }
-    }
+    void collectMedataForFunction(llvm::Function const *fun, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>& mdMap);
 
     struct LocationInfo {
         std::string filename;
@@ -77,12 +33,12 @@ namespace analysis {
 
         int column;
 
-        LocationInfo(std::string filename, int line, int column)
+        inline LocationInfo(std::string filename, int line, int column)
                 : filename(std::move(filename)), line(line), column(column) {
 
         }
 
-        std::string toStr() {
+        inline std::string toStr() {
             std::ostringstream ost;
             ost << filename;
             if (line != -1) ost << ":" << line;
@@ -95,7 +51,7 @@ namespace analysis {
     class LLVMUtils {
     public:
 
-        static const std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>>& getMetadata(const typename Domain::CompilationUnit *cUnit) {
+        static inline const std::map<llvm::Metadata::MetadataKind, std::vector<llvm::MDNode *>>& getMetadata(const typename Domain::CompilationUnit *cUnit) {
             auto module = cUnit->unwrap();
             if (mdnMap.find(module) == mdnMap.end()) {
                 std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>> mdMap;
@@ -110,19 +66,19 @@ namespace analysis {
             return mdnMap[module];
         }
 
-        static std::set<llvm::Metadata*> findNodesUnder(llvm::Metadata *root, std::function<bool(llvm::Metadata*)> &cond) {
+        static inline std::set<llvm::Metadata*> findNodesUnder(llvm::Metadata *root, std::function<bool(llvm::Metadata*)> &cond) {
             std::set<llvm::Metadata*> visited, found;
             findNodesHelper(root, cond, visited, found);
             return std::move(found);
         }
 
-        static const typename Domain::Value* getFunctionArg(typename Domain::Function *fun, int i) {
+        static inline const typename Domain::Value* getFunctionArg(typename Domain::Function *fun, int i) {
             assert("Invalid argument index." && i < fun->params().size());
 
             return Domain::Factory::instance().createVal(fun->unwrap()->getArg(i));
         }
 
-        static const typename Domain::Value* getNamedFunctionArg(typename Domain::Function *fun, const std::string &name) {
+        static inline const typename Domain::Value* getNamedFunctionArg(typename Domain::Function *fun, const std::string &name) {
             auto llFun = fun->unwrap();
             auto &factory = Domain::Factory::instance();
 
@@ -134,7 +90,7 @@ namespace analysis {
             return nullptr;
         }
 
-        static const llvm::Value* isMemRead(const typename Domain::Instruction *inst) {
+        static inline const llvm::Value* isMemRead(const typename Domain::Instruction *inst) {
             const auto llvmIns = inst->unwrap();
 
             if (auto loadInst = llvm::dyn_cast<llvm::LoadInst>(llvmIns)) {
@@ -146,7 +102,7 @@ namespace analysis {
             return nullptr;
         }
 
-        static const llvm::Value* isMemWrite(const typename Domain::Instruction *inst) {
+        static inline const llvm::Value* isMemWrite(const typename Domain::Instruction *inst) {
             const auto llvmIns = inst->unwrap();
             if (auto store = llvm::dyn_cast<llvm::StoreInst>(llvmIns)) {
                 return store->getPointerOperand();
@@ -157,13 +113,13 @@ namespace analysis {
             return nullptr;
         }
 
-        static std::string demangleFunction(const llvm::Function *fun) {
+        static inline std::string demangleFunction(const llvm::Function *fun) {
             assert("Function does not have name" && fun->hasName());
 
             return llvm::demangle(fun->getName().str());
         }
 
-        static void getPostDominatedBlocks(const typename Domain::Block *block, llvm::SmallVector<typename Domain::Block*> &dominated) {
+        static inline void getPostDominatedBlocks(const typename Domain::Block *block, llvm::SmallVector<typename Domain::Block*> &dominated) {
             auto llvmBlock = block->unwrap();
             auto domTree = getPostDomTree(llvmBlock->getParent());
             llvm::SmallVector<llvm::BasicBlock*> descendants;
@@ -174,7 +130,7 @@ namespace analysis {
                 dominated.push_back(factory.createBlk(descendant));
         }
 
-        static bool postDominates(const typename Domain::Instruction *i1, const typename Domain::Instruction *i2) {
+        static inline bool postDominates(const typename Domain::Instruction *i1, const typename Domain::Instruction *i2) {
             auto i1BB = i1->block(), i2BB = i2->block();
 
             assert(i1BB->function() == i2BB->function() && "Invalid instructions: i1 & i2 must belong to the same function");
@@ -185,13 +141,13 @@ namespace analysis {
             else return domTree->dominates(llvmI1->getParent(), llvmI2->getParent());
         }
 
-        static LocationInfo getLocInfo(const typename Domain::Instruction *instr) {
+        static inline LocationInfo getLocInfo(const typename Domain::Instruction *instr) {
             auto &llvmInstr = instr->unwrap();
             auto &dbLoc = llvmInstr.getDebugLoc();
             return {dbLoc->getFilename().str(), static_cast<int>(dbLoc->getLine()), static_cast<int>(dbLoc->getColumn())};
         }
 
-        static LocationInfo getLocInfo(const typename Domain::Function *fun) {
+        static inline LocationInfo getLocInfo(const typename Domain::Function *fun) {
             auto llvmFun = fun->unwrap();
             llvm::SmallVector<std::pair<unsigned int, llvm::MDNode*>> metadata;
             llvmFun->getAllMetadata(metadata);
@@ -203,11 +159,11 @@ namespace analysis {
             return {"Unknown Location", -1, -1};
         }
 
-        static std::string print(const typename Domain::Value *val) {
+        static inline std::string print(const typename Domain::Value *val) {
             return printLLVMValue(&val->unwrap());
         }
 
-        static std::string print(const typename Domain::Instruction *val) {
+        static inline std::string print(const typename Domain::Instruction *val) {
             return printLLVMValue(&val->unwrap());
         }
 
@@ -218,7 +174,7 @@ namespace analysis {
         static std::map<llvm::Module const *, std::map<llvm::MDNode::MetadataKind, std::vector<llvm::MDNode*>>> mdnMap;
 
     private:
-        static const llvm::PostDominatorTree* getPostDomTree(const llvm::Function *fun) {
+        static inline const llvm::PostDominatorTree* getPostDomTree(const llvm::Function *fun) {
             if (postDomTrees.find(fun) == postDomTrees.end()) {
                 postDomTrees[fun] = new llvm::PostDominatorTree(const_cast<llvm::Function&>(*fun));
             }
@@ -226,7 +182,7 @@ namespace analysis {
             return postDomTrees[fun];
         }
 
-        static void findNodesHelper(llvm::Metadata *n, std::function<bool(llvm::Metadata*)> &cond, std::set<llvm::Metadata*> &visited, std::set<llvm::Metadata*> &found) {
+        static inline void findNodesHelper(llvm::Metadata *n, std::function<bool(llvm::Metadata*)> &cond, std::set<llvm::Metadata*> &visited, std::set<llvm::Metadata*> &found) {
             if (visited.find(n) != visited.end())
                 return;
 
