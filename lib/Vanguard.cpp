@@ -26,8 +26,11 @@
 #include <llvm/Analysis/AliasAnalysis.h>
 #include <llvm/Demangle/Demangle.h>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include <SVF-FE/LLVMUtil.h>
 #include <Util/Options.h>
+#pragma GCC diagnostic pop
 
 #include "program/Base.h"
 #include "detectors/DetectorRegistry.h"
