@@ -64,7 +64,7 @@
 
         # Don't use debug build, it runs into linker errors with LLVM release builds.
         # TODO: build a debug version of LLVM so we can debug our own application
-        cmakeBuildType = "Debug";
+        cmakeBuildType = "RelWithDebInfo";
         cmakeFlags = [
           "-DCMAKE_EXPORT_COMPILE_COMMANDS=on"
         ];
