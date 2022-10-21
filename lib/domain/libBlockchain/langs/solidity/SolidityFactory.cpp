@@ -6,7 +6,7 @@
 
 namespace vanguard {
 
-    BlockchainDomain::Type* SolidityFactory::createBasicType(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) {
+    BlockchainDomain::Type* SolidityFactory::createBasicType(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) {
         // TODO: Implement this.
         return nullptr;
     }

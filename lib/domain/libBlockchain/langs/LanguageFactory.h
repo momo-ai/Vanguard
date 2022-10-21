@@ -17,7 +17,7 @@ namespace vanguard {
 
         inline explicit LanguageFactory(BlockchainDomain::Factory &factory) : factory(factory) { }
 
-        virtual BlockchainDomain::Type *createBasicType(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) = 0;
+        virtual BlockchainDomain::Type *createBasicType(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) = 0;
 
         virtual Visibility toVisibility(const std::string& visStr) = 0;
 
@@ -25,23 +25,31 @@ namespace vanguard {
 
         // TODO: Reduce number of arguments in the below methods.
 
-        virtual BlockchainDomain::Function *createBlkFn(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string contract,
+        virtual BlockchainDomain::Function *createBlkFn(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string contract,
                                                         std::string name, std::string selector, bool isCnstr, Visibility vis, Mutability mut,
                                                         std::vector<vanguard::Variable<BlockchainDomain> *> params, std::vector<vanguard::Variable<BlockchainDomain> *> rets,
                                                         std::vector<std::string> mods);
 
-        virtual BlockchainDomain::Contract *createContract(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string& name,
+        virtual BlockchainDomain::Contract *createContract(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string& name,
                                                            std::vector<BlockchainDomain::Function *>& fns, std::vector<Variable<BlockchainDomain> *>& vars);
 
-        virtual StructType<BlockchainDomain> *createStruct(const llvm::Module &mod, BlockchainModel<BlockchainDomain> &model, const std::string& name, std::vector<Variable<BlockchainDomain> *> fields);
+        virtual StructType<BlockchainDomain> *createStruct(rapidjson::Value &val, const llvm::Module &mod, BlockchainModel<BlockchainDomain> &model, const std::string& name, std::vector<Variable<BlockchainDomain> *> fields);
 
-        virtual Variable<BlockchainDomain> *createVariable(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name, BlockchainDomain::Type *type);
+        virtual Variable<BlockchainDomain> *createVariable(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name, BlockchainDomain::Type *type);
 
-        virtual ArrayType<BlockchainDomain> *createArrayType(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name, BlockchainDomain::Type *base);
+        virtual ArrayType<BlockchainDomain> *createArrayType(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name, BlockchainDomain::Type *base);
 
-        virtual MapType<BlockchainDomain> *createMapType(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name, BlockchainDomain::Type *keyType, BlockchainDomain::Type *valType);
+        virtual MapType<BlockchainDomain> *createMapType(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name, BlockchainDomain::Type *keyType, BlockchainDomain::Type *valType);
 
-        virtual BlockchainDomain::CompilationUnit *createBlkUnit(const llvm::Module *module, const std::vector<BlockchainDomain::Contract *> &contracts);
+        virtual BlockchainDomain::CompilationUnit *createBlkUnit(rapidjson::Value &val, const llvm::Module *module, const std::vector<BlockchainDomain::Contract *> &contracts);
+
+    protected:
+
+        inline void require(bool cond, std::string msg = "") {
+            if(!cond) {
+                throw std::runtime_error(msg);
+            }
+        }
 
     private:
 

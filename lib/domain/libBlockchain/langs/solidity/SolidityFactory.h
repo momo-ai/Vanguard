@@ -13,7 +13,7 @@ namespace vanguard {
     public:
         inline explicit SolidityFactory(BlockchainDomain::Factory &factory) : LanguageFactory(factory) {}
 
-        BlockchainDomain::Type *createBasicType(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) override;
+        BlockchainDomain::Type *createBasicType(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) override;
 
         Visibility toVisibility(const std::string& visStr) override;
 

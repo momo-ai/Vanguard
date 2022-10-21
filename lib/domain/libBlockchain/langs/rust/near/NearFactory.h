@@ -15,7 +15,10 @@ namespace vanguard {
 
         inline explicit NearFactory(BlockchainDomain::Factory &factory) : LanguageFactory(factory) { }
 
-        BlockchainDomain::Type *createBasicType(const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) override;
+        BlockchainDomain::Contract *createContract(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string& name,
+                                                   std::vector<BlockchainDomain::Function *>& fns, std::vector<Variable<BlockchainDomain> *>& vars) override;
+
+        BlockchainDomain::Type *createBasicType(rapidjson::Value &val, const llvm::Module &module, BlockchainModel<BlockchainDomain> &model, std::string name) override;
 
         Visibility toVisibility(const std::string& visStr) override;
 

@@ -146,14 +146,7 @@ namespace vanguard {
             }
         }*/
 
-        auto *contract = langFactory->createContract(module, *model, name, functions, variables);
-
-        // TODO: Fix this temp hack: this is for NEAR contracts
-        if (val.HasMember("external")) {
-            require(val["external"].IsBool(), "external must be boolean");
-            if (val["external"].GetBool())
-                contract->setExternal();
-        }
+        auto *contract = langFactory->createContract(val, module, *model, name, functions, variables);
 
         //auto *contract = new Blockchain<Universe>::Contract(name, functions, variables);
         //storageDecls[id] = contract;
@@ -176,7 +169,7 @@ namespace vanguard {
             }
         }
 
-        auto *aStruct = langFactory->createStruct(module, *model, name, fields);
+        auto *aStruct = langFactory->createStruct(val, module, *model, name, fields);
 
 
         // TODO: Add back?
@@ -229,7 +222,7 @@ namespace vanguard {
             selector = selectorIt->value.GetString();
         }
 
-        return langFactory->createBlkFn(module, *model, std::move(contractName), name, selector, isConstructor, visibility, mutability, params, returns, modifiers);
+        return langFactory->createBlkFn(val, module, *model, std::move(contractName), name, selector, isConstructor, visibility, mutability, params, returns, modifiers);
     }
 
     Variable<BlockchainDomain>* SummaryReader::readVariable(rapidjson::Value &val) {
@@ -237,13 +230,13 @@ namespace vanguard {
 
         BlockchainDomain::Type *type = readType(val["type"]);
 
-        std::string name = "";
+        std::string name;
         if(val.HasMember("name")) {
             require(val["name"].IsString(), "Variable name must be a string");
             name = val["name"].GetString();
         }
 
-        return langFactory->createVariable(module, *model, name, type);
+        return langFactory->createVariable(val, module, *model, name, type);
     }
 
     ArrayType<BlockchainDomain>* SummaryReader::readArrayType(rapidjson::Value &val) {
@@ -256,7 +249,7 @@ namespace vanguard {
         auto base = readType(val["base"]);
         std::string name = val["name"].GetString();
 
-        return langFactory->createArrayType(module, *model, name, base);
+        return langFactory->createArrayType(val, module, *model, name, base);
     }
 
     BlockchainDomain::Type* SummaryReader::readUserType(rapidjson::Value &val) {
@@ -270,7 +263,7 @@ namespace vanguard {
         std::string name = val["name"].GetString();
         uint id = val["refId"].GetUint();
 
-        auto userType = langFactory->createBasicType(module, *model, name);
+        auto userType = langFactory->createBasicType(val, module, *model, name);
 
         // TODO: Add back?
         //storageRefs[userType] = id;
@@ -291,7 +284,7 @@ namespace vanguard {
         BlockchainDomain::Type *value = readType(val["value"]);
         std::string name = val["name"].GetString();
 
-        return langFactory->createMapType(module, *model, name, key, value);
+        return langFactory->createMapType(val, module, *model, name, key, value);
     }
 
     BlockchainDomain::Type* SummaryReader::readElementaryType(rapidjson::Value &val) {
@@ -302,7 +295,7 @@ namespace vanguard {
         require(val.HasMember("name") && val["name"].IsString(), "ElementaryType must have a name");
         std::string name = val["name"].GetString();
 
-        return langFactory->createBasicType(module, *model, name);
+        return langFactory->createBasicType(val, module, *model, name);
     }
 
     BlockchainDomain::Type* SummaryReader::readType(rapidjson::Value &val) {
