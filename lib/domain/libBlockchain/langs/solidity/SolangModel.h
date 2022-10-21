@@ -5,12 +5,13 @@
 #ifndef LIBBLOCKCHAIN_SOLANGTOLLVM_H
 #define LIBBLOCKCHAIN_SOLANGTOLLVM_H
 
-#include "../BlockchainModel.h"
+#include "domain/libBlockchain/BlockchainModel.h"
 #include "llvm/IR/Function.h"
 #include <sstream>
 #include <regex>
 #include <program/TypeClass.h>
 
+// TODO: Remove Domain template parameter
 namespace vanguard {
     template<typename Domain>
     class SolangModel : public BlockchainModel<Domain> {

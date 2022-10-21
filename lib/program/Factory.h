@@ -59,8 +59,10 @@ namespace vanguard {
                 unsigned opcode = ins->getOpcode();
                 if (opcode == 1) instructionMap[ins] = new typename Domain::template ReturnIns<llvm::ReturnInst>(llvm::dyn_cast<llvm::ReturnInst>(ins));
                 else if (opcode == 2) instructionMap[ins] = new typename Domain::template BranchIns<llvm::BranchInst>(llvm::dyn_cast<llvm::BranchInst>(ins));
-                else if (opcode == 3)  instructionMap[ins] = new typename Domain::template BranchIns<llvm::SwitchInst>(llvm::dyn_cast<llvm::SwitchInst>(ins));
-                else if (opcode == 4) instructionMap[ins] = new typename Domain::template BranchIns<llvm::IndirectBrInst>(llvm::dyn_cast<llvm::IndirectBrInst>(ins));
+                // TODO: @Jon SwitchInst does not have method isConditional (required by BranchIns)
+                else if (opcode == 3) throw std::runtime_error("Unsupported Instruction, see comment above"); // instructionMap[ins] = new typename Domain::template BranchIns<llvm::SwitchInst>(llvm::dyn_cast<llvm::SwitchInst>(ins));
+                // TODO: @Jon IndirectBrInst does not have method isConditional (required by BranchIns)
+                else if (opcode == 4) throw std::runtime_error("Unsupported Instruction, see comment above"); // instructionMap[ins] = new typename Domain::template BranchIns<llvm::IndirectBrInst>(llvm::dyn_cast<llvm::IndirectBrInst>(ins));
                 else if (opcode == 7) instructionMap[ins] = new typename Domain::template ErrorIns<llvm::UnreachableInst>(llvm::dyn_cast<llvm::UnreachableInst>(ins));
                 else if (opcode == 12) instructionMap[ins] = new typename Domain::template UnaryOpIns<llvm::UnaryOperator>(llvm::dyn_cast<llvm::UnaryOperator>(ins));
                 else if (opcode >= 13 && opcode <= 30) instructionMap[ins] = new typename Domain::template BinaryOpIns<llvm::BinaryOperator>(llvm::dyn_cast<llvm::BinaryOperator>(ins));
@@ -113,8 +115,10 @@ namespace vanguard {
                 else if (auto structT = llvm::dyn_cast<llvm::StructType>(t)){
                     typeMap[t] = new typename Domain::template StructType<llvm::StructType>(structT);
                 }
+                // TODO: @Jon llvm::VectorType doesn't have method getNumElements (required by ArrayType)
                 else if (auto vector = llvm::dyn_cast<llvm::VectorType>(t)){
-                    typeMap[t] = new typename Domain::template ArrayType<llvm::VectorType>(vector);
+                    throw std::runtime_error("Unsupported type, see comment");
+                    // typeMap[t] = new typename Domain::template ArrayType<llvm::VectorType>(vector);
                 }
                 else if (t->isVoidTy()){
                     typeMap[t] = new typename Domain::template VoidType<llvm::Type>(t);

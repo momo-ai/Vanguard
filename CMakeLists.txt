@@ -17,6 +17,7 @@ if (NOT LLVM_ENABLE_RTTI)
   add_compile_options("-fno-rtti")
 endif()
 
+include_directories(${LLVM_INCLUDE_DIRS})
 list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
 include(AddLLVM)
 

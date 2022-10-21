@@ -25,6 +25,7 @@
 #include <llvm/CodeGen/TargetPassConfig.h>
 #include <llvm/Analysis/AliasAnalysis.h>
 #include <llvm/Demangle/Demangle.h>
+#include <llvm/Support/FormatVariadic.h>
 
 #pragma GCC diagnostic push
 #pragma GCC diagnostic ignored "-Wreturn-type"
@@ -35,9 +36,8 @@
 #include "program/Base.h"
 #include "detectors/DetectorRegistry.h"
 #include "program/Factory.h"
-#include <llvm/Support/FormatVariadic.h>
-//#include "domain/libBlockchain/BlockchainFactory.h"
-//#include "domain/libBlockchain/Blockchain.h"
+
+#include "domain/libBlockchain/SummaryReader.h"
 
 static llvm::cl::list<std::string> detectors("detectors", llvm::cl::desc("Vanguard Detectors to Run"), llvm::cl::CommaSeparated, llvm::cl::OneOrMore, llvm::cl::Optional);
 static llvm::cl::list<std::string> inputFiles(llvm::cl::Positional, llvm::cl::desc("<Input files>"), llvm::cl::OneOrMore);
@@ -249,7 +249,10 @@ int main(int argc, char **argv) {
             }
 
             llvm::dbgs() << "Read summary from: " << summary << "\n";
-            units.push_back(factory.createBlkUnit(modules.back(), summary));
+            const llvm::Module *module = modules.back();
+            vanguard::SummaryReader sumReader(*module, summary);
+
+            units.push_back(factory.createBlkUnit(mod, sumReader.contracts()));
         }
 
         vanguard::BlockchainDomain::Universe universe(units);

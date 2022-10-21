@@ -9,7 +9,7 @@
 #include <domain/libBlockchain/Blockchain.h>
 #include <domain/libBlockchain/BlockchainModel.h>
 #include <detectors/UniverseDetector.h>
-#include <domain/libBlockchain/rust/near/NearModel.h>
+#include <domain/libBlockchain/langs/rust/near/NearModel.h>
 #include <analysis/ir-utils/LLVMUtils.h>
 #include <analysis/interproc-analysis/SVFUtils.h>
 

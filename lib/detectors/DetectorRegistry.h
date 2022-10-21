@@ -13,17 +13,12 @@
 #include "detectors/UniverseDetector.h"
 #include "program/Base.h"
 #include "program/Factory.h"
-#include <domain/libBlockchain/Blockchain.h>
+#include <domain/Domains.h>
 #include <domain/libBlockchain/Factory.h>
 #include <domain/libBlockchain/Universe.h>
 #include <unordered_map>
 
 namespace vanguard {
-    class BlockchainDomain : public Blockchain<Base<BlockchainDomain>, BlockchainDomain> {
-    };
-
-    class LLVMDomain : public Base<LLVMDomain> {
-    };
 
     class DetectorRegistry {
     public:

@@ -1,9 +1,9 @@
 target_sources(libVanguard PRIVATE
+        SummaryReader.cpp
 )
 
 #include_directories(rapidjson)
 #include_directories(include)
-add_subdirectory(solidity)
-add_subdirectory(rust)
+add_subdirectory(langs)
 #add_subdirectory(test)
 
