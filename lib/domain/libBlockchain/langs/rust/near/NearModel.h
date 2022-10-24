@@ -5,11 +5,13 @@
 #ifndef VANGUARD_NEARMODEL_H
 #define VANGUARD_NEARMODEL_H
 
-#include <analysis/ir-utils/LLVMUtils.h>
-#include <analysis/interproc-analysis/InterProceduralAnalyses.h>
-#include "../../BlockchainModel.h"
+#include "analysis/ir-utils/LLVMUtils.h"
+#include "analysis/interproc-analysis/InterProceduralAnalyses.h"
+#include "domain/libBlockchain/BlockchainModel.h"
 #include "program/TypeClass.h"
+#include "domain/libBlockchain/langs/rust/near/NearContract.h"
 
+// TODO: Remove Domain template parameter
 namespace vanguard {
 
     template <typename Domain>
@@ -73,8 +75,9 @@ namespace vanguard {
             auto trgs = call.targets();
             return std::any_of(trgs.begin(), trgs.end(), [](auto fun) -> bool {
                 // TODO: WE NEED TO CHANGE THE DEFAULT BEHAVIOR OF CALLRESOLVER (IT CREATES BOGUS DOMAIN FUNCTIONS)
-                if (auto contr = fun->contract())
-                    return contr->isExternal();
+                if (auto contr = fun->contract()) {
+                    return dynamic_cast<NearContract*>(contr)->isExternal();
+                }
                 return false;
             });
         }

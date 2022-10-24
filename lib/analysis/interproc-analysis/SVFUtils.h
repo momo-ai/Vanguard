@@ -8,12 +8,15 @@
 #include <map>
 #include <set>
 
+#pragma GCC diagnostic push
+#pragma GCC diagnostic ignored "-Wreturn-type"
 #include <SVF-FE/LLVMUtil.h>
 #include <Util/Options.h>
 #include <Graphs/SVFG.h>
 #include <WPA/Andersen.h>
 #include <SVF-FE/SVFIRBuilder.h>
 #include <Graphs/SVFGNode.h>
+#pragma GCC diagnostic pop
 
 namespace analysis {
 

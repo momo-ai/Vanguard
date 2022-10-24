@@ -12,7 +12,15 @@ endif()
 find_package(LLVM 13 REQUIRED CONFIG)
 separate_arguments(LLVM_DEFINITIONS_LIST NATIVE_COMMAND ${LLVM_DEFINITIONS})
 add_definitions(${LLVM_DEFINITIONS_LIST})
+
+if (NOT LLVM_ENABLE_RTTI)
+  add_compile_options("-fno-rtti")
+endif()
+
 include_directories(${LLVM_INCLUDE_DIRS})
+list(APPEND CMAKE_MODULE_PATH "${LLVM_CMAKE_DIR}")
+include(AddLLVM)
+
 
 find_package(SVF 2.5 REQUIRED CONFIG)
 include_directories(${SVF_INCLUDE_DIR})
@@ -23,9 +31,6 @@ find_package(Z3 REQUIRED CONFIG)
 
 set(CMAKE_CXX_STANDARD 17)
 set(CMAKE_CXX_STANDARD_REQUIRED on)
-
-set(CMAKE_CXX_VISIBILITY_PRESET hidden)
-set(CMAKE_VISIBILITY_INLINES_HIDDEN on)
 
 add_subdirectory(lib)  # Use your pass name here.
 # TODO Here: define a bunch of variables in CMAKE that can be used as string substitutes into configure file

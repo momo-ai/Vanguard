@@ -1,5 +1,4 @@
-target_sources(Vanguard PRIVATE
-    #put source files here
-    )
+target_sources(libVanguard PRIVATE
+)
 
 add_subdirectory(interproc-analysis)
