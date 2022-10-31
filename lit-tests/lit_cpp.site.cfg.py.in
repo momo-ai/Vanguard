@@ -18,7 +18,7 @@ config.cpp_bin_dir = os.path.join(config.cpp_build_root, "bin")
 config.cpp_src_root = "@CMAKE_SOURCE_DIR@"
 
 # test_exec_root: The root path where tests should be run.
-config.test_exec_root = os.path.join(config.cpp_build_root, 'lit-tests')
+config.test_exec_root = os.path.join(config.cpp_build_root, 'tests')
 
 # test_source_root: The root path where tests are located.
 config.test_source_root = os.path.join("@CMAKE_CURRENT_SOURCE_DIR@", "cpp")

@@ -29,3 +29,5 @@ add_executable(Vanguard
   Vanguard.cpp
 )
 target_link_libraries(Vanguard PRIVATE libVanguard)
+
+# TODO - set the build folder as where the executable is created

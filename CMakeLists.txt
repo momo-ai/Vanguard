@@ -57,8 +57,8 @@ else()
     find_package(GTest REQUIRED)
 endif() 
 
+#TODO: merge unit and lit tests into same subdirectory
 add_subdirectory(unit-tests) 
-
 add_subdirectory(lit-tests) 
 
 # add catch-all target for tests 
@@ -66,7 +66,7 @@ add_custom_target(check
   DEPENDS
   # unit test target must exist 
   $<$<BOOL:BUILD_TESTING>:check-unit>
-  $<$<BOOL:BUILD_TESTING>:check-lit>
+  # check if target exists for lit 
   $<$<TARGET_EXISTS:check-lit>:check-lit>
 )
 

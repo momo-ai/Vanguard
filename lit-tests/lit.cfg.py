@@ -32,7 +32,7 @@ assert hasattr(config, 'test_exec_root')
 assert hasattr(config, 'test_source_root')
 
 # name: The name of this test suite.
-config.name = 'Vanguard'
+config.name = 'vanguard'
 
 config.test_format = lit.formats.ShTest(not llvm_config.use_lit_shell)
 

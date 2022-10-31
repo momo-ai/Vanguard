@@ -1,6 +1,6 @@
 { stdenv, cmake, ninja,
   llvmPackages_13, lib, python3, git, gtest,
-  svf
+  svf, lit
 }:
 
 let
@@ -36,6 +36,10 @@ stdenv.mkDerivation {
   buildInputs = [
     libllvm
     svf
+  ];
+
+  checkInputs = [
+    lit
   ];
 
   postInstall = ''
