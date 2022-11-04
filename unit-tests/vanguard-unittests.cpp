@@ -1,5 +1,5 @@
 #include <gtest/gtest.h>
-#include "unittests_config.h" 
+#include "unittests_config.h"
 
 // Demonstrate some basic assertions.
 TEST(HelloTest, BasicAssertions) {
@@ -11,5 +11,4 @@ TEST(HelloTest, BasicAssertions) {
 
 TEST(vanguardtest, BasicAssertions) {
   ASSERT_STRNE(UNITTESTS_SRC, ""); // make sure unit tests dir path actually works
-  
 }

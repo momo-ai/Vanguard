@@ -1,4 +1,4 @@
-# define header file that points to unit test source files 
+# define header file that points to unit test source files
 set(UNITTESTS_SRC "${CMAKE_CURRENT_SOURCE_DIR}/src")
 configure_file("${CMAKE_CURRENT_SOURCE_DIR}/unittests_config.h.in" "${CMAKE_CURRENT_BINARY_DIR}/unittests_config.h")
 
@@ -8,7 +8,7 @@ include(GoogleTest)
 macro(vanguard_gtest_suite target)
   gtest_discover_tests(${target})
   list(APPEND VANGUARD_UNIT_TESTS ${target})
-endmacro() 
+endmacro()
 
 add_executable(VanguardUnitTests
     vanguard-unittests.cpp

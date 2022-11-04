@@ -41,8 +41,8 @@ configure_file(run.py.in ${PROJECT_SOURCE_DIR}/run.py)
 option(DOWNLOAD_GTEST "automatically download gtest" ON)
 
 include(CTest)
-enable_testing() 
-# fetch google test directly unless installed via nix 
+enable_testing()
+# fetch google test directly unless installed via nix
 if (DOWNLOAD_GTEST)
     include(FetchContent)
     FetchContent_Declare(
@@ -53,20 +53,20 @@ if (DOWNLOAD_GTEST)
     # For Windows: Prevent overriding the parent project's compiler/linker settings
     set(gtest_force_shared_crt ON CACHE BOOL "" FORCE)
     FetchContent_MakeAvailable(googletest)
-else() 
+else()
     find_package(GTest REQUIRED)
-endif() 
+endif()
 
 #TODO: merge unit and lit tests into same subdirectory
-add_subdirectory(unit-tests) 
-add_subdirectory(lit-tests) 
+add_subdirectory(unit-tests)
+add_subdirectory(lit-tests)
 
-# add catch-all target for tests 
+# add catch-all target for tests
 add_custom_target(check
   DEPENDS
-  # unit test target must exist 
+  # unit test target must exist
   $<$<BOOL:BUILD_TESTING>:check-unit>
-  # check if target exists for lit 
+  # check if target exists for lit
   $<$<TARGET_EXISTS:check-lit>:check-lit>
 )
 
