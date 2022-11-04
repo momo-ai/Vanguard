@@ -1,3 +1,10 @@
+@LIT_SITE_CFG_IN_HEADER@
+config.llvm_tools_dir = "@LLVM_TOOLS_DIR@"
+config.python_executable = "@Python3_EXECUTABLE@"
+config.vanguard_build_root = "@CMAKE_BINARY_DIR@"
+config.vanguard_bin_dir = os.path.join(config.vanguard_build_root, "lib")
+config.vanguard_src_root = "@CMAKE_SOURCE_DIR@"
+
 # This is the lit test configuration for end-to-end tests.
 
 from pathlib import Path
@@ -6,21 +13,10 @@ import shutil
 import tempfile
 
 # test_source_root: The root path where tests are located.
-config.test_source_root = Path(__file__).parent
+config.test_source_root = Path(config.vanguard_src_root) / "lit-tests"
 
-config.llvm_tools_dir = subprocess.check_output(['llvm-config', '--bindir'],
-                                                     text=True).rstrip()
-
-vanguard_path = shutil.which('Vanguard')
-if vanguard_path is None:
-    # Check for in-source build
-    vanguard_path = config.test_source_root.parent / "lib" # / "build" / "bin" 
-    vanguard_path = vanguard_path.resolve() if vanguard_path.exists() else None
-assert vanguard_path is not None, 'Vanguard not found on PATH'
-# pyul_path = shutil.which('pyul')
-# assert pyul_path is not None, 'pyul not found on PATH'
-
-config.cpp_bin_dir = str(Path(vanguard_path).parent)
+# config.llvm_tools_dir = subprocess.check_output(['llvm-config', '--bindir'],
+#                                                      text=True).rstrip()
 
 config.extra_suffixes = []
 

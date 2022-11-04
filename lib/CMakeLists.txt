@@ -16,7 +16,7 @@ target_link_libraries(libVanguard
 )
 target_include_directories(libVanguard PUBLIC
   "$<BUILD_INTERFACE:${CMAKE_CURRENT_SOURCE_DIR}>"
-  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>"
+  "$<INSTALL_INTERFACE:${CMAKE_INSTALL_INCLUDEDIR}>" #TODO: Change install interface?
 )
 
 add_subdirectory(detectors)

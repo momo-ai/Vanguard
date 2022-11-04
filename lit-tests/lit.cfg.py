@@ -26,7 +26,7 @@ from lit.llvm.subst import FindTool
 # 3. running end-to-end tests
 
 assert hasattr(config, 'llvm_tools_dir')
-assert hasattr(config, 'cpp_bin_dir')
+assert hasattr(config, 'vanguard_bin_dir')
 assert hasattr(config, 'extra_suffixes')
 assert hasattr(config, 'test_exec_root')
 assert hasattr(config, 'test_source_root')
@@ -54,12 +54,13 @@ llvm_config.with_system_environment(
     ['HOME', 'INCLUDE', 'LIB', 'TMP', 'TEMP'])
 
 llvm_config.use_default_substitutions()
-llvm_config.with_environment('PATH', config.cpp_bin_dir, append_path=True)
+llvm_config.with_environment('PATH', config.vanguard_bin_dir, append_path=True)
 llvm_config.with_environment('PATH', config.llvm_tools_dir, append_path=True)
 
-tool_dirs = [config.cpp_bin_dir]
+tool_dirs = [config.vanguard_bin_dir, config.vanguard_src_root]
 tools = [
-    "Vanguard"
+    "Vanguard",
+    "vanguard_driver.py"
 ]
 
 # Set up variable substitutions

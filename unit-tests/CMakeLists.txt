@@ -14,10 +14,11 @@ add_executable(VanguardUnitTests
     vanguard-unittests.cpp
 )
 
-target_include_directories(VanguardUnitTests PRIVATE 
-  "${CMAKE_CURRENT_BINARY_DIR}")
+target_include_directories(VanguardUnitTests PRIVATE
+  "${CMAKE_CURRENT_BINARY_DIR}"
+  )
 
-target_link_libraries(VanguardUnitTests PUBLIC 
+target_link_libraries(VanguardUnitTests PUBLIC
   GTest::gtest_main
 )
 vanguard_gtest_suite(VanguardUnitTests)

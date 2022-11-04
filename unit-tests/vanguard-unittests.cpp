@@ -10,5 +10,6 @@ TEST(HelloTest, BasicAssertions) {
 }
 
 TEST(vanguardtest, BasicAssertions) {
-  ASSERT_STRNE(UNITTESTS_SRC, ""); 
+  ASSERT_STRNE(UNITTESTS_SRC, ""); // make sure unit tests dir path actually works
+  
 }
